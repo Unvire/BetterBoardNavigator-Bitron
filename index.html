@@ -41,7 +41,6 @@
             <button type="button" class="main-button" id="components-area-button" disabled="true">Area from components</button>
         </div>
         <div class="buttons-flexbox">
-            <button type="button" class="main-button" id="find-component-by-name-button" disabled="true">Find component by name</button>
             <button type="button" class="main-button" id="toggle-leave-markers-button" disabled="true">Multiple component selection</button>
             <button type="button" class="main-button" id="unselect-components-button" disabled="true">Clear component markers</button>
             <button type="button" class="main-button" id="unselect-net-button" disabled="true">Unselect net</button>
@@ -79,8 +78,8 @@
             <div class="item-header">
                 <p>All components</p> 
             </div>
-            <div class="scrollable-list" id="scrollable-all-components-list">
-            </div>
+            <div class="scrollable-list" id="scrollable-all-components-list"></div>            
+            <button type="button" class="main-button" id="find-component-by-name-button" disabled="true">Find component by name</button>
         </div>
         <div id="item-left-bottom" class="functionality-container">
             <div class="item-header"> 
@@ -94,8 +93,7 @@
                     <p>Net</p>
                 </div>
             </div>
-            <div id="pinout-table" class="table-body">
-            </div>
+            <div id="pinout-table" class="table-body"></div>
         </div>
         <div id="item-center" class="functionality-container">
             <canvas id="canvas"></canvas>
@@ -112,15 +110,13 @@
             <div class="item-header">
                 <p>Marked components</p>
             </div>
-            <div class="scrollable-list" id="scrollable-marked-components-list">
-            </div>
+            <div class="scrollable-list" id="scrollable-marked-components-list"></div>
         </div>
         <div id="item-right-bottom" class="functionality-container">
             <div class="item-header"> 
                 <p>Nets list</p>
             </div>
-            <div id="net-treeview" class="tree-view">
-            </div>
+            <div id="net-treeview" class="tree-view"></div>
         </div>
     </div>
     <div id="text-modal" class="modal">
