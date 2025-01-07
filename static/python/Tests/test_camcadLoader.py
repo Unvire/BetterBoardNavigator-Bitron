@@ -133,20 +133,20 @@ def rotateFileLines():
 def test__getSectionsLinesBeginEnd(exampleFileLines):
     instance = CamCadLoader()
     instance._getSectionsLinesBeginEnd(exampleFileLines)
-    expected = {'BOARDINFO':[0, 2], 'PARTLIST':[4, 9], 'PNDATA':[20, 24], 'NETLIST':[11, 18], 'PAD':[34, 38], 'PACKAGES':[26, 32], 'BOARDOUTLINE':[40, 44]}
+    expected = {'BOARDINFO':[0, 3], 'PARTLIST':[5, 10], 'PNDATA':[21, 25], 'NETLIST':[12, 19], 'PAD':[35, 39], 'PACKAGES':[27, 33], 'BOARDOUTLINE':[41, 45]}
     print(instance.sectionsLineNumbers)
     assert expected == instance.sectionsLineNumbers
 
 def test__calculateRange(exampleFileLines):
     instance = CamCadLoader()
     instance._getSectionsLinesBeginEnd(exampleFileLines)
-    assert range(0, 2) == instance._calculateRange('BOARDINFO')
-    assert range(4, 9) == instance._calculateRange('PARTLIST')
-    assert range(20, 24) == instance._calculateRange('PNDATA')
-    assert range(11, 18) == instance._calculateRange('NETLIST')
-    assert range(34, 38) == instance._calculateRange('PAD')
-    assert range(26, 32) == instance._calculateRange('PACKAGES')
-    assert range(40, 44) == instance._calculateRange('BOARDOUTLINE')
+    assert range(0, 3) == instance._calculateRange('BOARDINFO')
+    assert range(5, 10) == instance._calculateRange('PARTLIST')
+    assert range(21, 25) == instance._calculateRange('PNDATA')
+    assert range(12, 19) == instance._calculateRange('NETLIST')
+    assert range(35, 39) == instance._calculateRange('PAD')
+    assert range(27, 33) == instance._calculateRange('PACKAGES')
+    assert range(41, 45) == instance._calculateRange('BOARDOUTLINE')
 
 def test__getBoardDimensions_BoardOutlines(exampleFileLines):
     instance = CamCadLoader()
