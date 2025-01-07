@@ -4,6 +4,7 @@ Web application for displaying PCBs (Printed Schematic Boards) given as a schema
  - gcd - GenCAD
  - tgz - ODB++
  - ccz - visECAD
+**Please be careful with .tgz files, because components can be rotated 180 degrees.**
  
 Used technologies:
 - **python** - processing cad files
