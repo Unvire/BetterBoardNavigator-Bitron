@@ -15,14 +15,13 @@ Used technologies:
 ### Buttons and controls
 - **Dragging with a left mouse button** - moving the board acros the canvas.
 - **Load schematic file** - loads a file and processes it. Files are not stored on side, except the demo file.
-- **Rotate** - when button is active, clicking on canvas will rotate the board 90 deg clockwise.
+- **Rotate** - clicking the button will rotate the board 90 deg clockwise.
 - **Change side** - changes currently viewed side.
 - **Mirror side** - mirrors current side along X axis.
 - **Board outlines** - shows/hides board outlines.
 - **Default view** - resets viewed board to initial state.
 - **Area from components** - recalculates board dimensions using all components. Useful when default view is not working.
 - **Find component by name** - searches and displays component with given name if it exists.
-- **Component name on click** - when active, displays clicked components name.
 - **Multiple component selection** - changes between single selection and multiple selection of components.
 - **Clear components markers** - clears markers and marked components.
 - **Unselect net** - unselects selected net.
