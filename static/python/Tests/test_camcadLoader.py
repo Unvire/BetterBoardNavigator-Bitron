@@ -6,6 +6,7 @@ import geometryObjects as gobj
 def exampleFileLines():
     fileLinesMock = [       
         ':BOARDINFO',
+        '',
         '15015648 , ,-0.081 ,-4.216 ,3.857 ,0.081 ,02/16/18 , ,INCH ,0.061 ,31',
         ':ENDBOARDINFO',
         '',
@@ -147,7 +148,7 @@ def test__calculateRange(exampleFileLines):
     assert range(26, 32) == instance._calculateRange('PACKAGES')
     assert range(40, 44) == instance._calculateRange('BOARDOUTLINE')
 
-def test__getBoardDimensions(exampleFileLines):
+def test__getBoardDimensions_BoardOutlines(exampleFileLines):
     instance = CamCadLoader()
     instance._getSectionsLinesBeginEnd(exampleFileLines)
     instance._getBoardDimensions(exampleFileLines, instance.boardData)
@@ -160,6 +161,19 @@ def test__getBoardDimensions(exampleFileLines):
     assert line3 == boardLine3
     bottomLeftPoint = gobj.Point(2.238, -0.386)
     topRightPoint = gobj.Point(4.028, -0.177)
+    assert [bottomLeftPoint, topRightPoint] == instance.boardData.getArea()
+
+def test__getBoardDimensions_BoardInfo(exampleFileLines):
+    exampleFileLines = exampleFileLines[:-6] # remove boardoutlines section
+
+    instance = CamCadLoader()
+    instance._getSectionsLinesBeginEnd(exampleFileLines)
+    instance._getBoardDimensions(exampleFileLines, instance.boardData)
+    boardShapes = instance.boardData.getOutlines()
+    assert boardShapes == []
+
+    bottomLeftPoint = gobj.Point(-0.081, -4.216)
+    topRightPoint = gobj.Point(3.776, -4.135)
     assert [bottomLeftPoint, topRightPoint] == instance.boardData.getArea()
 
 def test__getComponenentsFromPARTLIST(exampleFileLines):

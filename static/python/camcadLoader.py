@@ -44,6 +44,17 @@ class CamCadLoader:
     
     def _getBoardDimensions(self, fileLines:list[str], boardInstance:board.Board):
         boardOutlineRange = self._calculateRange('BOARDOUTLINE')
+        
+        if boardOutlineRange:
+            bottomLeftPoint, topRightPoint, shapes = self.__processBoardOutlineSection(boardOutlineRange, fileLines)
+        else:
+            boardInfoRange = self._calculateRange('BOARDINFO')
+            bottomLeftPoint, topRightPoint, shapes = self.__processBoardInfoSection(boardInfoRange, fileLines)
+        
+        boardInstance.setOutlines(shapes)
+        boardInstance.setArea(bottomLeftPoint, topRightPoint)
+    
+    def __processBoardOutlineSection(self, boardOutlineRange:range, fileLines:list[str]) -> tuple[gobj.Point, gobj.Point, list[gobj.Line]]:
         bottomLeftPoint, topRightPoint = gobj.getDefaultBottomLeftTopRightPoints()
         shapes = []
 
@@ -56,9 +67,19 @@ class CamCadLoader:
                 shapes.append(gobj.Line(startPoint, endPoint))
                 for point in [startPoint, endPoint]:
                     bottomLeftPoint, topRightPoint = gobj.Point.minXY_maxXYCoords(bottomLeftPoint, topRightPoint, point)
-        
-        boardInstance.setOutlines(shapes)
-        boardInstance.setArea(bottomLeftPoint, topRightPoint)
+        return bottomLeftPoint, topRightPoint, shapes
+    
+    def __processBoardInfoSection(self, boardOutlineRange:range, fileLines:list[str]) -> tuple[gobj.Point, gobj.Point, list]:
+        for i in boardOutlineRange:
+            if ',' in fileLines[i]:
+                break
+
+        _, _, xStart, yStart, width, height, *_ = fileLines[i].split(',')  
+        xStart, yStart = float(xStart), float(yStart)
+        xEnd, yEnd = xStart + float(width), yStart + float(height)
+        bottomLeftPoint = gobj.Point(float(xStart), float(yStart))              
+        topRightPoint = gobj.Point(float(xEnd), float(yEnd))
+        return bottomLeftPoint, topRightPoint, []
     
     def _getComponenentsFromPARTLIST(self, fileLines:list[str], boardInstance:board.Board) -> dict:
         partlistRange = self._calculateRange('PARTLIST')
@@ -266,8 +287,11 @@ class CamCadLoader:
     def _calculateMoveVectorFromWidthHeight(self, width:float, height:float) -> tuple[float, float]:
         return round(-width / 2, gobj.Point.DECIMAL_POINT_PRECISION), round(-height / 2, gobj.Point.DECIMAL_POINT_PRECISION)
 
-    def _calculateRange(self, sectionName:str) -> range:
-        return range(self.sectionsLineNumbers[sectionName][0], self.sectionsLineNumbers[sectionName][1])
+    def _calculateRange(self, sectionName:str) -> range|None:
+        try:
+            return range(self.sectionsLineNumbers[sectionName][0], self.sectionsLineNumbers[sectionName][1])
+        except IndexError:
+            return None
     
 
 if __name__ == '__main__':
