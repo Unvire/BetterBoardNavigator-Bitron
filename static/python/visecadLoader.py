@@ -309,7 +309,6 @@ if __name__ == '__main__':
         return filePath.name
 
     filePath = openSchematicFile()
-
     loader = VisecadLoader()
     fileLines = loader.loadFile(filePath)
     loader.processFileLines(fileLines)

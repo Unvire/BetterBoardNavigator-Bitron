@@ -345,6 +345,12 @@ class ODBPlusPlusLoader():
         return lines
 
 if __name__ == '__main__':
+    def openSchematicFile() -> str:        
+        from tkinter import filedialog
+        filePath = filedialog.askopenfile(mode='r', filetypes=[('*', '*')])
+        return filePath.name
+    
+    filePath = openSchematicFile()
     loader = ODBPlusPlusLoader()
-    fileLines = loader.loadFile(r'C:\Python 3.11.1\Compiled\Board Navigator\Schematic\odb\DEL2114.tgz')
+    fileLines = loader.loadFile(filePath)
     loader.processFileLines(fileLines)

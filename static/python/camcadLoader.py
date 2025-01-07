@@ -271,8 +271,12 @@ class CamCadLoader:
     
 
 if __name__ == '__main__':
-    #filePath = r'C:\Users\krzys\Documents\GitHub\boardNavigator\Schematic\lvm Core.cad'
-    filePath = r'C:\Python 3.11.1\Compiled\Board Navigator\Schematic\cerm.cad'
+    def openSchematicFile() -> str:        
+        from tkinter import filedialog
+        filePath = filedialog.askopenfile(mode='r', filetypes=[('*', '*')])
+        return filePath.name
+    
+    filePath = openSchematicFile()
     loader = CamCadLoader()
     fileLines = loader.loadFile(filePath)
     boardData = loader.processFileLines(fileLines)

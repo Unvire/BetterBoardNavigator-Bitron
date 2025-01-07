@@ -359,6 +359,12 @@ class GenCadLoader:
     
     
 if __name__ == '__main__':
+    def openSchematicFile() -> str:        
+        from tkinter import filedialog
+        filePath = filedialog.askopenfile(mode='r', filetypes=[('*', '*')])
+        return filePath.name
+    
+    filePath = openSchematicFile()
     loader = GenCadLoader()
-    fileLines = loader.loadFile(r'C:\Users\kbalcerzak\Documents\schematy z Q\Schematic\CITYVAN-STOPTAIL-LH.gcd')
+    fileLines = loader.loadFile(filePath)
     loader.processFileLines(fileLines)
