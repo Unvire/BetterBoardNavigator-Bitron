@@ -199,10 +199,10 @@ class CamCadLoader:
         return newPin
     
     def _removeNotMatchedComponents(self, boardInstance:board.Board, matchedComponentsSet:set):
-        boardComponentsSet = set(boardInstance.getComponents().keys())
-        removeComponents = list(boardComponentsSet - matchedComponentsSet)
+        boardsComponentsList = list(boardInstance.getComponents().keys())
+        removeComponents = list(set(boardsComponentsList) - matchedComponentsSet) + [component for component in boardsComponentsList if component.upper()[:3] == 'VIA']
         for componentName in removeComponents:
-            boardInstance.removeComponent(componentName)
+            boardInstance.removeComponent(componentName)        
 
     def _calculatePinCoordsAndAddNet(self, pad:dict, pinX:str, pinY:str, netName:str) -> pin.Pin:
         pad = copy.deepcopy(pad)
