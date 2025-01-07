@@ -1,6 +1,5 @@
 let isMousePressed = false;
 let isMouseClickedFirstTime = false;
-let isRotateActive = false;
 let isFindComponentByClickActive = true;
 let isSelectionModeSingle = true;
 
@@ -12,9 +11,7 @@ function mouseDownEvent(event){
     isMousePressed = true;
     isMouseClickedFirstTime = true;
     
-    if (isRotateActive){
-        EngineAdapter.rotateBoard();
-    } else if (isFindComponentByClickActive){        
+    if (isFindComponentByClickActive){        
         const x = event.offsetX; 
         const y = event.offsetY;
         
@@ -33,11 +30,6 @@ async function mouseMoveEvent(event){
             isMouseClickedFirstTime = false;
         }
     }
-}
-
-function rotateOnClickEvent(){
-    isRotateActive = !isRotateActive;
-    EventHandler.toggleButton(rotateButton);
 }
 
 function toggleFindComponentByClickEvent(){
