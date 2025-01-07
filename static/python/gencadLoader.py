@@ -71,14 +71,16 @@ class GenCadLoader:
                 _, padName, *_  = self._splitButNotBetweenCharacterAndUpperCase(line)                  
                 bottomLeftPoint, topRightPoint = gobj.getDefaultBottomLeftTopRightPoints()
                 
+                keyWord = None
                 while 'PAD' not in fileLines[i + 1]:
                     i += 1
                     keyWord, *line  =  self._splitButNotBetweenCharacterAndUpperCase(fileLines[i])
                     _, bottomLeftPoint, topRightPoint = self.handleShape[keyWord](line, bottomLeftPoint, topRightPoint)
                 
-                keyWord = 'RECT' if keyWord != 'CIRCLE' else keyWord
-                newPad = self._createPin(padName, keyWord, bottomLeftPoint, topRightPoint)                    
-                padsDict[padName] = newPad
+                if keyWord:
+                    keyWord = 'RECT' if keyWord != 'CIRCLE' else keyWord
+                    newPad = self._createPin(padName, keyWord, bottomLeftPoint, topRightPoint)                    
+                    padsDict[padName] = newPad
             i += 1
         return padsDict
     

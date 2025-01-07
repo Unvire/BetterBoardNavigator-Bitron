@@ -42,6 +42,7 @@ def bouardOutlineTest():
 def padsTest():
     fileLinesMock = [
         '$PADS',
+        'PAD ap_padc_pot8_4140713060 POLYGON 0',
         'PAD "Round 32" ROUND -1',
         'CIRCLE 0.000000 0.000000 0.406400',
         'PAD "Oblong 3.2x5.2" FINGER -1',
