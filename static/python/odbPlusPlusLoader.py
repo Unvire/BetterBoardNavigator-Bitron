@@ -185,9 +185,10 @@ class ODBPlusPlusLoader():
         components = boardInstance.getComponents()
         for _, componentInstance in components.items():
             angle = componentInstance.getAngle()
-            componentInstance.rotatePinsAroundCoords(componentInstance.getCoords(), angle)
+            componentInstance.rotatePinsAroundCoords(componentInstance.getCoords(), -angle)
             for _, pinInstance in componentInstance.getPins().items():
-                pinInstance.rotateInPlaceAroundCoords(angle)
+                pinInstance.rotateInPlaceAroundCoords(-angle)
+            componentInstance.rotateInPlaceAroundCoords(2*angle, isRotatePins=False)
     
     def _fixComponentsAreaScale(self, boardInstance:board.Board):
         boardArea = boardInstance.getArea()
