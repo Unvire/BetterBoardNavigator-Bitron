@@ -20,7 +20,7 @@ class CamCadLoader:
         ## boardData is modified globally inside these functions
         self._getBoardDimensions(fileLines, self.boardData)
         partNumberToComponents = self._getComponenentsFromPARTLIST(fileLines, self.boardData)
-        padsDict = self._getPadsFromPAD(fileLines)
+        padsDict = self._getPadsFromPAD(fileLines, self.boardData.getWidthHeight())
         matchedComponents = self._getNetsFromNETLIST(fileLines, padsDict, self.boardData)
         componentWithoutpackages = self._getPackages(fileLines, partNumberToComponents, self.boardData)
         self._rotateComponents(self.boardData, componentWithoutpackages)
@@ -101,8 +101,10 @@ class CamCadLoader:
         boardInstance.setComponents(components)
         return partNumberToComponents
 
-    def _getPadsFromPAD(self, fileLines:list[str]) -> dict:
+    def _getPadsFromPAD(self, fileLines:list[str], boardWidthHeight:tuple[float, float]) -> dict:
+        BOARD_DIMENSION_FRACTION = 0.03
         padlistRange = self._calculateRange('PAD')
+        boardWidth, boardHeight = boardWidthHeight
         
         padsDict = {}
         for i in padlistRange:
@@ -110,7 +112,12 @@ class CamCadLoader:
                 line = fileLines[i]
                 padID, name, shape, width, height, _, _ = [parameter.strip() for parameter in line.split(',')]                
                 width = gobj.floatOrNone(width)
-                height = gobj.floatOrNone(height)                
+                if not width:
+                    width = boardWidth * BOARD_DIMENSION_FRACTION
+
+                height = gobj.floatOrNone(height)
+                if not height:
+                    height = boardHeight * BOARD_DIMENSION_FRACTION
                 padsDict[padID] = self._createPin(name, shape, width, height)
         return padsDict
 
@@ -304,5 +311,3 @@ if __name__ == '__main__':
     loader = CamCadLoader()
     fileLines = loader.loadFile(filePath)
     boardData = loader.processFileLines(fileLines)
-    for componentName, component in boardData.components.items():
-        print(componentName, component.area)
