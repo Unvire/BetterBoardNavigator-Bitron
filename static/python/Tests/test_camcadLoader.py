@@ -77,6 +77,17 @@ def netlistFileLines():
     return fileLinesMock
 
 @pytest.fixture
+def noPadWidthHeightFileLines():
+    fileLinesMock = [
+        ':PAD',
+        '',
+        '49 ,AP_ap_padc_pot8_4140713060 ,RECT ,-1.#IO ,-1.#IO ,-1.#IO ,-1.#IO',
+        '',
+        ':ENDPAD',
+    ]
+    return fileLinesMock
+
+@pytest.fixture
 def packagesFileLines():
     fileLinesMock = [
         ':PARTLIST',
@@ -205,6 +216,19 @@ def test__getPadsFromPAD(netlistFileLines):
     assert pad1.shape == 'CIRCLE'
     assert pad1.width == 0.016
     assert pad1.height == 0.016
+
+def test__getPadsFromPAD_noPadWidthHeight(noPadWidthHeightFileLines):
+    MOCK_BOARD_DIMENSIONS = [100, 100]
+    instance = CamCadLoader()
+    instance._getSectionsLinesBeginEnd(noPadWidthHeightFileLines)
+    padsDict = instance._getPadsFromPAD(noPadWidthHeightFileLines, MOCK_BOARD_DIMENSIONS)
+    assert list(padsDict.keys()) == ['49']
+    
+    pad = padsDict['49']
+    assert pad.name == 'AP_ap_padc_pot8_4140713060'
+    assert pad.shape == 'RECT'
+    assert pad.width == 3
+    assert pad.height == 3
 
 def test__getNetsFromNETLIST(netlistFileLines):
     instance = CamCadLoader()
