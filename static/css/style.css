@@ -46,6 +46,7 @@ body{
     background-color: var(--COLOR-BUTTONS-FLEXBOX-BG);
     padding-top: var(--BUTTONS-ROW-VERTICAL-PADDING);
     padding-bottom: var(--BUTTONS-ROW-VERTICAL-PADDING);
+    gap: 1.5em;
 }
 
 .buttons-flexbox{
