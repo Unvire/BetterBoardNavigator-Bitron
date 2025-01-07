@@ -191,7 +191,7 @@ def test__getComponenentsFromPARTLIST(exampleFileLines):
 def test__getPadsFromPAD(netlistFileLines):
     instance = CamCadLoader()
     instance._getSectionsLinesBeginEnd(netlistFileLines)
-    padsDict = instance._getPadsFromPAD(netlistFileLines)
+    padsDict = instance._getPadsFromPAD(netlistFileLines, [0, 0])
     assert list(padsDict.keys()) == ['222', '276']
     
     pad1 = padsDict['222']
@@ -210,7 +210,7 @@ def test__getNetsFromNETLIST(netlistFileLines):
     instance = CamCadLoader()
     instance._getSectionsLinesBeginEnd(netlistFileLines)
     instance._getComponenentsFromPARTLIST(netlistFileLines, instance.boardData)   
-    padsDict = instance._getPadsFromPAD(netlistFileLines)
+    padsDict = instance._getPadsFromPAD(netlistFileLines, [0, 0])
     matchedComponents = instance._getNetsFromNETLIST(netlistFileLines, padsDict, instance.boardData)
     
     boardNets = instance.boardData.getNets()    
@@ -268,7 +268,7 @@ def test__getPackages(packagesFileLines):
     instance = CamCadLoader()
     instance._getSectionsLinesBeginEnd(packagesFileLines)
     partNumberToComponents = instance._getComponenentsFromPARTLIST(packagesFileLines, instance.boardData)  
-    padsDict = instance._getPadsFromPAD(packagesFileLines)  
+    padsDict = instance._getPadsFromPAD(packagesFileLines, [0, 0])  
     instance._getNetsFromNETLIST(packagesFileLines, padsDict, instance.boardData)
     _ = instance._getPackages(packagesFileLines, partNumberToComponents, instance.boardData)
 
@@ -296,7 +296,7 @@ def test__rotateComponents(rotateFileLines):
     instance = CamCadLoader()
     instance._getSectionsLinesBeginEnd(rotateFileLines)
     partNumberToComponents = instance._getComponenentsFromPARTLIST(rotateFileLines, instance.boardData)
-    padsDict = instance._getPadsFromPAD(rotateFileLines)
+    padsDict = instance._getPadsFromPAD(rotateFileLines, [0, 0])
     instance._getNetsFromNETLIST(rotateFileLines, padsDict, instance.boardData)
     noMatchedComponents = instance._getPackages(rotateFileLines, partNumberToComponents, instance.boardData)
     instance._rotateComponents(instance.boardData, noMatchedComponents)
