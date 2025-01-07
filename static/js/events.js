@@ -54,7 +54,6 @@ class EventHandler{
         toggleOutlinesButton.disabled = false;
         resetViewButton.disabled = false;
         areaFromComponentsButton.disabled = false;
-        toggleFindComponentByClickButton.disabled = false;
         preserveComponentMarkesButton.disabled = false;
         clearMarkersButton.disabled = false;
         unselectNetButton.disabled = false;

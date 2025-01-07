@@ -1,6 +1,5 @@
 let isMousePressed = false;
 let isMouseClickedFirstTime = false;
-let isFindComponentByClickActive = true;
 let isSelectionModeSingle = true;
 
 function mouseUpEvent(){
@@ -10,14 +9,12 @@ function mouseUpEvent(){
 function mouseDownEvent(event){
     isMousePressed = true;
     isMouseClickedFirstTime = true;
+           
+    const x = event.offsetX; 
+    const y = event.offsetY;
     
-    if (isFindComponentByClickActive){        
-        const x = event.offsetX; 
-        const y = event.offsetY;
-        
-        let clickedComponents = EngineAdapter.findClickedComponents(x, y, isSelectionModeSingle);
-        SpanListAdapter.generateSpanList(clickedComponents);
-    }
+    let clickedComponents = EngineAdapter.findClickedComponents(x, y, isSelectionModeSingle);
+    SpanListAdapter.generateSpanList(clickedComponents);
 }
 
 async function mouseMoveEvent(event){
@@ -30,9 +27,4 @@ async function mouseMoveEvent(event){
             isMouseClickedFirstTime = false;
         }
     }
-}
-
-function toggleFindComponentByClickEvent(){
-    isFindComponentByClickActive = !isFindComponentByClickActive;
-    EventHandler.toggleButton(toggleFindComponentByClickButton);
 }

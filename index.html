@@ -42,7 +42,6 @@
         </div>
         <div class="buttons-flexbox">
             <button type="button" class="main-button" id="find-component-by-name-button" disabled="true">Find component by name</button>
-            <button type="button" class="main-button" id="clicked-component-button" disabled="true">Component name on click</button>
             <button type="button" class="main-button" id="toggle-leave-markers-button" disabled="true">Multiple component selection</button>
             <button type="button" class="main-button" id="unselect-components-button" disabled="true">Clear component markers</button>
             <button type="button" class="main-button" id="unselect-net-button" disabled="true">Unselect net</button>
@@ -276,7 +275,6 @@
         const toggleOutlinesButton = document.getElementById("toggle-outlines-button");
         const resetViewButton = document.getElementById("default-view-button");    
         const areaFromComponentsButton = document.getElementById("components-area-button");
-        const toggleFindComponentByClickButton = document.getElementById("clicked-component-button");
         const clickedComponentContainer = document.getElementById("clicked-components");
         const allComponentsContainer = document.getElementById("scrollable-all-components-list");
         const preserveComponentMarkesButton = document.getElementById("toggle-leave-markers-button");
@@ -317,7 +315,6 @@
         globalInstancesMap.setCommonPrefixSpan(commonPrefixSpan);
         globalInstancesMap.setCurrentSideSpan(currentSideSpan);
         globalInstancesMap.setToggleOutlinesButton(toggleOutlinesButton);
-        globalInstancesMap.setToggleFindComponentByClickButton(toggleFindComponentByClickButton);
 
         var modalSubmit = new ModalSubmit(textModalContainer, textModalCloseSpan, 
                                             textModalPromptHeader, textModalInput, 
@@ -401,7 +398,6 @@
             toggleOutlinesButton.addEventListener("click", EventHandler.toggleOutlines);
             resetViewButton.addEventListener("click", EngineAdapter.resetView);
             areaFromComponentsButton.addEventListener("click", EngineAdapter.areaFromComponents);
-            toggleFindComponentByClickButton.addEventListener("click", toggleFindComponentByClickEvent);
             preserveComponentMarkesButton.addEventListener("click", () => {
                 isSelectionModeSingle = EventHandler.preserveComponentMarkes(isSelectionModeSingle);
             });

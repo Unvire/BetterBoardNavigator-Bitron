@@ -40,10 +40,7 @@ function openAndLoadCadFile(pyodide, file) {
         WidgetAdapter.resetWidgets();
 
         const toggleOutlinesButton = globalInstancesMap.getToggleOutlinesButton();
-        toggleOutlinesButton.classList.add("button-selected");   
-        
-        const toggleFindComponentByClickButton = globalInstancesMap.getToggleFindComponentByClickButton();
-        toggleFindComponentByClickButton.classList.add("button-selected")
+        toggleOutlinesButton.classList.add("button-selected");
     }
     reader.readAsArrayBuffer(file);
 }
