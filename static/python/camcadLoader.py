@@ -129,6 +129,9 @@ class CamCadLoader:
             if ',' in fileLines[i]:
                 line = fileLines[i]
                 _, netName, componentName, pinName , pinX, pinY, mountingType, padID = [parameter.strip() for parameter in line.split(',')]
+                if componentName.upper().startswith('VIA'):
+                    continue
+                
                 self._addBlankNet(nets, netName, componentName)     
                 components = boardInstance.getComponents()
 
