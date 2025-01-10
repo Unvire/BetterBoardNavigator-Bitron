@@ -557,7 +557,7 @@ class DrawBoardEngine:
     def _drawSelectedPins(self, surface:pygame.Surface, color:tuple[int, int, int], side:str):
         for componentName, pinsList in self.selectedNet.items():
             componentInstance = self.boardData.getElementByName('components', componentName)
-            pinsInstancesList = [componentInstance.getPinByName(pinName) for pinName in pinsList]
+            pinsInstancesList = [componentInstance.getPinByName(pinName) for pinName in pinsList if componentInstance]
             for pinInstance in pinsInstancesList:
                 if componentInstance.getMountingType() == 'TH' or componentInstance.getSide() == side:
                     self._drawInstanceAsCirlceOrPolygon(surface, pinInstance, color, width=0)

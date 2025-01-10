@@ -200,7 +200,7 @@ class CamCadLoader:
     
     def _removeNotMatchedComponents(self, boardInstance:board.Board, matchedComponentsSet:set):
         boardsComponentsList = list(boardInstance.getComponents().keys())
-        removeComponents = list(set(boardsComponentsList) - matchedComponentsSet) + [component for component in boardsComponentsList if component.upper()[:3] == 'VIA']
+        removeComponents = list(set(boardsComponentsList) - matchedComponentsSet) + [component for component in boardsComponentsList if component.upper().startswith('VIA')]
         for componentName in removeComponents:
             boardInstance.removeComponent(componentName)        
 
