@@ -341,7 +341,17 @@ class ODBPlusPlusLoader():
                     decompressedFile = unlzw3.unlzw(compressedFile).decode('utf-8')
                     lines = [line.replace('\r', '') for line in decompressedFile.split('\n')]
                 else:
-                    lines = [line.decode('utf-8').replace('\n', '').replace('\r', '') for line in extractedFile.readlines()]
+                    lines = self._decodeLines(extractedFile.readlines())
+        return lines
+
+    def _decodeLines(self, listOfLines:list[str]) -> list[str]:
+        lines = []
+        for rawLine in listOfLines:
+            try:
+                line = rawLine.decode('utf-8').replace('\n', '').replace('\r', '')
+            except UnicodeDecodeError:
+                line = rawLine.decode('latin-1').replace('\n', '').replace('\r', '')
+            lines.append(line)
         return lines
 
 if __name__ == '__main__':
