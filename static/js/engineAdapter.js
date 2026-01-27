@@ -20,8 +20,10 @@ class EngineAdapter{
     static findClickedComponents(x, y){
         const side = sideHandler.currentSide();
         pyodide.runPython(`
-            clickedXY = [int('${x}'), int('${y}')]
-            clickedComponents = engine.findComponentByClick(clickedXY, '${side}')
+            clickedComponents = []
+            if engine:
+                clickedXY = [int('${x}'), int('${y}')]
+                clickedComponents = engine.findComponentByClick(clickedXY, '${side}')
         `);
         return pyodide.globals.get("clickedComponents").toJs();
     }
