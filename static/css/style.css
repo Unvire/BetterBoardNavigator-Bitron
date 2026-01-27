@@ -18,11 +18,13 @@
     --BUTTONS-ROW-VERTICAL-PADDING: 0.2em;
     --GRID-VERTICAL-MARGIN-PADDING: 0.4em;
     --GRID-CONTAINER-HEIGHT: 100vh;
+    
+    --FONT-FAMILY: Cambria, Cochin, Georgia, serif;
 }
 
 body{
     height: 100vh;
-    font-family: "Aleo", serif;
+    font-family: var(--FONT-FAMILY);
     margin: 0;
     padding: 0;
     user-select: none;
@@ -58,6 +60,7 @@ body{
 
 .main-button{
     font-size: 1em;
+    font-family: var(--FONT-FAMILY);
     background-color: var(--COLOR-BUTTON-BG);
     border-color: var(--COLOR-BUTTON-BORDER);
     color: var(--COLOR-BUTTON-TEXT);
