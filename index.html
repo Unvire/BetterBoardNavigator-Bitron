@@ -25,30 +25,30 @@
 <body>
     <div class="buttons-row-flexbox">
         <div class="buttons-flexbox">
-            <button type="button" class="main-button" id="load-file-button" disabled="true">Load schematic file</button>
+            <button type="button" class="main-button" id="load-file-button" disabled="true">Wczytaj schemat</button>
             <input type="file" class="main-button" id="load-file-input"/>
         </div>
         <div class="buttons-flexbox">
-            <button type="button" class="main-button" id="rotate-button" disabled="true">Rotate</button>
-            <button type="button" class="main-button" id="change-side-button" disabled="true">Change side</button>
-            <button type="button" class="main-button" id="mirror-side-button" disabled="true">Mirror side</button>
-            <button type="button" class="main-button" id="toggle-outlines-button" disabled="true">Board outlines</button>
+            <button type="button" class="main-button" id="rotate-button" disabled="true">Obróć</button>
+            <button type="button" class="main-button" id="change-side-button" disabled="true">Zmień stronę</button>
+            <button type="button" class="main-button" id="mirror-side-button" disabled="true">Lustrzane odbicie</button>
+            <button type="button" class="main-button" id="toggle-outlines-button" disabled="true">Krawędzie płytki</button>
         </div>
         <div class="buttons-flexbox">
-            <button type="button" class="main-button" id="default-view-button" disabled="true">Default view</button>
-            <button type="button" class="main-button" id="components-area-button" disabled="true">Area from components</button>
+            <button type="button" class="main-button" id="default-view-button" disabled="true">Domyślny widok</button>
+            <button type="button" class="main-button" id="components-area-button" disabled="true">Domyślny widok z komponentów</button>
         </div>
         <div class="buttons-flexbox">
-            <button type="button" class="main-button" id="toggle-leave-markers-button" disabled="true">Multiple component selection</button>
-            <button type="button" class="main-button" id="unselect-components-button" disabled="true">Clear component markers</button>
-            <button type="button" class="main-button" id="unselect-net-button" disabled="true">Unselect net</button>
+            <button type="button" class="main-button" id="toggle-leave-markers-button" disabled="true">Zaznacz wiele komponentów</button>
+            <button type="button" class="main-button" id="unselect-components-button" disabled="true">Usuń znaczniki komponentów</button>
+            <button type="button" class="main-button" id="unselect-net-button" disabled="true">Odznacz siatkę</button>
         </div>
         <div class="buttons-flexbox">
-            <button type="button" class="main-button" id="prefix-components-button" disabled="true">Prefix components</button>
-            <button type="button" class="main-button" id="unselect-prefix-components-button" disabled="true">Unselect prefix components</button>
+            <button type="button" class="main-button" id="prefix-components-button" disabled="true">Prefix komponenty</button>
+            <button type="button" class="main-button" id="unselect-prefix-components-button" disabled="true">Odznacz prefix komponenty</button>
         </div>
         <div class="buttons-flexbox">
-            <button type="button" class="main-button" id="help-button" disabled="true">Help</button>
+            <button type="button" class="main-button" id="help-button" disabled="true">Pomoc</button>
         </div>
     </div>
     <div class="grid-container">
@@ -56,7 +56,7 @@
             <div class="table-body">
                 <div class="table-row">
                     <div>
-                        <p>Current side</p>
+                        <p>Strona</p>
                     </div>
                     <div>
                         <p><span class="highlighted-text" id="current-side-span"></span></p>
@@ -64,7 +64,7 @@
                 </div>
                 <div class="table-row">
                     <div>
-                        <p>Highlighted prefix</p>
+                        <p>Zaznaczony prefix</p>
                     </div>
                     <div>
                         <p><span class="highlighted-text" id="common-prefix-span"></span></p>
@@ -74,21 +74,21 @@
         </div>
         <div id="item-left-middle"  class="functionality-container">
             <div class="item-header">
-                <p>All components</p> 
+                <p>Wspólny prefix</p> 
             </div>
             <div class="scrollable-list" id="scrollable-all-components-list"></div>            
-            <button type="button" class="main-button" id="find-component-by-name-button" disabled="true">Find component by name</button>
+            <button type="button" class="main-button" id="find-component-by-name-button" disabled="true">Znajdź komponent po nazwie</button>
         </div>
         <div id="item-left-bottom" class="functionality-container">
             <div class="item-header"> 
-                <p><span id="selected-component-span">Component</span> pinout</p>
+                <p>Piny komponentu <span id="selected-component-span"></span></p>
             </div>
             <div class="table-row">
                 <div>
                     <p>Pin</p>
                 </div>
                 <div>
-                    <p>Net</p>
+                    <p>Siatka</p>
                 </div>
             </div>
             <div id="pinout-table" class="table-body"></div>
@@ -98,7 +98,7 @@
         </div>
         <div id="item-right-top" class="functionality-container">
             <div class="item-header">
-                <p>Clicked components</p>
+                <p>Kliknięte komponenty</p>
             </div>
             <div id="clicked-components">
                 <p></p>
@@ -106,13 +106,13 @@
         </div>
         <div id="item-right-middle" class="functionality-container">
             <div class="item-header">
-                <p>Marked components</p>
+                <p>Zaznaczone komponenty</p>
             </div>
             <div class="scrollable-list" id="scrollable-marked-components-list"></div>
         </div>
         <div id="item-right-bottom" class="functionality-container">
             <div class="item-header"> 
-                <p>Nets list</p>
+                <p>Lista siatek</p>
             </div>
             <div id="net-treeview" class="tree-view"></div>
         </div>
@@ -138,114 +138,117 @@
                 <span class="close" id="help-modal-close-span">&times;</span>
             </div>
             <div class="modal-main">
-                <h3>About</h3>
+                <h3>Pomoc</h3>
                 <p class="new-line">
-                    Better Navigator is an application to view PCB given as a schematic file. Works with CamCad (.cad), GenCad (.gcd), ODB++ (.tgz) and ViseCAD (.ccz) files.
-                    <b>Please be careful with .tgz files, because components can be rotated 180 degrees.</b>
+                    Better Board Navigator to aplikacja służąca do przeglądania płytek PCB zapisanych w postaci plików schematów. Obsługuje pliki CamCad (.cad), GenCad (.gcd), ODB++ (.tgz) oraz ViseCAD (.ccz).
+                    <b>Należy uważać w przypadku plików .tgz, ponieważ komponenty mogą być obrócone o 180 stopni.</b>
                 </p>
                 <p class="new-line">
-                    To use a program, wait until the loading of libraries is completed and the "Load schematic file" and "Help" button become active.
+                    Program można używać, gdy tylko się załaduje - odblokują się przyciski "Wczytaj schemat" oraz "Pomoc".
+                </p>
+                </br>
+                <p class="new-line">
+                    Autor programu - <span class="highlighted-text">Krzysztof Balcerzak</span>.
                 </p>
                 </br>
 
-                <h3>Controls and buttons description</h3>
+                <h3>Opis akcji i przycisków</h3>
                 <p class="new-line">
-                    <span class="highlighted-text">Dragging with a left mouse button</span> - moving the board acros the canvas.
+                    <span class="highlighted-text">Przesuwanie z wciśniętym lewym przyciskiem myszki</span> - przesuwanie płytki na ekranie.
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Load schematic file</span> - loads a file and processes it. Files are not stored on side, except the demo file.
+                    <span class="highlighted-text">Wczytaj schemat</span> - Wczytuje schemat i wyświetla go na ekranie. 
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Rotate</span> - clicking the button will rotate the board 90 deg clockwise.
+                    <span class="highlighted-text">Obróć</span> - Obraca płytkę o 90 stopni zgodnie z ruchem wskazówek zegara.
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Change side</span> - changes currently viewed side.
+                    <span class="highlighted-text">Zmień stronę</span> - Zmienia obecnie wyświetlaną stronę.
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Mirror side</span> - mirrors current side along X axis.
+                    <span class="highlighted-text">Lustrzane odbicie</span> - Robi lustrzane odbicie w osi X.
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Board outlines</span> - shows/hides board outlines.
+                    <span class="highlighted-text">Krawędzie płytki</span> - Pokazuje / Chowa krawędzie płytki.
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Default view</span> - resets viewed board to initial state.
+                    <span class="highlighted-text">Domyślny widok</span> - Resetuje widok do domyślnego (po załadowaniu schematu).
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Area from components</span> - recalculates board dimensions using all components. Useful when default view is not working.
+                    <span class="highlighted-text">Domyślny widok z komponentów</span> - Wyznacza domyślny widok na podstawie pozycji komponentów.
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Find component by name</span> - searches and displays component with given name if it exists.
+                    <span class="highlighted-text">Znajdź komponent po nazwie</span> - Szuka komponentu o zadanej nazwie i pokazuje go na środku ekranu, jeśli istnieje.
+                <p class="new-line">
+                    <span class="highlighted-text">Zaznacz wiele komponentów</span> - Zmienia tryb zaznaczania pomiędzy wieloma i jednym komponentem.
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Multiple component selection</span> - changes between single selection and multiple selection of components.
+                    <span class="highlighted-text">Usuń znaczniki komponentów</span> - Usuwa zaznaczone komponenty.
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Clear components markers</span> - clears markers and marked components.
+                    <span class="highlighted-text">Odznacz siatkę</span> - Usuwa zaznaczoną siatkę potencjałową.
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Unselect net</span> - unselects selected net.
+                    <span class="highlighted-text">Prefix komponenty</span> - Zaznacza komponenty o wspólnym przyrostku.
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Prefix components</span> - highlights common prefix components with given prefix.
+                    <span class="highlighted-text">Odznacz prefix komponenty</span> - Usuwa zaznaczone komponenty o wspólnym przyrostku.
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Unselect prefix components</span> - clears highlighted common prefix components.
-                </p>
-                <p class="new-line">
-                    <span class="highlighted-text">Demo board</span> - displays example file of NPN audio amplifier.
-                </p>
-                </br>
-
-                <h3>Panels description</h3>
-                <p class="new-line">
-                    <span class="highlighted-text">Current side and highlighted prefix</span> - displays currently viewed side and displayed common prefix for components.
-                </p>
-                <p class="new-line">
-                    <span class="highlighted-text">All components</span> - displays list with all board components. User can select one or multiple components which will be displayed in "Marked components" list.
-                </p>
-                <p class="new-line">
-                    <span class="highlighted-text">Clicking on components</span> will also show it pinout in the "Component pinout" table.
-                </p>
-                <p class="new-line">
-                    <span class="highlighted-text">Component pinout</span> - displays component pins and nets. Clicking on row will highlight net.
-                </p>
-                <p class="new-line">
-                    <span class="highlighted-text"> Clicked components</span> - displays components clicked with a mouse. Clicking on component name will generate its pinout in the "Pinout table".
-                </p>
-                <p class="new-line">
-                    <span class="highlighted-text">Marked components</span> - displays marked components. Clicking on item will set the component in the center of the canvas and generate its pinout in the "Pinout table".
-                </p>
-                <p class="new-line">
-                    <span class="highlighted-text">Nets list</span> - displays nets of the PCB and components assigned to them. Clicking on the net name will reveal components and mark the net. Clicking on the component will mark the component, set it in the center of the canvas and generate its pinout table.
+                    <span class="highlighted-text">Demo płytka</span> - Wyświetla przykładowy schemat wzmacniacza audio na bazie tranzystora NPN.
                 </p>
                 </br>
 
-                <h3>Colors description</h3>
+                <h3>Panele i akcje</h3>
                 <p class="new-line">
-                    <span class="highlighted-text">Bold white</span> - outlines of the PCB.
+                    <span class="highlighted-text">Strona i zaznaczony prefix</span> - Pokazuje obecnie wyświetlaną stronę i zaznaczony prefix.
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Green</span> - outlines of the components. Shapes of the components are simplified.
+                    <span class="highlighted-text">Wszystkie komponenty</span> - Lista wszystkich komponentów. Kliknięcie elementu listy pokazuje komponent na środku ekarnu. Dodatkowo, po kliknięciu w trybie zaznaczania wielu komponentów uzupełniana jest lista "Zaznaczonych komponentów".
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Yellow</span> - SMT pads.
+                    <span class="highlighted-text">Klikanie na komponent</span> - Pokazuje jego nazwę w panelu "Kliknięte komponenty".
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Blue</span> - TH pads.
+                    <span class="highlighted-text">Piny komponentu</span> - Pokazuje pinout komponentu. Kliknięcie na nazwę siatki, zaznaczy ją.
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Red arrows</span> - selected components marker.
+                    <span class="highlighted-text">Kliknięte komponenty</span> - Pokazuje kliknięte komponenty. Dodatkowo, kliknięcie na nazwę wygeneruje tablę pinoutu.
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Violet</span> - pads on selected net.
+                    <span class="highlighted-text">Zaznaczone komponenty</span> - Pokazuje kompopnenty zaznaczone czerwoną strzałką. Kliknięcie na element listy pokaże go na środku ekranu i wygeneruje tabelę pinoutu.
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Violet arrow</span> - component, whose pads are on selected net.
+                    <span class="highlighted-text">Lista siatek</span> - Pokazuje siatki potencjałowe i komponenty przypisane do nich. Kliknięcie na nazwę siatki, zaznaczy ją i rozwinie listę komponentów przypisanych do niej. Kliknięcie na nazwę komponentu przypisanego do siatki, zaznaczy go i ustawi na środku ekranu.
+                </p>
+                </br>
+
+                <h3>Opisy kolorów</h3>
+                <p class="new-line">
+                    <span class="highlighted-text">Pogrubiony biały</span> - Krawędzie płytki.
+                </p>
+                <p class="new-line">
+                    <span class="highlighted-text">Zielony</span> - Obrys komponentów. Kształt jest uproszczony do prostokątów i okręgów.
+                </p>
+                <p class="new-line">
+                    <span class="highlighted-text">Żółty</span> - Pady SMT.
+                </p>
+                <p class="new-line">
+                    <span class="highlighted-text">Niebieski</span> - Pady TH.
+                </p>
+                <p class="new-line">
+                    <span class="highlighted-text">Czerwone strzałki</span> - Zaznaczone komponenty.
+                </p>
+                <p class="new-line">
+                    <span class="highlighted-text">Fioletowy</span> - Pady zaznaczonej siatki potencjałów.
+                </p>
+                <p class="new-line">
+                    <span class="highlighted-text">Fioletowa strzałka</span> - Komponent, którego pady należą do zaznaczonej siatki.
                 </p>
                 </br>
             </div>
             <div class="modal-footer">
-                <button class="main-button" id="show-demo-board-button">Demo board</button>
+                <button class="main-button" id="show-demo-board-button">Płytka demo</button>
             </div>
         </div>
     </div>

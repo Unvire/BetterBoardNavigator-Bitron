@@ -79,7 +79,7 @@ class EventHandler{
 
     static findComponentUsingName(){
         const modalSubmit = globalInstancesMap.getModalSubmit();
-        InputModalBoxAdapter.generateModalBox(modalSubmit, "Component name", InputModalBoxAdapter.getComponentNameFromInput);
+        InputModalBoxAdapter.generateModalBox(modalSubmit, "Nazwa komponentu", InputModalBoxAdapter.getComponentNameFromInput);
     }
     
     static showCommonPrefixComponents(){

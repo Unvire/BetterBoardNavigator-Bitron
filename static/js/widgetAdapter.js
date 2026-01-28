@@ -16,7 +16,7 @@ class WidgetAdapter{
         pinoutTable.clearBody();
         DynamicSelectableListAdapter.generateMarkedComponentsList();
         SpanListAdapter.clearSpanList(clickedComponentSpanList);
-        selectedComponentSpan.innerText = "Component";
+        selectedComponentSpan.innerText = "";
     }
 
     static resetSelectedNet(){
@@ -34,7 +34,7 @@ class WidgetAdapter{
         commonPrefixSpan.innerText = '';
         currentSideSpan.innerText = sideHandler.currentSide();
 
-        selectedComponentSpan.innerText = "Component";
+        selectedComponentSpan.innerText = "";
 
     }
 }
