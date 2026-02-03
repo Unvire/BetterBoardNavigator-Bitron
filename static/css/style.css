@@ -53,9 +53,13 @@ body{
 
 .buttons-flexbox{
     display: flex;
-    margin: 0em 0.4em;
+    margin: 0.4em 0.4em;
     flex-direction: row;
     justify-content: space-evenly;
+}
+
+.vertical-buttons-flexbox{
+    flex-direction: column;
 }
 
 .main-button{
@@ -64,7 +68,7 @@ body{
     background-color: var(--COLOR-BUTTON-BG);
     border-color: var(--COLOR-BUTTON-BORDER);
     color: var(--COLOR-BUTTON-TEXT);
-    margin: 0.5em 0.2em;
+    margin: 0.2em 0.2em;
     border-radius: 0.4em;
 }
 
@@ -136,15 +140,20 @@ body{
 }
 
 #item-right-middle{
-    grid-area: 2 / 10 / 5 / 10;
+    grid-area: 2 / 10 / 6 / 10;
 }
 
 #item-right-bottom{
-    grid-area: 5 / 10 / 11 / 10;
+    grid-area: 6 / 10 / 11 / 10;
 }
 
 p{
-    line-height: 0.25em;
+    line-height: 0.15em;
+    font-size: 0.8em;
+}
+
+p.section-title{
+    font-size: 1em;
 }
 
 .item-header{
@@ -189,11 +198,12 @@ canvas{
 }
 
 .table-row{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    align-items: center;
     border-bottom: 1px solid var(--COLOR-TEXT-MAIN);
-    padding: 1px;
+    padding: 1px 1px 1px 1.5em;
+
 }
 
 .selected{
