@@ -94,6 +94,7 @@ class DynamicSelectableListAdapter{
     static selectItemFromListEvent(itemElement){
         const itemName = DynamicSelectableListAdapter.generatePinoutTableForComponent(itemElement);
         EngineAdapter.findComponentByName(itemName, isSelectionModeSingle);
+        EngineAdapter.componentInScreenCenter(itemName);
         DynamicSelectableListAdapter.generateMarkedComponentsList()
     }
 
