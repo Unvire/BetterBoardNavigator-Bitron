@@ -148,7 +148,8 @@ body{
 }
 
 p{
-    line-height: 0.15em;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
     font-size: 0.8em;
 }
 
@@ -204,6 +205,15 @@ canvas{
     border-bottom: 1px solid var(--COLOR-TEXT-MAIN);
     padding: 1px 1px 1px 1.5em;
 
+}
+
+.table-row > div {
+    min-width: 0;
+}
+
+.table-row > div:last-child {
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .selected{
