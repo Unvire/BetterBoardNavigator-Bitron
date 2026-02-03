@@ -330,6 +330,11 @@ canvas{
     text-align: center;
 }
 
+.modal-main .new-line{
+    font-size: 1em;
+}
+
+
 #text-modal .modal-main{
     justify-content: center;
 }
