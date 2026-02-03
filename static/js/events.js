@@ -54,7 +54,7 @@ class EventHandler{
         toggleOutlinesButton.disabled = false;
         resetViewButton.disabled = false;
         areaFromComponentsButton.disabled = false;
-        preserveComponentMarkesButton.disabled = false;
+        preserveComponentMarkersButton.disabled = false;
         clearMarkersButton.disabled = false;
         unselectNetButton.disabled = false;
         findComponentUsingNameButton.disabled = false;
@@ -62,13 +62,13 @@ class EventHandler{
         unselectPrefixComponentsButton.disabled = false;
     }
 
-    static preserveComponentMarkes(isSelectionModeSingle){
+    static preserveComponentMarkers(isSelectionModeSingle){
         const allComponentsList = globalInstancesMap.getAllComponentsList();
         const selectionModesMap = {true: "single", false: "multiple"};
     
         isSelectionModeSingle = !isSelectionModeSingle;
         allComponentsList.selectionMode = selectionModesMap[isSelectionModeSingle];
-        EventHandler.toggleButton(preserveComponentMarkesButton);
+        EventHandler.toggleButton(preserveComponentMarkersButton);
         return isSelectionModeSingle;
     }
 
@@ -105,6 +105,10 @@ class EventHandler{
         } else {
             button.classList.add("button-selected");
         }
+    }
+
+    static forcedUntoggleButton(button){
+        button.classList.remove("button-selected");
     }
 
     static showHelpModalBox(){

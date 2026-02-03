@@ -273,7 +273,7 @@
         const areaFromComponentsButton = document.getElementById("components-area-button");
         const clickedComponentContainer = document.getElementById("clicked-components");
         const allComponentsContainer = document.getElementById("scrollable-all-components-list");
-        const preserveComponentMarkesButton = document.getElementById("toggle-leave-markers-button");
+        const preserveComponentMarkersButton = document.getElementById("toggle-leave-markers-button");
         const clearMarkersButton = document.getElementById("unselect-components-button");
         const markedComponentsContainer = document.getElementById("scrollable-marked-components-list");
         const pinoutTableContainer = document.getElementById("pinout-table");
@@ -394,8 +394,8 @@
             toggleOutlinesButton.addEventListener("click", EventHandler.toggleOutlines);
             resetViewButton.addEventListener("click", EngineAdapter.resetView);
             areaFromComponentsButton.addEventListener("click", EngineAdapter.areaFromComponents);
-            preserveComponentMarkesButton.addEventListener("click", () => {
-                isSelectionModeSingle = EventHandler.preserveComponentMarkes(isSelectionModeSingle);
+            preserveComponentMarkersButton.addEventListener("click", () => {
+                isSelectionModeSingle = EventHandler.preserveComponentMarkers(isSelectionModeSingle);
             });
             clearMarkersButton.addEventListener("click", EngineAdapter.clearMarkers);
             unselectNetButton.addEventListener("click", EventHandler.unselectNet);            

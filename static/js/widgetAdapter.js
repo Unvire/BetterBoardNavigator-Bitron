@@ -17,6 +17,9 @@ class WidgetAdapter{
         DynamicSelectableListAdapter.generateMarkedComponentsList();
         SpanListAdapter.clearSpanList(clickedComponentSpanList);
         selectedComponentSpan.innerText = "";
+
+        EventHandler.forcedUntoggleButton(preserveComponentMarkersButton)
+        isSelectionModeSingle = true;
     }
 
     static resetSelectedNet(){
@@ -201,6 +204,7 @@ class InputModalBoxAdapter{
         if (isComponentExist){
             EngineAdapter.componentInScreenCenter(modalBoxComponentName);
             PinoutTableAdapter.generatePinoutTable(modalBoxComponentName);
+            DynamicSelectableListAdapter.generateMarkedComponentsList();
         }
     }
 
