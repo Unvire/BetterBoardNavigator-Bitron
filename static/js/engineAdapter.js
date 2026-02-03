@@ -95,8 +95,6 @@ class EngineAdapter{
     }
 
     static async clearMarkers(){
-        isSelectionModeSingle = true;
-
         const side = sideHandler.currentSide();
         pyodide.runPython(`
             engine.clearFindComponentByNameInterface(SURFACE, '${side}')
