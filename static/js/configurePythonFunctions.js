@@ -36,4 +36,7 @@ async function loadLocalModules(pyodide) {
     modulesList.forEach(async (moduleName) => {
         await copyModuleToVirtualMemory(pyodide, moduleName)
     });
+
+    hideLoadingDots();
+    setLoadingScreenMessage("Aplikacja załadowana. Wczytaj schemat!")
 }

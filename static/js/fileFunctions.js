@@ -2,6 +2,9 @@ function openAndLoadCadFile(pyodide, file) {
     var fileName = `/${file.name}`;
     const reader = new FileReader(); 
 
+    setLoadingScreenMessage("Przetwarzanie schematu");
+    showLoadingDots();
+
     reader.onload = (event) => {
         const fileContent = event.target.result;
         pyodide.FS.writeFile(fileName, new Uint8Array(fileContent));
@@ -41,6 +44,9 @@ function openAndLoadCadFile(pyodide, file) {
 
         const toggleOutlinesButton = globalInstancesMap.getToggleOutlinesButton();
         toggleOutlinesButton.classList.add("button-selected");
+
+        hideLoadingDots();
+        hideLoadingScreen();
     }
     reader.readAsArrayBuffer(file);
 }

@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="./static/css/style.css"/>
     
     <script src="./static/pyodide/pyodide.js"></script>
+    <script type="text/javascript" src="./static/js/loadingScreen.js"></script>
     <script type="text/javascript" src="./static/js/configurePythonFunctions.js"></script>    
     <script type="text/javascript" src="./static/js/fileFunctions.js"></script>
     <script type="text/javascript" src="./static/js/sideHandler.js"></script>
@@ -93,6 +94,12 @@
             <div id="net-treeview" class="tree-view"></div>
         </div>
         <div id="item-center" class="functionality-container">
+            <div id="loading-screen" class="app-loading">
+                <p>
+                    <span id="loading-text">Ładowanie aplikacji</span>
+                    <span id="loading-dots"></span>
+                </p>
+            </div>
             <canvas id="canvas"></canvas>
         </div>
         <div id="item-right-top" class="functionality-container">
@@ -254,6 +261,9 @@
         </div>
     </div>
     <script>
+        showLoadingScreen();
+        showLoadingDots();
+
         EventHandler.compensateUserDevicePixelRatio();
 
         let pyodide = null;
@@ -361,7 +371,20 @@
             window.addEventListener("resize", EventHandler.windowResize);
             window.addEventListener("keydown", (event) =>{
                 EventHandler.keyDown(event, isTextModalInputFocused);
-            });
+                
+                // allow for text field events
+                if (isTextModalInputFocused || EventHandler.isTextFieldEvent(event)){
+                    return;
+                }
+
+                // do not pass keydown event to pygame SDL
+                event.stopImmediatePropagation();
+            }, true); 
+
+            window.addEventListener("keyup", (event) => {
+                // do not pass keydown event to pygame SDL
+                event.stopImmediatePropagation();
+            }, true); 
 
             canvas.addEventListener("mousedown", mouseDownEvent);
             canvas.addEventListener("mouseup", mouseUpEvent);       
