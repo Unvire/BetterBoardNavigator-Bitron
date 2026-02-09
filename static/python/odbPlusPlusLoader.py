@@ -1,5 +1,5 @@
 import copy, re
-import tarfile,  unlzw3
+import tarfile, zipfile, unlzw3
 import geometryObjects as gobj
 import component as comp
 import board, pin
@@ -16,7 +16,7 @@ class ODBPlusPlusLoader():
 
     def loadFile(self, filePath:str) -> list[str]:
         self._setFilePath(filePath)
-        fileLines = self._getFileLinesFromTar()
+        fileLines = self._getFileLinesFromArchive()
         return fileLines
 
     def processFileLines(self, fileLines:list[str]) -> board.Board:
@@ -34,19 +34,30 @@ class ODBPlusPlusLoader():
     def _setFilePath(self, filePath:str):
         self.filePath = filePath
 
-    def _getFileLinesFromTar(self) -> dict:
-        with tarfile.open(self.filePath, 'r') as file:
-            allTarPaths = file.getnames()
-        
-        tarPaths = self._getTarPathsToEdaComponents(allTarPaths)
+    def _getFileLinesFromArchive(self) -> dict:
+        HANDLERS_DICT = {
+            'tgz': {
+                'pathsExtractor': self._getPathsFromTar,
+                'fileLinesExtractor': self._extractFileInsideTar
+            },
+            'zip': {
+                'pathsExtractor': self._getPathsFromZip,
+                'fileLinesExtractor': self._extractFileInsideZip
+            }
+        }
 
+        _, extension = self.filePath.rsplit('.', 1)
+        extension = extension.lower()
+
+        archivePaths = HANDLERS_DICT[extension]['pathsExtractor']()
+        
         fileLines = []
         endLineNumber = -1
         lastLineSectionNumbers = ''
-        for path in tarPaths:
+        for path in archivePaths:
             if path:
                 startLineNumber = endLineNumber + 1
-                lines = self._extractFileInsideTar(path)
+                lines = HANDLERS_DICT[extension]['fileLinesExtractor'](path)
                 fileLines += lines
                 endLineNumber = startLineNumber + len(lines) - 1
                 lastLineSectionNumbers += f'{startLineNumber};{endLineNumber};'
@@ -55,6 +66,20 @@ class ODBPlusPlusLoader():
         fileLines.append(lastLineSectionNumbers)
 
         return fileLines
+    
+    def _getPathsFromTar(self):
+        with tarfile.open(self.filePath, 'r') as file:
+            allPaths = file.getnames()
+        return self._getArchivePathsToEdaComponents(allPaths)
+    
+    def _getPathsFromZip(self):
+        with zipfile.ZipFile(self.filePath, 'r') as file:
+            allPaths = file.namelist()
+        return self._getArchivePathsToEdaComponents(allPaths)
+    
+
+
+
     
     def _getSectionsFromFileLines(self, fileLines:list[str]):
         *sectionsStartEnd, _ = [val for val in fileLines[-1].split(';')] # last item is always ''
@@ -305,8 +330,9 @@ class ODBPlusPlusLoader():
             i += 1
 
         return shapes, i, bottomLeftPoint, topRightPoint
+    
 
-    def _getTarPathsToEdaComponents(self, tarPaths:list[str]) -> list[str]:
+    def _getArchivePathsToEdaComponents(self, archivePaths:list[str]) -> list[str]:
         def findMatchingStrings(pattern:str, strings:list[str]) -> list[str]:
             result = []
             for s in strings:
@@ -314,16 +340,16 @@ class ODBPlusPlusLoader():
                     result.append(s)
             return result
 
-        commonPattern = '^[\w+\s\-]+\/steps\/[\w+\s\-]+\/'
-        botComponentsFilePattern = commonPattern + 'layers\/comp_\+_bot\/components(.(z|Z))?$' # matches comp_+_bot files both zipped and uzipped
-        topComponentsFilePattern = commonPattern + 'layers\/comp_\+_top\/components(.(z|Z))?$' # matches comp_+_top files both zipped and uzipped
-        edaFilePattern = commonPattern + 'eda\/data(.(z|Z))?$' # matches eda path both zipped and unzipped
-        profileFilePattern = commonPattern + 'profile(.(z|Z))?$'  # matches profile path both zipped and unzipped
+        commonPattern = r'^[\w+\s\-]+\/steps\/[\w+\s\-]+\/'
+        botComponentsFilePattern = commonPattern + r'layers\/comp_\+_bot\/components(.(z|Z))?$' # matches comp_+_bot files both zipped and uzipped
+        topComponentsFilePattern = commonPattern + r'layers\/comp_\+_top\/components(.(z|Z))?$' # matches comp_+_top files both zipped and uzipped
+        edaFilePattern = commonPattern + r'eda\/data(.(z|Z))?$' # matches eda path both zipped and unzipped
+        profileFilePattern = commonPattern + r'profile(.(z|Z))?$'  # matches profile path both zipped and unzipped
 
-        matchingEdaPaths = findMatchingStrings(edaFilePattern, tarPaths)
-        matchingBotComponentPaths = findMatchingStrings(botComponentsFilePattern, tarPaths)
-        matchingTopComponentsPaths = findMatchingStrings(topComponentsFilePattern, tarPaths)
-        matchingProfilePaths = findMatchingStrings(profileFilePattern, tarPaths)
+        matchingEdaPaths = findMatchingStrings(edaFilePattern, archivePaths)
+        matchingBotComponentPaths = findMatchingStrings(botComponentsFilePattern, archivePaths)
+        matchingTopComponentsPaths = findMatchingStrings(topComponentsFilePattern, archivePaths)
+        matchingProfilePaths = findMatchingStrings(profileFilePattern, archivePaths)
 
         result = []
         for pathsList in [matchingEdaPaths, matchingBotComponentPaths, matchingTopComponentsPaths, matchingProfilePaths]:
@@ -331,18 +357,32 @@ class ODBPlusPlusLoader():
             result.append(subList)
         return result
     
-    def _extractFileInsideTar(self, pathInTar) -> list[str]:
-        with tarfile.open(self.filePath, 'r') as file:
-            if not pathInTar:
+    def _extractFileInsideTar(self, pathInTar:str) -> list[str]:
+        if not pathInTar:
                 return []
+        
+        with tarfile.open(self.filePath, 'r') as file:
             with file.extractfile(pathInTar) as extractedFile:
-                if pathInTar[-2:].upper() == '.Z':
-                    compressedFile = extractedFile.read()
-                    decompressedFile = unlzw3.unlzw(compressedFile).decode('utf-8')
-                    lines = [line.replace('\r', '') for line in decompressedFile.split('\n')]
-                else:
-                    lines = self._decodeLines(extractedFile.readlines())
+                lines = self._getFileLinesFromArchiveFile(extractedFile, pathInTar)
         return lines
+    
+    def _extractFileInsideZip(self, pathInZip:str) -> list[str]:
+        if not pathInZip:
+                return []
+        
+        with zipfile.ZipFile(self.filePath, 'r') as file:
+            with file.open(pathInZip) as extractedFile:
+                lines = self._getFileLinesFromArchiveFile(extractedFile, pathInZip)
+        return lines
+
+    def _getFileLinesFromArchiveFile(self, extractedFileHandle, pathInArchive:str) -> list[str]:
+        if pathInArchive[-2:].upper() == '.Z':
+            compressedFile = extractedFileHandle.read()
+            decompressedFile = unlzw3.unlzw(compressedFile).decode('utf-8')
+            lines = [line.replace('\r', '') for line in decompressedFile.split('\n')]
+        else:
+            lines = self._decodeLines(extractedFileHandle.readlines())
+        return lines        
 
     def _decodeLines(self, listOfLines:list[str]) -> list[str]:
         lines = []

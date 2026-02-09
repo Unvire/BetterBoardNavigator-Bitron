@@ -6,7 +6,8 @@ class LoaderSelectorFactory:
         self.loadersDict = {
             'cad': camcadLoader.CamCadLoader,
             'gcd': gencadLoader.GenCadLoader,
-            'tgz': odbPlusPlusLoader.ODBPlusPlusLoader,
+            'tgz': odbPlusPlusLoader.ODBPlusPlusLoader,            
+            'zip': odbPlusPlusLoader.ODBPlusPlusLoader,
             'ccz': visecadLoader.VisecadLoader
         }
         extension = fileName.split('.')[-1].lower()
