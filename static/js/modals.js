@@ -85,4 +85,8 @@ class ModalPartNumberSearcher extends ModalBox{
         super(parentContainer, closeSpan, header)
         this.header.innerText = "Wyszukiwarka part number";
     }
+    
+    close(){
+        this.parentContainer.style.display = "none";
+    }
 }
