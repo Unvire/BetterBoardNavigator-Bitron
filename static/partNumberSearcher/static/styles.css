@@ -1,14 +1,14 @@
 :root {
-  --bg: #0b0c10;
-  --panel: #11131a;
-  --text: #e8e8ea;
-  --muted: #a6a7ad;
-  --line: #2a2e3b;
-  --btn: #1b1f2c;
-  --btnHover: #232840;
-  --primary: #2b6cff;
-  --primaryHover: #1f5df0;
-  --radius: 14px;
+  --bg: #374151;
+  --panel: #4B5563; 
+  --text: #EEEEEE;
+  --muted: #c0c0c5;
+  --line: #1F2937;
+  --btn: #52525B;
+  --btnHover: #6b7280;
+  --primary: #2187A3;
+  --primaryHover: #196B81;
+  --radius: 8px;
 }
 
 * { box-sizing: border-box; }
@@ -146,21 +146,4 @@ td.name {
 
 td.desc {
   color: #c8c9d1;
-}
-
-.app-title {
-  margin: 0 0 10px 0;
-  padding-left: 15px;
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.footer {
-  margin-top: 20px;
-  padding: 12px 16px;
-  text-align: center;
-  font-size: 13px;
-  color: var(--muted);
-  border-top: 1px solid var(--line);
 }
