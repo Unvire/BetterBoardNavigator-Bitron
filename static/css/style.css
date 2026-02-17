@@ -322,6 +322,12 @@ canvas{
     height: 700px;
 }
 
+#part-number-searcher-modal .modal-content-layout{
+    width: 70%;
+    height: 80%;
+}
+
+
 .modal-head{
     background-color: var(--COLOR-ITEM-HEADER-BG);
     margin-top: 0;
