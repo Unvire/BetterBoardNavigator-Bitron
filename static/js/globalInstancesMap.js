@@ -15,6 +15,7 @@ class GlobalInstancesMap{
         this.currentSideSpan = null;
         this.modalParagraph = null;
         this.modalPartNumberSearcher = null;
+        this.partNumberSearcherIframe = null;
     }
 
     setModalSubmit(instance){
@@ -151,5 +152,13 @@ class GlobalInstancesMap{
 
     getModalPartNumberSearcher(){
         return this.modalPartNumberSearcher;
+    }
+
+    setPartNumberSearcherIframe(instance){
+        this.partNumberSearcherIframe = instance;
+    }
+
+    getPartNumberSearcherIframe(){
+        return this.partNumberSearcherIframe;
     }
 }

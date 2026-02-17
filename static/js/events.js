@@ -40,9 +40,12 @@ class EventHandler{
     static loadFile(event, loadedFileName){
         const file = event.target.files[0];
         if (file) {
+            const partNumberSearcherIframe = globalInstancesMap.getPartNumberSearcherIframe()
+
             removePreviousFileFromFS(pyodide, loadedFileName);
             openAndLoadCadFile(pyodide, file);
             EventHandler.enableButtons();
+            partNumberSearcherIframe.contentWindow.location.reload();
             return file.name;
         }
     }

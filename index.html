@@ -270,7 +270,7 @@
                 <span class="close" id="part-number-searcher-modal-close-span">&times;</span>
             </div>
             <div class="modal-main">
-                <iframe src="static/partNumberSearcher/partNumberSearcher.html"></iframe>
+                <iframe src="static/partNumberSearcher/partNumberSearcher.html" id="part-number-searcher-iframe"></iframe>
             </div>
             <div class="modal-footer"></div>
         </div>
@@ -311,7 +311,9 @@
         const commonPrefixSpan = document.getElementById("common-prefix-span");
         const selectedComponentSpan = document.getElementById("selected-component-span");
         const helpButton = document.getElementById("help-button");
+
         const partNumberSearcherButton = document.getElementById("part-number-searcher-button");
+        const partNumberSearcherIframe = document.getElementById("part-number-searcher-iframe");
 
         const textModalContainer = document.getElementById("text-modal");
         const textModalCloseSpan = document.getElementById("text-modal-close-span");
@@ -341,6 +343,7 @@
         globalInstancesMap.setCommonPrefixSpan(commonPrefixSpan);
         globalInstancesMap.setCurrentSideSpan(currentSideSpan);
         globalInstancesMap.setToggleOutlinesButton(toggleOutlinesButton);
+        globalInstancesMap.setPartNumberSearcherIframe(partNumberSearcherIframe)
 
         var modalSubmit = new ModalSubmit(textModalContainer, textModalCloseSpan, 
                                             textModalPromptHeader, textModalInput, 
