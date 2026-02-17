@@ -323,8 +323,8 @@ canvas{
 }
 
 #part-number-searcher-modal .modal-content-layout{
-    width: 70%;
-    height: 80%;
+    width: min(850px, calc(100vw - 40px));
+    height: min(850px, calc(100vh - 40px));
 }
 
 .modal-head{
@@ -350,6 +350,12 @@ canvas{
     overflow: auto;
     flex: 1;
 }
+
+#part-number-searcher-modal .modal-main {
+    padding: 0;
+}
+
+
 
 .modal-main h3{
     text-align: center;
