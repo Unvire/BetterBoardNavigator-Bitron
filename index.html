@@ -311,7 +311,7 @@
         const commonPrefixSpan = document.getElementById("common-prefix-span");
         const selectedComponentSpan = document.getElementById("selected-component-span");
         const helpButton = document.getElementById("help-button");
-        const partNumberSearcher = document.getElementById("part-number-searcher-button");
+        const partNumberSearcherButton = document.getElementById("part-number-searcher-button");
 
         const textModalContainer = document.getElementById("text-modal");
         const textModalCloseSpan = document.getElementById("text-modal-close-span");
@@ -388,6 +388,7 @@
             EventHandler.setCanvasDimensions();
             
             loadFileButton.disabled = false;
+            partNumberSearcherButton.disabled = false;
             helpButton.disabled = false;
             
             window.addEventListener("resize", EventHandler.windowResize);
@@ -435,7 +436,7 @@
             prefixComponentsButton.addEventListener("click", EventHandler.showCommonPrefixComponents);
             unselectPrefixComponentsButton.addEventListener("click", EventHandler.hideCommonPrefixComponents);
             helpButton.addEventListener("click", EventHandler.showHelpModalBox);
-            partNumberSearcher.addEventListener("click", EventHandler.showPartNumberSearcherModalBox);
+            partNumberSearcherButton.addEventListener("click", EventHandler.showPartNumberSearcherModalBox);
             
             textModalInput.addEventListener("focus", () => {
                 isTextModalInputFocused = true;

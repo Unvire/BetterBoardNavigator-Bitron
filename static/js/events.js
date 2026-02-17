@@ -59,8 +59,6 @@ class EventHandler{
         unselectNetButton.disabled = false;
         findComponentUsingNameButton.disabled = false;
         prefixComponentsButton.disabled = false;
-        unselectPrefixComponentsButton.disabled = false;
-        partNumberSearcher.disabled = false;
     }
 
     static preserveComponentMarkers(isSelectionModeSingle){

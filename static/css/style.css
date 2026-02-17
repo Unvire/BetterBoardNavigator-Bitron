@@ -327,7 +327,6 @@ canvas{
     height: 80%;
 }
 
-
 .modal-head{
     background-color: var(--COLOR-ITEM-HEADER-BG);
     margin-top: 0;
@@ -349,6 +348,7 @@ canvas{
     display: flex;
     flex-direction: column;
     overflow: auto;
+    flex: 1;
 }
 
 .modal-main h3{
@@ -358,6 +358,13 @@ canvas{
 .modal-main .new-line{
     font-size: 1em;
 }
+
+.modal-main iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
 
 
 #text-modal .modal-main{
