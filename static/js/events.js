@@ -60,6 +60,7 @@ class EventHandler{
         findComponentUsingNameButton.disabled = false;
         prefixComponentsButton.disabled = false;
         unselectPrefixComponentsButton.disabled = false;
+        partNumberSearcher.disabled = false;
     }
 
     static preserveComponentMarkers(isSelectionModeSingle){
@@ -113,7 +114,12 @@ class EventHandler{
 
     static showHelpModalBox(){
         const modalHelp = globalInstancesMap.getModalHelp();
-        HelpModalAdapter.generateModalBox(modalHelp)
+        SimpleModalAdapter.generateModalBox(modalHelp)
+    }
+
+    static showPartNumberSearcherModalBox(){
+        const modalPartNumberSearcher = globalInstancesMap.getModalPartNumberSearcher();
+        SimpleModalAdapter.generateModalBox(modalPartNumberSearcher)
     }
 
     static loadDemoFile(loadedFileName){

@@ -234,7 +234,7 @@ class InputModalBoxAdapter{
     }
 }
 
-class HelpModalAdapter{
+class SimpleModalAdapter{
     static generateModalBox(modalboxInstance){
         modalboxInstance.show();
     }

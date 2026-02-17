@@ -40,6 +40,9 @@
             <button type="button" class="main-button" id="components-area-button" disabled="true">Domyślny widok z komponentów</button>
         </div>
         <div class="buttons-flexbox">
+            <button type="button" class="main-button" id="part-number-searcher-button" disabled="true">Wyszukiwarka part number</button>
+        </div>
+        <div class="buttons-flexbox">
             <button type="button" class="main-button" id="unselect-components-button" disabled="true">Usuń znaczniki komponentów</button>
             <button type="button" class="main-button" id="unselect-net-button" disabled="true">Odznacz siatkę</button>
         </div>
@@ -260,6 +263,17 @@
             </div>
         </div>
     </div>
+    <div id="part-number-searcher-modal" class="modal">
+        <div class="modal-content-layout">
+            <div class="modal-head">
+                <p class="item-header modal-header" id="part-number-searcher-modal-header"></p>
+                <span class="close" id="part-number-searcher-modal-close-span">&times;</span>
+            </div>
+            <div class="modal-main">
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
     <script>
         showLoadingScreen();
         showLoadingDots();
@@ -296,6 +310,7 @@
         const commonPrefixSpan = document.getElementById("common-prefix-span");
         const selectedComponentSpan = document.getElementById("selected-component-span");
         const helpButton = document.getElementById("help-button");
+        const partNumberSearcher = document.getElementById("part-number-searcher-button");
 
         const textModalContainer = document.getElementById("text-modal");
         const textModalCloseSpan = document.getElementById("text-modal-close-span");
@@ -313,6 +328,10 @@
         const helpModalHeader = document.getElementById("help-modal-header");
         const showDemoBoardButton = document.getElementById("show-demo-board-button");
         
+        const partNumberModalContainer = document.getElementById("part-number-searcher-modal");
+        const partNumberModalCloseSpan = document.getElementById("part-number-searcher-modal-close-span");
+        const partNumberModalHeader = document.getElementById("part-number-searcher-modal-header");
+        
 
         var globalInstancesMap = new GlobalInstancesMap();
         globalInstancesMap.setCanvas(canvas);
@@ -328,13 +347,15 @@
         globalInstancesMap.setModalSubmit(modalSubmit);
         globalInstancesMap.setTextModalSubmitButton(textModalSubmitButton);
         globalInstancesMap.setTextModalInput(textModalInput);
-        
 
         var modalHelp = new ModalHelp(helpModalContainer, helpModalCloseSpan, helpModalHeader, showDemoBoardButton);
         modalHelp.eventParameter = loadedFileName;
         modalHelp.setButtonEvent(EventHandler.loadDemoFile);
         globalInstancesMap.setModalHelp(modalHelp);
         globalInstancesMap.setShowDemoBoardButton(showDemoBoardButton);
+
+        var modalPartNumberSearcher = new ModalPartNumberSearcher(partNumberModalContainer, partNumberModalCloseSpan, partNumberModalHeader)
+        globalInstancesMap.setModalPartNumberSearcher(modalPartNumberSearcher)
 
         var allComponentsList = DynamicSelectableListAdapter.initDynamicSelectableList(allComponentsContainer);
         globalInstancesMap.setAllComponentsList(allComponentsList);
@@ -413,6 +434,7 @@
             prefixComponentsButton.addEventListener("click", EventHandler.showCommonPrefixComponents);
             unselectPrefixComponentsButton.addEventListener("click", EventHandler.hideCommonPrefixComponents);
             helpButton.addEventListener("click", EventHandler.showHelpModalBox);
+            partNumberSearcher.addEventListener("click", EventHandler.showPartNumberSearcherModalBox);
             
             textModalInput.addEventListener("focus", () => {
                 isTextModalInputFocused = true;

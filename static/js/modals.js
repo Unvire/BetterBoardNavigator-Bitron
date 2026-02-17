@@ -79,3 +79,10 @@ class ModalHelp extends ModalBox{
         this.parentContainer.style.display = "none";
     }
 }
+
+class ModalPartNumberSearcher extends ModalBox{
+    constructor(parentContainer, closeSpan, header){
+        super(parentContainer, closeSpan, header)
+        this.header.innerText = "Wyszukiwarka part number";
+    }
+}

@@ -14,6 +14,7 @@ class GlobalInstancesMap{
         this.selectedComponentSpan = null;
         this.currentSideSpan = null;
         this.modalParagraph = null;
+        this.modalPartNumberSearcher = null;
     }
 
     setModalSubmit(instance){
@@ -142,5 +143,13 @@ class GlobalInstancesMap{
 
     getShowDemoBoardButton(){
         return this.showDemoBoardButton;
+    }
+
+    setModalPartNumberSearcher(instance){
+        this.modalPartNumberSearcher = instance;
+    }
+
+    getModalPartNumberSearcher(){
+        return this.modalPartNumberSearcher;
     }
 }
