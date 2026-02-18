@@ -37,7 +37,7 @@ class EventHandler{
         canvas.height = canvasParent.clientHeight;
     }
 
-    static loadFile(event, loadedFileName){
+    static loadCadFile(event, loadedFileName){
         const file = event.target.files[0];
         if (file) {
             const partNumberSearcherIframe = globalInstancesMap.getPartNumberSearcherIframe()
@@ -47,6 +47,15 @@ class EventHandler{
             EventHandler.enableButtons();
             partNumberSearcherIframe.contentWindow.location.reload();
             return file.name;
+        }
+    }
+
+    static async loadPdfFile(event){
+        const file = event.target.files[0];
+        if (file) {
+            const partNumberExtractor = globalInstancesMap.getPdfPartNumberExtractor()
+            
+            partNumberExtractor.getPartNumbers(file);
         }
     }
 
@@ -133,7 +142,7 @@ class EventHandler{
                         files: [file]
                     }
                 };
-                EventHandler.loadFile(simulatedEvent, loadedFileName);
+                EventHandler.loadCadFile(simulatedEvent, loadedFileName);
                 return "demo.cad"
             });
     }

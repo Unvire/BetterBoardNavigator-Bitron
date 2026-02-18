@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="./static/css/style.css"/>
     
     <script src="./static/pyodide/pyodide.js"></script>
+    <script src="./static/js/pdfjs/pdf.min.js"></script>
     <script type="text/javascript" src="./static/js/loadingScreen.js"></script>
     <script type="text/javascript" src="./static/js/configurePythonFunctions.js"></script>    
     <script type="text/javascript" src="./static/js/fileFunctions.js"></script>
@@ -22,13 +23,14 @@
     <script type="text/javascript" src="./static/js/dynamicSpanList.js"></script>
     <script type="text/javascript" src="./static/js/widgetAdapter.js"></script>
     <script type="text/javascript" src="./static/js/globalInstancesMap.js"></script>
+    <script type="text/javascript" src="./static/js/pdfPartNumberExtractor.js"></script>
 </head>
 <body>
     <div class="buttons-row-flexbox">
         <div class="buttons-flexbox">
             <button type="button" class="main-button" id="load-cad-file-button" disabled="true">Wczytaj schemat</button>
             <input type="file" class="main-button hidden" id="load-cad-file-input" accept=".cad,.gcd,.tgz,.zip"/>
-            <button type="button" class="main-button" id="load-pdf-file-button" disabled="true">Wczytaj PDF z komponentami</button>
+            <button type="button" class="main-button" id="load-pdf-file-button">Wczytaj PDF z komponentami</button>
             <input type="file" class="main-button hidden" id="load-pdf-file-input" accept=".pdf"/>
         </div>
         <div class="buttons-flexbox">
@@ -300,8 +302,8 @@
         // buttons row
         const loadCadFileButton = document.getElementById("load-cad-file-button");
         const loadCadFileInput = document.getElementById("load-cad-file-input");
-        const loadPartNumberFileButton = document.getElementById("load-cad-file-button");
-        const loadPartNumberFileInput = document.getElementById("load-cad-file-input");
+        const loadPartNumberFileButton = document.getElementById("load-pdf-file-button");
+        const loadPartNumberFileInput = document.getElementById("load-pdf-file-input");
 
         const changeSideButton = document.getElementById("change-side-button");
         const rotateButton = document.getElementById("rotate-button");
@@ -413,6 +415,9 @@
 
         var sideHandler = new SideHandler();
 
+        var partNumberExtractor = new PartNumberPDFExtractor();
+        globalInstancesMap.setPdfPartNumberExtractor(partNumberExtractor)
+
         
         document.addEventListener("DOMContentLoaded", async () => {
             pinoutTable.generateTable();
@@ -429,6 +434,8 @@
             partNumberSearcherButton.disabled = false;
             helpButton.disabled = false;
             
+
+            /* EVENTS */
             window.addEventListener("resize", EventHandler.windowResize);
             window.addEventListener("keydown", (event) =>{
                 EventHandler.keyDown(event, isTextModalInputFocused);
@@ -456,7 +463,14 @@
                 loadCadFileInput.click();
             });
             loadCadFileInput.addEventListener("change", (event) => {
-                loadedFileName = EventHandler.loadFile(event, loadedFileName);
+                loadedFileName = EventHandler.loadCadFile(event, loadedFileName);
+            });
+
+            loadPartNumberFileButton.addEventListener("click", () => {
+                loadPartNumberFileInput.click();
+            });
+            loadPartNumberFileInput.addEventListener("change", (event) => {
+                EventHandler.loadPdfFile(event)
             });
 
             changeSideButton.addEventListener("click", EngineAdapter.changeSide);

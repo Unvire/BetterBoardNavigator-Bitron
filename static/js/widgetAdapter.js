@@ -239,3 +239,7 @@ class SimpleModalAdapter{
         modalboxInstance.show();
     }
 }
+
+class PartNumberWidgetAdapter{
+    
+}
