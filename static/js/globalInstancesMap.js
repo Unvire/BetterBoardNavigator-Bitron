@@ -17,6 +17,7 @@ class GlobalInstancesMap{
         this.modalPartNumberSearcher = null;
         this.partNumberSearcherIframe = null;
         this.pdfPartNumberExtractor = null;
+        this.partNumberSpan = null;
     }
 
     setModalSubmit(instance){
@@ -169,5 +170,21 @@ class GlobalInstancesMap{
 
     getPdfPartNumberExtractor(){
         return this.pdfPartNumberExtractor;
+    }
+
+    setPartNumberSpan(instance){
+        this.partNumberSpan = instance;
+    }
+
+    getPartNumberSpan(){
+        return this.partNumberSpan;
+    }
+
+    setPartNumberSearcherButton(instance){
+        this.partNumberSearcherButton = instance;
+    }
+
+    getPartNumberSearcherButton(){
+        return this.partNumberSearcherButton;
     }
 }

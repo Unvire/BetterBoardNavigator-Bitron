@@ -4,8 +4,10 @@ class PartNumberPDFExtractor {
     }
 
     async getPartNumbers(file) {
+        this.pnDict = {};
         const text = await this._extractTextFromPDF(file);
         this.pnDict = this._searchComponentsData(text);
+        
         return this.pnDict;
     }
 

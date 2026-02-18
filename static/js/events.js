@@ -40,11 +40,15 @@ class EventHandler{
     static loadCadFile(event, loadedFileName){
         const file = event.target.files[0];
         if (file) {
-            const partNumberSearcherIframe = globalInstancesMap.getPartNumberSearcherIframe()
+            const partNumberSearcherIframe = globalInstancesMap.getPartNumberSearcherIframe();
+            const partNumberButton = globalInstancesMap.getPartNumberSearcherButton();
 
             removePreviousFileFromFS(pyodide, loadedFileName);
             openAndLoadCadFile(pyodide, file);
             EventHandler.enableButtons();
+            
+
+            partNumberButton.disabled = true;
             partNumberSearcherIframe.contentWindow.location.reload();
             return file.name;
         }
@@ -53,9 +57,17 @@ class EventHandler{
     static async loadPdfFile(event){
         const file = event.target.files[0];
         if (file) {
-            const partNumberExtractor = globalInstancesMap.getPdfPartNumberExtractor()
+            const partNumberExtractor = globalInstancesMap.getPdfPartNumberExtractor();
+            const partNumberButton = globalInstancesMap.getPartNumberSearcherButton();
             
-            partNumberExtractor.getPartNumbers(file);
+            const pnDict = await partNumberExtractor.getPartNumbers(file);
+            console.log(pnDict)
+            if (Object.keys(pnDict).length === 0) {
+                partNumberButton.disabled = true;
+                alert("W pliku PDF nie ma tabel z part numberami!");
+            } else {
+                partNumberButton.disabled = false;
+            }
         }
     }
 

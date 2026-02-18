@@ -230,6 +230,10 @@ canvas{
     cursor: pointer;
 }
 
+#item-left-top .table-body div{
+    cursor: default;
+}
+
 .table-row{
     display: grid;
     grid-template-columns: 1fr 2fr;
