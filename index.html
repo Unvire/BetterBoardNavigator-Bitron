@@ -26,8 +26,10 @@
 <body>
     <div class="buttons-row-flexbox">
         <div class="buttons-flexbox">
-            <button type="button" class="main-button" id="load-file-button" disabled="true">Wczytaj schemat</button>
-            <input type="file" class="main-button" id="load-file-input"/>
+            <button type="button" class="main-button" id="load-cad-file-button" disabled="true">Wczytaj schemat</button>
+            <input type="file" class="main-button hidden" id="load-cad-file-input" accept=".cad,.gcd,.tgz,.zip"/>
+            <button type="button" class="main-button" id="load-pdf-file-button" disabled="true">Wczytaj PDF z komponentami</button>
+            <input type="file" class="main-button hidden" id="load-pdf-file-input" accept=".pdf"/>
         </div>
         <div class="buttons-flexbox">
             <button type="button" class="main-button" id="rotate-button" disabled="true">Obróć</button>
@@ -71,6 +73,14 @@
                     </div>
                     <div>
                         <p><span class="highlighted-text section-title" id="common-prefix-span"></span></p>
+                    </div>
+                </div>
+                <div class="table-row">
+                    <div>
+                        <p class="section-title">Kod</p>
+                    </div>
+                    <div>
+                        <p><span class="highlighted-text section-title" id="part-number-span"></span></p>
                     </div>
                 </div>
             </div>
@@ -285,35 +295,59 @@
         let loadedFileName = "";
         let resizeTimeout = null;
         let isTextModalInputFocused = false;
+        
 
-        const canvas = document.getElementById("canvas");
-        const canvasParent = document.getElementById("item-center");
-        const loadFileButton = document.getElementById("load-file-button");
-        const loadFileInput = document.getElementById("load-file-input");
+        // buttons row
+        const loadCadFileButton = document.getElementById("load-cad-file-button");
+        const loadCadFileInput = document.getElementById("load-cad-file-input");
+        const loadPartNumberFileButton = document.getElementById("load-cad-file-button");
+        const loadPartNumberFileInput = document.getElementById("load-cad-file-input");
+
         const changeSideButton = document.getElementById("change-side-button");
         const rotateButton = document.getElementById("rotate-button");
         const mirrorSideButton = document.getElementById("mirror-side-button");
         const toggleOutlinesButton = document.getElementById("toggle-outlines-button");
+
         const resetViewButton = document.getElementById("default-view-button");    
         const areaFromComponentsButton = document.getElementById("components-area-button");
-        const clickedComponentContainer = document.getElementById("clicked-components");
-        const allComponentsContainer = document.getElementById("scrollable-all-components-list");
-        const preserveComponentMarkersButton = document.getElementById("toggle-leave-markers-button");
-        const clearMarkersButton = document.getElementById("unselect-components-button");
-        const markedComponentsContainer = document.getElementById("scrollable-marked-components-list");
-        const pinoutTableContainer = document.getElementById("pinout-table");
-        const netTreeviewContainer = document.getElementById("net-treeview");
-        const unselectNetButton = document.getElementById("unselect-net-button");
-        const currentSideSpan = document.getElementById("current-side-span");
-        const findComponentUsingNameButton = document.getElementById("find-component-by-name-button");
-        const prefixComponentsButton = document.getElementById("prefix-components-button");
-        const unselectPrefixComponentsButton = document.getElementById("unselect-prefix-components-button");
-        const commonPrefixSpan = document.getElementById("common-prefix-span");
-        const selectedComponentSpan = document.getElementById("selected-component-span");
-        const helpButton = document.getElementById("help-button");
 
         const partNumberSearcherButton = document.getElementById("part-number-searcher-button");
         const partNumberSearcherIframe = document.getElementById("part-number-searcher-iframe");
+        
+        const clearMarkersButton = document.getElementById("unselect-components-button");
+        const unselectNetButton = document.getElementById("unselect-net-button");
+
+        const prefixComponentsButton = document.getElementById("prefix-components-button");
+        const unselectPrefixComponentsButton = document.getElementById("unselect-prefix-components-button");
+
+        const helpButton = document.getElementById("help-button");
+
+        // middle
+        const canvas = document.getElementById("canvas");
+        const canvasParent = document.getElementById("item-center");
+
+        // left top
+        const currentSideSpan = document.getElementById("current-side-span");
+        const commonPrefixSpan = document.getElementById("common-prefix-span");
+        const partNumberSpan = document.getElementById("part-number-span");
+
+        // left middle
+        const allComponentsContainer = document.getElementById("scrollable-all-components-list");
+        const findComponentUsingNameButton = document.getElementById("find-component-by-name-button");
+        const preserveComponentMarkersButton = document.getElementById("toggle-leave-markers-button");
+
+        // left bot
+        const markedComponentsContainer = document.getElementById("scrollable-marked-components-list");
+
+        // right top
+        const clickedComponentContainer = document.getElementById("clicked-components");
+        
+        // right middle
+        const pinoutTableContainer = document.getElementById("pinout-table");
+        const selectedComponentSpan = document.getElementById("selected-component-span");
+
+        // right bot
+        const netTreeviewContainer = document.getElementById("net-treeview");
 
         const textModalContainer = document.getElementById("text-modal");
         const textModalCloseSpan = document.getElementById("text-modal-close-span");
@@ -335,6 +369,7 @@
         const partNumberModalCloseSpan = document.getElementById("part-number-searcher-modal-close-span");
         const partNumberModalHeader = document.getElementById("part-number-searcher-modal-header");
         
+
 
         var globalInstancesMap = new GlobalInstancesMap();
         globalInstancesMap.setCanvas(canvas);
@@ -390,7 +425,7 @@
             pyodide.canvas.setCanvas2D(canvas);
             EventHandler.setCanvasDimensions();
             
-            loadFileButton.disabled = false;
+            loadCadFileButton.disabled = false;
             partNumberSearcherButton.disabled = false;
             helpButton.disabled = false;
             
@@ -399,7 +434,7 @@
                 EventHandler.keyDown(event, isTextModalInputFocused);
                 
                 // allow for text field events
-                if (isTextModalInputFocused || EventHandler.isTextFieldEvent(event)){
+                if (isTextModalInputFocused){
                     return;
                 }
 
@@ -417,10 +452,10 @@
             canvas.addEventListener("mousemove", mouseMoveEvent);
             canvas.addEventListener("wheel", EngineAdapter.zoomInOut);
 
-            loadFileButton.addEventListener("click", () => {
-                loadFileInput.click();
+            loadCadFileButton.addEventListener("click", () => {
+                loadCadFileInput.click();
             });
-            loadFileInput.addEventListener("change", (event) => {
+            loadCadFileInput.addEventListener("change", (event) => {
                 loadedFileName = EventHandler.loadFile(event, loadedFileName);
             });
 
