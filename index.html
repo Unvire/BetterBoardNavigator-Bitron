@@ -464,7 +464,9 @@
 
             loadCadFileButton.addEventListener("click", () => {
                 loadCadFileInput.click();
-                loadPartNumberFileInput.click();
+                if (loadedFileName !== ""){
+                    loadPartNumberFileInput.click();
+                }
             });
             loadCadFileInput.addEventListener("change", (event) => {
                 loadedFileName = EventHandler.loadCadFile(event, loadedFileName);
