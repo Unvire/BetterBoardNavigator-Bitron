@@ -1,32 +1,19 @@
 <!doctype html>
 <html lang="pl">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Wyszukiwarka kodu komponentów</title>
-    <link rel="stylesheet" href="static/stylesPartNumberSearcher.css" />
-
-    <script src="static/pdfjs/pdf.min.js"></script>
-  </head>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Wyszukiwarka kodu komponentów</title>
+  <link rel="stylesheet" href="static/stylesPartNumberSearcher.css" />
+</head>
 <body>
   <div class="app">
-    
-    <header class="topbar">
-      <button id="btnLoad" class="btn primary">Wczytaj schemat PDF</button>
-
       <div class="search">
         <input id="searchInput" type="text" placeholder="Szukaj (nazwa / kod / opis)..." />
         <button id="btnClear" class="btn">Wyczyść</button>
       </div>
-
-      <input id="fileInput" type="file" accept="application/pdf" hidden />
     </header>
-
     <main class="content">
-      <div class="meta">
-        <span id="status">Nie wczytano pliku.</span>
-      </div>
-
       <div class="tableWrap">
         <table>
           <thead>

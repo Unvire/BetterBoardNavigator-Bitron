@@ -59,6 +59,7 @@ class EventHandler{
         if (file) {
             const partNumberExtractor = globalInstancesMap.getPdfPartNumberExtractor();
             const partNumberButton = globalInstancesMap.getPartNumberSearcherButton();
+            const iframe = globalInstancesMap.getPartNumberSearcherIframe();
             
             const pnDict = await partNumberExtractor.getPartNumbers(file);
             if (Object.keys(pnDict).length === 0) {
@@ -68,6 +69,10 @@ class EventHandler{
             } else {
                 partNumberButton.disabled = false;
                 isPdfFileLoaded = true;
+                iframe.contentWindow.postMessage({
+                    type: "PN_DICT",
+                    payload: pnDict
+                }, "*");
             }
         }
     }
