@@ -47,7 +47,7 @@ class EventHandler{
             openAndLoadCadFile(pyodide, file);
             EventHandler.enableButtons();
             
-
+            isPdfFileLoaded = false;
             partNumberButton.disabled = true;
             partNumberSearcherIframe.contentWindow.location.reload();
             return file.name;
@@ -61,12 +61,13 @@ class EventHandler{
             const partNumberButton = globalInstancesMap.getPartNumberSearcherButton();
             
             const pnDict = await partNumberExtractor.getPartNumbers(file);
-            console.log(pnDict)
             if (Object.keys(pnDict).length === 0) {
                 partNumberButton.disabled = true;
+                isPdfFileLoaded = false;
                 alert("W pliku PDF nie ma tabel z part numberami!");
             } else {
                 partNumberButton.disabled = false;
+                isPdfFileLoaded = true;
             }
         }
     }

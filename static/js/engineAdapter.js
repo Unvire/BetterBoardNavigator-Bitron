@@ -126,6 +126,7 @@ class EngineAdapter{
             pygame.display.flip()
         `);
         EngineAdapter.componentInScreenCenter(componentName);
+        //return componentName
     }
 
     static unselectNet(){

@@ -34,11 +34,13 @@ class WidgetAdapter{
         const commonPrefixSpan = globalInstancesMap.getCommonPrefixSpan();
         const currentSideSpan = globalInstancesMap.getCurrentSideSpan();
         const selectedComponentSpan = globalInstancesMap.getSelectedComponentSpan();
+        const partNumberSpan = globalInstancesMap.getPartNumberSpan()
 
         commonPrefixSpan.innerText = '';
         currentSideSpan.innerText = sideHandler.currentSide();
 
         selectedComponentSpan.innerText = "";
+        partNumberSpan.innerText = "";
     }
 
     static setSelectionModeToSingle() {
@@ -65,6 +67,7 @@ class SpanListAdapter{
 
     static onClickEventSpanList(componentName){
         PinoutTableAdapter.generatePinoutTable(componentName);
+        PartNumberSpanAdapter.displayPartNumberOfComponent(componentName);
     }
 
     static clearSpanList(spanList){
@@ -95,12 +98,14 @@ class DynamicSelectableListAdapter{
         const itemName = DynamicSelectableListAdapter.generatePinoutTableForComponent(itemElement);
         EngineAdapter.findComponentByName(itemName, isSelectionModeSingle);
         EngineAdapter.componentInScreenCenter(itemName);
-        DynamicSelectableListAdapter.generateMarkedComponentsList()
+        DynamicSelectableListAdapter.generateMarkedComponentsList();
+        PartNumberSpanAdapter.displayPartNumberOfComponent(itemName);
     }
 
     static onClickItemEvent(itemElement){
         const itemName = DynamicSelectableListAdapter.generatePinoutTableForComponent(itemElement);
         EngineAdapter.componentInScreenCenter(itemName);
+        PartNumberSpanAdapter.displayPartNumberOfComponent(itemName);
     }
 
     static generatePinoutTableForComponent(itemElement){
@@ -175,7 +180,7 @@ class TreeViewAdapter{
 
         netsTreeview.eventBeforeSelection = EngineAdapter.unselectNet;
         netsTreeview.netEvent = TreeViewAdapter.selectNetFromTreeviewEvent;
-        netsTreeview.componentEvent = EngineAdapter.selectNetComponentByName;
+        netsTreeview.componentEvent = TreeViewAdapter.selectNetComponentByName;
         netsTreeview.addBranches(netsMap);
         netsTreeview.generate();
     }
@@ -189,6 +194,11 @@ class TreeViewAdapter{
         if(netsTreeview.getSelectedNet()){
             EngineAdapter.selectNet(netName);
         }
+    }
+
+    static selectNetComponentByName(componentName){
+        EngineAdapter.selectNetComponentByName();
+        PartNumberSpanAdapter.displayPartNumberOfComponent(componentName);
     }
 
     static resetTreeview(){
@@ -209,18 +219,21 @@ class InputModalBoxAdapter{
     static getComponentNameFromInput(componentName){
         const modalBoxComponentName = componentName.toUpperCase();
         const isComponentExist = EngineAdapter.findComponentByName(modalBoxComponentName, isSelectionModeSingle);
-        if (isComponentExist){            
-            const allComponentsList = globalInstancesMap.getAllComponentsList();
-
-            if (isSelectionModeSingle) {
-                allComponentsList.unselectAllItems();
-            }
-            allComponentsList.selectItemByName(modalBoxComponentName);
-
-            EngineAdapter.componentInScreenCenter(modalBoxComponentName);
-            PinoutTableAdapter.generatePinoutTable(modalBoxComponentName);
-            DynamicSelectableListAdapter.generateMarkedComponentsList();
+        if (!isComponentExist){
+            return;
         }
+                
+        const allComponentsList = globalInstancesMap.getAllComponentsList();
+
+        if (isSelectionModeSingle) {
+            allComponentsList.unselectAllItems();
+        }
+        allComponentsList.selectItemByName(modalBoxComponentName);
+
+        EngineAdapter.componentInScreenCenter(modalBoxComponentName);
+        PinoutTableAdapter.generatePinoutTable(modalBoxComponentName);
+        DynamicSelectableListAdapter.generateMarkedComponentsList();
+        PartNumberSpanAdapter.displayPartNumberOfComponent(modalBoxComponentName);
     }
 
     static getCommonPrefixFromInput(commonPrefix){
@@ -240,6 +253,20 @@ class SimpleModalAdapter{
     }
 }
 
-class PartNumberWidgetAdapter{
-    
+class PartNumberSpanAdapter{
+    static displayPartNumberOfComponent(componentName) {
+        if (!isPdfFileLoaded) {
+            return;
+        }
+
+        const partNumberSpan = globalInstancesMap.getPartNumberSpan();
+        const partNumberExtractor = globalInstancesMap.getPdfPartNumberExtractor();
+
+        const partNumber = partNumberExtractor.getPartNumberOfComponent(componentName);
+        partNumberSpan.innerText = partNumber;
+
+        if (partNumber == "") {
+            alert("Nie odnaleziono part number w pliku PDF!")
+        }
+    }
 }

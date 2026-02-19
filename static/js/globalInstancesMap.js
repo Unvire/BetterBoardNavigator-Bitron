@@ -18,6 +18,7 @@ class GlobalInstancesMap{
         this.partNumberSearcherIframe = null;
         this.pdfPartNumberExtractor = null;
         this.partNumberSpan = null;
+        this.partNumberSearcherButton = null;
     }
 
     setModalSubmit(instance){

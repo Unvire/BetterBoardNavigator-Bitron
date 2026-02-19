@@ -293,10 +293,12 @@
 
         EventHandler.compensateUserDevicePixelRatio();
 
+        // global variables. Global variables for mouse events are in the mouseEvents.js
         let pyodide = null;
         let loadedFileName = "";
         let resizeTimeout = null;
         let isTextModalInputFocused = false;
+        let isPdfFileLoaded = false;
         
 
         // buttons row
@@ -382,6 +384,7 @@
         globalInstancesMap.setToggleOutlinesButton(toggleOutlinesButton);
         globalInstancesMap.setPartNumberSearcherIframe(partNumberSearcherIframe)
         globalInstancesMap.setPartNumberSearcherButton(partNumberSearcherButton)
+        globalInstancesMap.setPartNumberSpan(partNumberSpan)
 
         var modalSubmit = new ModalSubmit(textModalContainer, textModalCloseSpan, 
                                             textModalPromptHeader, textModalInput, 
