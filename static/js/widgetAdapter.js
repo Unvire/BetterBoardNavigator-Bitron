@@ -254,7 +254,7 @@ class SimpleModalAdapter{
 }
 
 class PartNumberSpanAdapter{
-    static displayPartNumberOfComponent(componentName) {
+    static displayPartNumberOfComponent(componentName){
         if (!isPdfFileLoaded) {
             return;
         }
@@ -264,9 +264,5 @@ class PartNumberSpanAdapter{
 
         const partNumber = partNumberExtractor.getPartNumberOfComponent(componentName);
         partNumberSpan.innerText = partNumber;
-
-        if (partNumber == "") {
-            alert("Nie odnaleziono part number w pliku PDF!")
-        }
     }
 }

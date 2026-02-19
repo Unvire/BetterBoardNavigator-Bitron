@@ -28,9 +28,8 @@
 <body>
     <div class="buttons-row-flexbox">
         <div class="buttons-flexbox">
-            <button type="button" class="main-button" id="load-cad-file-button" disabled="true">Wczytaj schemat</button>
+            <button type="button" class="main-button" id="load-cad-file-button" disabled="true">Wczytaj schemat i part number PDF</button>
             <input type="file" class="main-button hidden" id="load-cad-file-input" accept=".cad,.gcd,.tgz,.zip"/>
-            <button type="button" class="main-button" id="load-pdf-file-button" disabled="true">Wczytaj PDF z komponentami</button>
             <input type="file" class="main-button hidden" id="load-pdf-file-input" accept=".pdf"/>
         </div>
         <div class="buttons-flexbox">
@@ -304,7 +303,6 @@
         // buttons row
         const loadCadFileButton = document.getElementById("load-cad-file-button");
         const loadCadFileInput = document.getElementById("load-cad-file-input");
-        const loadPartNumberFileButton = document.getElementById("load-pdf-file-button");
         const loadPartNumberFileInput = document.getElementById("load-pdf-file-input");
 
         const changeSideButton = document.getElementById("change-side-button");
@@ -435,7 +433,6 @@
             EventHandler.setCanvasDimensions();
             
             loadCadFileButton.disabled = false;
-            loadPartNumberFileButton.disabled = false;
             helpButton.disabled = false;
             
 
@@ -457,25 +454,25 @@
                 // do not pass keydown event to pygame SDL
                 event.stopImmediatePropagation();
             }, true); 
+            
 
             canvas.addEventListener("mousedown", mouseDownEvent);
             canvas.addEventListener("mouseup", mouseUpEvent);       
             canvas.addEventListener("mousemove", mouseMoveEvent);
             canvas.addEventListener("wheel", EngineAdapter.zoomInOut);
 
+
             loadCadFileButton.addEventListener("click", () => {
                 loadCadFileInput.click();
+                loadPartNumberFileInput.click();
             });
             loadCadFileInput.addEventListener("change", (event) => {
                 loadedFileName = EventHandler.loadCadFile(event, loadedFileName);
             });
-
-            loadPartNumberFileButton.addEventListener("click", () => {
-                loadPartNumberFileInput.click();
-            });
             loadPartNumberFileInput.addEventListener("change", (event) => {
                 EventHandler.loadPdfFile(event)
             });
+
 
             changeSideButton.addEventListener("click", EngineAdapter.changeSide);
             rotateButton.addEventListener("click", EngineAdapter.rotateBoard);
