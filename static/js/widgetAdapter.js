@@ -197,7 +197,7 @@ class TreeViewAdapter{
     }
 
     static selectNetComponentByName(componentName){
-        EngineAdapter.selectNetComponentByName();
+        EngineAdapter.selectNetComponentByName(componentName);
         PartNumberSpanAdapter.displayPartNumberOfComponent(componentName);
     }
 
