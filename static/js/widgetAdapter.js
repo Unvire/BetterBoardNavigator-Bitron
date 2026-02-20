@@ -38,11 +38,13 @@ class WidgetAdapter{
         const currentSideSpan = globalInstancesMap.getCurrentSideSpan();
         const selectedComponentSpan = globalInstancesMap.getSelectedComponentSpan();
         const partNumberSpan = globalInstancesMap.getPartNumberSpan();
+        const partNumberComponentNameSpan = globalInstancesMap.getPartNumberComponentNameSpan();
 
-        commonPrefixSpan.innerText = '';
+        commonPrefixSpan.innerText = "";
         currentSideSpan.innerText = sideHandler.currentSide();
 
         selectedComponentSpan.innerText = "";
+        partNumberComponentNameSpan.innerText = "Kod";
         partNumberSpan.innerText = "";
     }
 
@@ -66,6 +68,9 @@ class SpanListAdapter{
 
         clickedComponentSpanList.addSpans(clickedComponentsList);
         clickedComponentSpanList.generate();
+
+        const componentName = clickedComponentsList.length === 1 ? clickedComponentsList[0] : "";
+        PartNumberSpanAdapter.displayPartNumberOfComponent(componentName);
     }
 
     static onClickEventSpanList(componentName){
@@ -267,9 +272,12 @@ class PartNumberSpanAdapter{
         const partNumberExtractor = globalInstancesMap.getPdfPartNumberExtractor();
 
         const partNumber = partNumberExtractor.getPartNumberOfComponent(componentName);
-
-        partNumberComponentNameSpan.innerText = componentName;
-        partNumberSpan.innerText = partNumber;
-        
+        if (partNumber == ""){
+            partNumberComponentNameSpan.innerText = "Kod";
+            partNumberSpan.innerText = "";
+        } else {
+            partNumberComponentNameSpan.innerText = componentName;
+            partNumberSpan.innerText = partNumber;
+        }
     }
 }
