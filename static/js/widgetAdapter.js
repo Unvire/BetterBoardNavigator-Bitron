@@ -6,7 +6,7 @@ class WidgetAdapter{
     }
 
     static resetSelectedComponentsWidgets(){
-        const allComponentsList = globalInstancesMap.getAllComponentsList()
+        const allComponentsList = globalInstancesMap.getAllComponentsList();
         const pinoutTable = globalInstancesMap.getPinoutTable();
         const clickedComponentSpanList = globalInstancesMap.getClickedComponentSpanList();
         const selectedComponentSpan = globalInstancesMap.getSelectedComponentSpan();
@@ -20,7 +20,7 @@ class WidgetAdapter{
         SpanListAdapter.clearSpanList(clickedComponentSpanList);
         selectedComponentSpan.innerText = "";
 
-        EventHandler.forcedUntoggleButton(preserveComponentMarkersButton)
+        EventHandler.forcedUntoggleButton(preserveComponentMarkersButton);
     }
 
     static resetSelectedNet(){
@@ -34,7 +34,7 @@ class WidgetAdapter{
         const commonPrefixSpan = globalInstancesMap.getCommonPrefixSpan();
         const currentSideSpan = globalInstancesMap.getCurrentSideSpan();
         const selectedComponentSpan = globalInstancesMap.getSelectedComponentSpan();
-        const partNumberSpan = globalInstancesMap.getPartNumberSpan()
+        const partNumberSpan = globalInstancesMap.getPartNumberSpan();
 
         commonPrefixSpan.innerText = '';
         currentSideSpan.innerText = sideHandler.currentSide();
@@ -44,7 +44,7 @@ class WidgetAdapter{
     }
 
     static setSelectionModeToSingle() {
-        const allComponentsList = globalInstancesMap.getAllComponentsList()
+        const allComponentsList = globalInstancesMap.getAllComponentsList();
 
         isSelectionModeSingle = true;
         allComponentsList.selectionMode = "single";
@@ -55,7 +55,7 @@ class SpanListAdapter{
     static initSpanList(parentContainer){
         let spanList =  new DynamicSpanList(parentContainer);
         spanList.clickEvent = SpanListAdapter.onClickEventSpanList;
-        return spanList
+        return spanList;
     }
 
     static generateSpanList(clickedComponentsList){
@@ -80,7 +80,7 @@ class SpanListAdapter{
 class DynamicSelectableListAdapter{
     static initDynamicSelectableList(parentContainer){
         let listInstance = new DynamicSelectableList(parentContainer);
-        return listInstance
+        return listInstance;
     }
 
     static generateList(listInstance, dataList, onClickEvent, selectionMode){
@@ -111,7 +111,7 @@ class DynamicSelectableListAdapter{
     static generatePinoutTableForComponent(itemElement){
         let itemName = itemElement.textContent;
         PinoutTableAdapter.generatePinoutTable(itemName);
-        return itemName
+        return itemName;
     }
 
     static generateMarkedComponentsList(){
@@ -165,7 +165,7 @@ class PinoutTableAdapter{
     static clearBody(){
         const pinoutTable = globalInstancesMap.getPinoutTable();
 
-        pinoutTable.clearBody()
+        pinoutTable.clearBody();
     }
 }
 

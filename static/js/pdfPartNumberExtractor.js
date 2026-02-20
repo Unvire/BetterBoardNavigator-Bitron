@@ -51,7 +51,7 @@ class PartNumberPDFExtractor {
             i++;
 
             if (!isTableHeader){
-              continue
+              continue;
             };
 
             while (/^\d{8}$/.test(text[i])) {

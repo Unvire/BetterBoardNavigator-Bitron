@@ -32,7 +32,7 @@ class ModalBox{
 
 class ModalSubmit extends ModalBox{
     constructor(parentContainer, closeSpan, header, textInput, submitButton){
-        super(parentContainer, closeSpan, header)
+        super(parentContainer, closeSpan, header);
         this.textInput = textInput;
         this.submitButton = submitButton;
     }
@@ -57,7 +57,7 @@ class ModalSubmit extends ModalBox{
 
 class ModalHelp extends ModalBox{
     constructor(parentContainer, closeSpan, header, button){
-        super(parentContainer, closeSpan, header)
+        super(parentContainer, closeSpan, header);
         this.button = button;
         this.parameterConstant = null;
         this.header.innerText = "Better Board Navigator - pomoc";
@@ -82,7 +82,7 @@ class ModalHelp extends ModalBox{
 
 class ModalPartNumberSearcher extends ModalBox{
     constructor(parentContainer, closeSpan, header){
-        super(parentContainer, closeSpan, header)
+        super(parentContainer, closeSpan, header);
         this.header.innerText = "Wyszukiwarka part number";
     }
     

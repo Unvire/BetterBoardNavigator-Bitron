@@ -40,7 +40,7 @@ class EngineAdapter{
     static zoomInOut(event){
         const x = event.offsetX; 
         const y = event.offsetY;
-        const isZoomIn = event.deltaY < 0
+        const isZoomIn = event.deltaY < 0;
         
         const side = sideHandler.currentSide();
         pyodide.runPythonAsync(`

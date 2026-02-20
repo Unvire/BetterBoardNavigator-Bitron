@@ -8,7 +8,9 @@ let filteredItems = [];
 
 /* ===== GET DATA FROM PARENT ===== */
 window.addEventListener("message", (event) => {
-    if (!event.data || event.data.type !== "PN_DICT") return;
+    if (!event.data || event.data.type !== "PN_DICT"){
+        return;
+    }
 
     const pnDict = event.data.payload || {};
 

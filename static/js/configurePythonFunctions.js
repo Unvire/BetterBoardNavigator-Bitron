@@ -34,9 +34,9 @@ async function loadLocalModules(pyodide) {
                           'loaderSelectorFactory','boardWrapper', 'pygameDrawBoard']
     
     modulesList.forEach(async (moduleName) => {
-        await copyModuleToVirtualMemory(pyodide, moduleName)
+        await copyModuleToVirtualMemory(pyodide, moduleName);
     });
 
     hideLoadingDots();
-    setLoadingScreenMessage("Aplikacja załadowana. Wczytaj schemat!")
+    setLoadingScreenMessage("Aplikacja załadowana. Wczytaj schemat!");
 }

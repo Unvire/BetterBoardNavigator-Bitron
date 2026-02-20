@@ -380,9 +380,9 @@
         globalInstancesMap.setCommonPrefixSpan(commonPrefixSpan);
         globalInstancesMap.setCurrentSideSpan(currentSideSpan);
         globalInstancesMap.setToggleOutlinesButton(toggleOutlinesButton);
-        globalInstancesMap.setPartNumberSearcherIframe(partNumberSearcherIframe)
-        globalInstancesMap.setPartNumberSearcherButton(partNumberSearcherButton)
-        globalInstancesMap.setPartNumberSpan(partNumberSpan)
+        globalInstancesMap.setPartNumberSearcherIframe(partNumberSearcherIframe);
+        globalInstancesMap.setPartNumberSearcherButton(partNumberSearcherButton);
+        globalInstancesMap.setPartNumberSpan(partNumberSpan);
 
         var modalSubmit = new ModalSubmit(textModalContainer, textModalCloseSpan, 
                                             textModalPromptHeader, textModalInput, 
@@ -397,8 +397,8 @@
         globalInstancesMap.setModalHelp(modalHelp);
         globalInstancesMap.setShowDemoBoardButton(showDemoBoardButton);
 
-        var modalPartNumberSearcher = new ModalPartNumberSearcher(partNumberModalContainer, partNumberModalCloseSpan, partNumberModalHeader)
-        globalInstancesMap.setModalPartNumberSearcher(modalPartNumberSearcher)
+        var modalPartNumberSearcher = new ModalPartNumberSearcher(partNumberModalContainer, partNumberModalCloseSpan, partNumberModalHeader);
+        globalInstancesMap.setModalPartNumberSearcher(modalPartNumberSearcher);
 
         var allComponentsList = DynamicSelectableListAdapter.initDynamicSelectableList(allComponentsContainer);
         globalInstancesMap.setAllComponentsList(allComponentsList);
@@ -418,7 +418,7 @@
         var sideHandler = new SideHandler();
 
         var partNumberExtractor = new PartNumberPDFExtractor();
-        globalInstancesMap.setPdfPartNumberExtractor(partNumberExtractor)
+        globalInstancesMap.setPdfPartNumberExtractor(partNumberExtractor);
 
         
         document.addEventListener("DOMContentLoaded", async () => {
@@ -468,12 +468,12 @@
             loadCadFileInput.addEventListener("change", (event) => {
                 loadedFileName = EventHandler.loadCadFile(event, loadedFileName);
                 if (loadedFileName === undefined){
-                    return
+                    return;
                 }
                 loadPartNumberFileInput.click();
             });
             loadPartNumberFileInput.addEventListener("change", (event) => {
-                EventHandler.loadPdfFile(event)
+                EventHandler.loadPdfFile(event);
             });
 
 

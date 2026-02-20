@@ -142,12 +142,12 @@ class EventHandler{
 
     static showHelpModalBox(){
         const modalHelp = globalInstancesMap.getModalHelp();
-        SimpleModalAdapter.generateModalBox(modalHelp)
+        SimpleModalAdapter.generateModalBox(modalHelp);
     }
 
     static showPartNumberSearcherModalBox(){
         const modalPartNumberSearcher = globalInstancesMap.getModalPartNumberSearcher();
-        SimpleModalAdapter.generateModalBox(modalPartNumberSearcher)
+        SimpleModalAdapter.generateModalBox(modalPartNumberSearcher);
     }
 
     static loadDemoFile(loadedFileName){
@@ -161,7 +161,7 @@ class EventHandler{
                     }
                 };
                 EventHandler.loadCadFile(simulatedEvent, loadedFileName);
-                return "demo.cad"
+                return "demo.cad";
             });
     }
 }
