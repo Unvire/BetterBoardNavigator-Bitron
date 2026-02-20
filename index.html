@@ -464,12 +464,13 @@
 
             loadCadFileButton.addEventListener("click", () => {
                 loadCadFileInput.click();
-                if (loadedFileName !== ""){
-                    loadPartNumberFileInput.click();
-                }
             });
             loadCadFileInput.addEventListener("change", (event) => {
                 loadedFileName = EventHandler.loadCadFile(event, loadedFileName);
+                if (loadedFileName === undefined){
+                    return
+                }
+                loadPartNumberFileInput.click();
             });
             loadPartNumberFileInput.addEventListener("change", (event) => {
                 EventHandler.loadPdfFile(event)
