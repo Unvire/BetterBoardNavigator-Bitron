@@ -19,6 +19,7 @@ class GlobalInstancesMap{
         this.pdfPartNumberExtractor = null;
         this.partNumberSpan = null;
         this.partNumberSearcherButton = null;
+        this.partNumberComponentNameSpan = null;
     }
 
     setModalSubmit(instance){
@@ -179,6 +180,14 @@ class GlobalInstancesMap{
 
     getPartNumberSpan(){
         return this.partNumberSpan;
+    }
+
+    setPartNumberComponentNameSpan(instance){
+        this.partNumberComponentNameSpan = instance;
+    }
+
+    getPartNumberComponentNameSpan(){
+        return this.partNumberComponentNameSpan;
     }
 
     setPartNumberSearcherButton(instance){

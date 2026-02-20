@@ -78,7 +78,7 @@
                 </div>
                 <div class="table-row">
                     <div>
-                        <p class="section-title">Kod</p>
+                        <p class="section-title"><span id="part-number-component-name-span">Kod</span></p>
                     </div>
                     <div>
                         <p><span class="highlighted-text section-title" id="part-number-span"></span></p>
@@ -332,6 +332,7 @@
         const currentSideSpan = document.getElementById("current-side-span");
         const commonPrefixSpan = document.getElementById("common-prefix-span");
         const partNumberSpan = document.getElementById("part-number-span");
+        const partNumberComponentNameSpan = document.getElementById("part-number-component-name-span");
 
         // left middle
         const allComponentsContainer = document.getElementById("scrollable-all-components-list");
@@ -383,6 +384,7 @@
         globalInstancesMap.setPartNumberSearcherIframe(partNumberSearcherIframe);
         globalInstancesMap.setPartNumberSearcherButton(partNumberSearcherButton);
         globalInstancesMap.setPartNumberSpan(partNumberSpan);
+        globalInstancesMap.setPartNumberComponentNameSpan(partNumberComponentNameSpan);
 
         var modalSubmit = new ModalSubmit(textModalContainer, textModalCloseSpan, 
                                             textModalPromptHeader, textModalInput, 

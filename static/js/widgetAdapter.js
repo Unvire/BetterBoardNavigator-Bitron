@@ -10,6 +10,7 @@ class WidgetAdapter{
         const pinoutTable = globalInstancesMap.getPinoutTable();
         const clickedComponentSpanList = globalInstancesMap.getClickedComponentSpanList();
         const selectedComponentSpan = globalInstancesMap.getSelectedComponentSpan();
+        const partNumberComponentNameSpan = globalInstancesMap.getPartNumberComponentNameSpan();
         
         allComponentsList.unselectAllItems();
         WidgetAdapter.setSelectionModeToSingle();
@@ -18,7 +19,9 @@ class WidgetAdapter{
         pinoutTable.clearBody();
         DynamicSelectableListAdapter.generateMarkedComponentsList();
         SpanListAdapter.clearSpanList(clickedComponentSpanList);
+
         selectedComponentSpan.innerText = "";
+        partNumberComponentNameSpan.innerText = "Kod";
 
         EventHandler.forcedUntoggleButton(preserveComponentMarkersButton);
     }
@@ -260,9 +263,13 @@ class PartNumberSpanAdapter{
         }
 
         const partNumberSpan = globalInstancesMap.getPartNumberSpan();
+        const partNumberComponentNameSpan = globalInstancesMap.getPartNumberComponentNameSpan();
         const partNumberExtractor = globalInstancesMap.getPdfPartNumberExtractor();
 
         const partNumber = partNumberExtractor.getPartNumberOfComponent(componentName);
+
+        partNumberComponentNameSpan.innerText = componentName;
         partNumberSpan.innerText = partNumber;
+        
     }
 }
