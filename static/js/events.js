@@ -161,6 +161,40 @@ class EventHandler{
                     }
                 };
                 EventHandler.loadCadFile(simulatedEvent, loadedFileName);
+                
+                
+                const partNumberButton = globalInstancesMap.getPartNumberSearcherButton();
+                partNumberButton.disabled = false;
+                isPdfFileLoaded = true;
+
+                const partNumberExtractor = globalInstancesMap.getPdfPartNumberExtractor();
+                const pnDict = {
+                    "R1": {"partNumber": "kod1", "description": "opis1"},
+                    "R2": {"partNumber": "kod2", "description": "opis2"},
+                    "R3": {"partNumber": "kod3", "description": "opis3"},
+                    "R4": {"partNumber": "kod4", "description": "opis4"},
+                    "C1": {"partNumber": "kod5", "description": "opis5"},
+                    "C2": {"partNumber": "kod5", "description": "opis5"},
+                    "CN1": {"partNumber": "kod6", "description": "opis6"},
+                    "CN2": {"partNumber": "kod7", "description": "opis7"},
+                    "CN3": {"partNumber": "kod8", "description": "opis8"},
+                    "Q1": {"partNumber": "kod9", "description": "opis9"}
+                };
+                partNumberExtractor.pnDict = pnDict;
+                
+                
+                const iframe = globalInstancesMap.getPartNumberSearcherIframe();
+                iframe.onload = () => {
+                    iframe.contentWindow.postMessage({
+                        type: "PN_DICT",
+                        payload: pnDict
+                    }, "*");
+                };
+
+                if (iframe.contentWindow && iframe.contentDocument.readyState === "complete"){
+                    iframe.onload(); 
+                }   
+
                 return "demo.cad";
             });
     }
