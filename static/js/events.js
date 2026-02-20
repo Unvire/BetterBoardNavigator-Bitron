@@ -37,43 +37,38 @@ class EventHandler{
         canvas.height = canvasParent.clientHeight;
     }
 
-    static loadCadFile(event, loadedFileName){
-        const file = event.target.files[0];
-        if (file) {
-            const partNumberSearcherIframe = globalInstancesMap.getPartNumberSearcherIframe();
-            const partNumberButton = globalInstancesMap.getPartNumberSearcherButton();
+    static loadCadFile(loadedFileName){
+        const partNumberSearcherIframe = globalInstancesMap.getPartNumberSearcherIframe();
+        const partNumberButton = globalInstancesMap.getPartNumberSearcherButton();
 
-            removePreviousFileFromFS(pyodide, loadedFileName);
-            openAndLoadCadFile(pyodide, file);
-            EventHandler.enableButtons();
-            
-            isPdfFileLoaded = false;
-            partNumberButton.disabled = true;
-            partNumberSearcherIframe.contentWindow.location.reload();
-            return file.name;
-        }
+        removePreviousFileFromFS(pyodide, loadedFileName);
+        openAndLoadCadFile(pyodide, loadedFileName);
+        EventHandler.enableButtons();
+        
+        isPdfFileLoaded = false;
+        partNumberButton.disabled = true;
+        partNumberSearcherIframe.contentWindow.location.reload();
+        return loadedFileName.name;
     }
 
-    static async loadPdfFile(event){
-        const file = event.target.files[0];
-        if (file) {
-            const partNumberExtractor = globalInstancesMap.getPdfPartNumberExtractor();
-            const partNumberButton = globalInstancesMap.getPartNumberSearcherButton();
-            const iframe = globalInstancesMap.getPartNumberSearcherIframe();
-            
-            const pnDict = await partNumberExtractor.getPartNumbers(file);
-            if (Object.keys(pnDict).length === 0) {
-                partNumberButton.disabled = true;
-                isPdfFileLoaded = false;
-                alert("W pliku PDF nie ma tabel z part numberami!");
-            } else {
-                partNumberButton.disabled = false;
-                isPdfFileLoaded = true;
-                iframe.contentWindow.postMessage({
-                    type: "PN_DICT",
-                    payload: pnDict
-                }, "*");
-            }
+    static async loadPdfFile(loadedFileName){
+        const partNumberExtractor = globalInstancesMap.getPdfPartNumberExtractor();
+        const partNumberButton = globalInstancesMap.getPartNumberSearcherButton();
+        const iframe = globalInstancesMap.getPartNumberSearcherIframe();
+        
+        const pnDict = await partNumberExtractor.getPartNumbers(loadedFileName);
+
+        if (Object.keys(pnDict).length === 0) {
+            partNumberButton.disabled = true;
+            isPdfFileLoaded = false;
+            alert("W pliku PDF nie ma tabel z part numberami!");
+        } else {
+            partNumberButton.disabled = false;
+            isPdfFileLoaded = true;
+            iframe.contentWindow.postMessage({
+                type: "PN_DICT",
+                payload: pnDict
+            }, "*");
         }
     }
 
