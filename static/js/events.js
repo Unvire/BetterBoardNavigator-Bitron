@@ -37,26 +37,26 @@ class EventHandler{
         canvas.height = canvasParent.clientHeight;
     }
 
-    static loadCadFile(loadedFileName){
+    static loadCadFile(loadedFile){
         const partNumberSearcherIframe = globalInstancesMap.getPartNumberSearcherIframe();
         const partNumberButton = globalInstancesMap.getPartNumberSearcherButton();
 
-        removePreviousFileFromFS(pyodide, loadedFileName);
-        openAndLoadCadFile(pyodide, loadedFileName);
+        removePreviousFileFromFS(pyodide, loadedFile);
+        openAndLoadCadFile(pyodide, loadedFile);
         EventHandler.enableButtons();
         
         isPdfFileLoaded = false;
         partNumberButton.disabled = true;
         partNumberSearcherIframe.contentWindow.location.reload();
-        return loadedFileName.name;
+        return loadedFile.name;
     }
 
-    static async loadPdfFile(loadedFileName){
+    static async loadPdfFile(loadedFile){
         const partNumberExtractor = globalInstancesMap.getPdfPartNumberExtractor();
         const partNumberButton = globalInstancesMap.getPartNumberSearcherButton();
         const iframe = globalInstancesMap.getPartNumberSearcherIframe();
         
-        const pnDict = await partNumberExtractor.getPartNumbers(loadedFileName);
+        const pnDict = await partNumberExtractor.getPartNumbers(loadedFile);
 
         if (Object.keys(pnDict).length === 0) {
             partNumberButton.disabled = true;
@@ -149,13 +149,8 @@ class EventHandler{
         fetch("./static/cad_files/demo.cad")
             .then(response => response.blob())
             .then(blob => {
-                const file = new File([blob], "demo.cad", {type: "application/octet-stream"});
-                const simulatedEvent = {
-                    target: {
-                        files: [file]
-                    }
-                };
-                EventHandler.loadCadFile(simulatedEvent, loadedFileName);
+                const demofile = new File([blob], "demo.cad", {type: "application/octet-stream"});
+                EventHandler.loadCadFile(demofile);
                 
                 
                 const partNumberButton = globalInstancesMap.getPartNumberSearcherButton();
