@@ -37,6 +37,6 @@ async function loadLocalModules(pyodide) {
         await copyModuleToVirtualMemory(pyodide, moduleName);
     });
 
-    hideLoadingDots();
-    setLoadingScreenMessage("Aplikacja załadowana. Wczytaj schemat!");
+    LoadingScreen.hideLoadingDots();
+    LoadingScreen.setLoadingScreenMessage("Aplikacja załadowana. Wczytaj schemat!");
 }
