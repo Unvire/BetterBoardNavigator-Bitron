@@ -17,7 +17,7 @@ function main(){
         pyodide.canvas.setCanvas2D(canvas);
         EventHandler.setCanvasDimensions();
         
-        globalInstancesMap.loadFileButton.disabled = false;
+        globalInstancesMap.loadFilesButton.disabled = false;
         globalInstancesMap.helpButton.disabled = false;
 
         /* EVENTS */
@@ -46,11 +46,30 @@ function main(){
         globalInstancesMap.canvas.addEventListener("mousemove", MouseEventHandler.mouseMoveEvent);
         globalInstancesMap.canvas.addEventListener("wheel", EngineAdapter.zoomInOut);
 
-        globalInstancesMap.loadFileButton.addEventListener("click", () => {
-            globalInstancesMap.loadFileInput.click();
+        globalInstancesMap.loadFilesButton.addEventListener("click", () => {
+            globalInstancesMap.loadFilesInput.click();
         });
-        globalInstancesMap.loadFileInput.addEventListener("change", (event) => {
-            globalInstancesMap.loadedFileName = EventHandler.loadFile(event, loadedFileName);
+        globalInstancesMap.loadFilesInput.addEventListener("change", (event) => {
+            const files = [...event.target.files];
+
+            const cadFile = files.find(f =>
+                /\.(cad|gcd|tgz|zip)$/i.test(f.name)
+            );
+
+            const pdfFile = files.find(f =>
+                /\.pdf$/i.test(f.name)
+            );
+
+
+            if (!cadFile) {
+                alert("Musisz wybrać plik ze schematem płytki");
+                return;
+            }
+
+            EventHandler.loadCadFile(cadFile);
+            if (pdfFile) {
+                EventHandler.loadPdfFile(pdfFile);
+            }
         });
 
         globalInstancesMap.changeSideButton.addEventListener("click", EngineAdapter.changeSide);
@@ -68,6 +87,7 @@ function main(){
         globalInstancesMap.prefixComponentsButton.addEventListener("click", EventHandler.showCommonPrefixComponents);
         globalInstancesMap.unselectPrefixComponentsButton.addEventListener("click", EventHandler.hideCommonPrefixComponents);
         globalInstancesMap.helpButton.addEventListener("click", EventHandler.showHelpModalBox);
+        globalInstancesMap.partNumberSearcherButton.addEventListener("click", EventHandler.showPartNumberSearcherModalBox);
         
         globalInstancesMap.textModalInput.addEventListener("focus", () => {
             isTextModalInputFocused = true;
@@ -80,42 +100,74 @@ function main(){
 
 
 function _bindHtmlElements(){
-    globalInstancesMap.canvas = document.getElementById("canvas");
-    globalInstancesMap.canvasParent = document.getElementById("item-center");
-    globalInstancesMap.loadFileButton = document.getElementById("load-file-button");
-    globalInstancesMap.loadFileInput = document.getElementById("load-file-input");
-    globalInstancesMap.changeSideButton = document.getElementById("change-side-button");
+    // buttons row
+    globalInstancesMap.loadFilesButton = document.getElementById("load-files-button");
+    globalInstancesMap.loadFilesInput = document.getElementById("load-files-input");
+
     globalInstancesMap.rotateButton = document.getElementById("rotate-button");
+    globalInstancesMap.changeSideButton = document.getElementById("change-side-button");
     globalInstancesMap.mirrorSideButton = document.getElementById("mirror-side-button");
     globalInstancesMap.toggleOutlinesButton = document.getElementById("toggle-outlines-button");
+
     globalInstancesMap.resetViewButton = document.getElementById("default-view-button");    
     globalInstancesMap.areaFromComponentsButton = document.getElementById("components-area-button");
-    globalInstancesMap.clickedComponentContainer = document.getElementById("clicked-components");
-    globalInstancesMap.allComponentsContainer = document.getElementById("scrollable-all-components-list");
-    globalInstancesMap.preserveComponentMarkersButton = document.getElementById("toggle-leave-markers-button");
+
+    globalInstancesMap.partNumberSearcherButton = document.getElementById("part-number-searcher-button");
+    globalInstancesMap.partNumberSearcherIframe = document.getElementById("part-number-searcher-iframe");
+
     globalInstancesMap.clearMarkersButton = document.getElementById("unselect-components-button");
-    globalInstancesMap.markedComponentsContainer = document.getElementById("scrollable-marked-components-list");
-    globalInstancesMap.pinoutTableContainer = document.getElementById("pinout-table");
-    globalInstancesMap.netTreeviewContainer = document.getElementById("net-treeview");
     globalInstancesMap.unselectNetButton = document.getElementById("unselect-net-button");
-    globalInstancesMap.currentSideSpan = document.getElementById("current-side-span");
-    globalInstancesMap.findComponentUsingNameButton = document.getElementById("find-component-by-name-button");
+
     globalInstancesMap.prefixComponentsButton = document.getElementById("prefix-components-button");
     globalInstancesMap.unselectPrefixComponentsButton = document.getElementById("unselect-prefix-components-button");
-    globalInstancesMap.commonPrefixSpan = document.getElementById("common-prefix-span");
-    globalInstancesMap.selectedComponentSpan = document.getElementById("selected-component-span");
+
     globalInstancesMap.helpButton = document.getElementById("help-button");
 
+    // left top
+    globalInstancesMap.currentSideSpan = document.getElementById("current-side-span");
+    globalInstancesMap.commonPrefixSpan = document.getElementById("common-prefix-span");
+    globalInstancesMap.partNumberSpan = document.getElementById("part-number-span");
+    globalInstancesMap.partNumberComponentNameSpan = document.getElementById("part-number-component-name-span");
+
+    // left middle
+    globalInstancesMap.allComponentsContainer = document.getElementById("scrollable-all-components-list");
+    globalInstancesMap.findComponentUsingNameButton = document.getElementById("find-component-by-name-button");
+    globalInstancesMap.preserveComponentMarkersButton = document.getElementById("toggle-leave-markers-button");
+
+    // left bottom
+    globalInstancesMap.markedComponentsContainer = document.getElementById("scrollable-marked-components-list");
+
+    // middle
+    globalInstancesMap.canvas = document.getElementById("canvas");
+    globalInstancesMap.canvasParent = document.getElementById("item-center");
+
+    // right top
+    globalInstancesMap.clickedComponentContainer = document.getElementById("clicked-components");
+    
+    // right middle
+    globalInstancesMap.pinoutTableContainer = document.getElementById("pinout-table");    
+    globalInstancesMap.selectedComponentSpan = document.getElementById("selected-component-span");
+
+    // right bottom
+    globalInstancesMap.netTreeviewContainer = document.getElementById("net-treeview");
+
+    // modal box with input field and button
     globalInstancesMap.textModalContainer = document.getElementById("text-modal");
     globalInstancesMap.textModalCloseSpan = document.getElementById("text-modal-close-span");
     globalInstancesMap.textModalPromptHeader = document.getElementById("text-modal-header");
     globalInstancesMap.textModalInput = document.getElementById("text-modal-input");
     globalInstancesMap.textModalSubmitButton = document.getElementById("text-modal-submit-text");
 
+    // help modal box
     globalInstancesMap.helpModalContainer = document.getElementById("help-modal");
     globalInstancesMap.helpModalCloseSpan = document.getElementById("help-modal-close-span");
     globalInstancesMap.helpModalHeader = document.getElementById("help-modal-header");
     globalInstancesMap.showDemoBoardButton = document.getElementById("show-demo-board-button");
+
+    // part number searcher modal box
+    globalInstancesMap.partNumberModalContainer = document.getElementById("part-number-searcher-modal");
+    globalInstancesMap.partNumberModalCloseSpan = document.getElementById("part-number-searcher-modal-close-span");
+    globalInstancesMap.partNumberModalHeader = document.getElementById("part-number-searcher-modal-header");
 }
 
 function _initWidgetClasses(){
@@ -128,6 +180,10 @@ function _initWidgetClasses(){
     modalHelp.eventParameter = loadedFileName;
     modalHelp.setButtonEvent(EventHandler.loadDemoFile);
     globalInstancesMap.modalHelp = modalHelp;
+
+    const modalPartNumberSearcher = new ModalPartNumberSearcher(globalInstancesMap.partNumberModalContainer, 
+        globalInstancesMap.partNumberModalCloseSpan, globalInstancesMap.partNumberModalHeader);
+    globalInstancesMap.modalPartNumberSearcher = modalPartNumberSearcher;
 
 
     const allComponentsList = DynamicSelectableListAdapter.initDynamicSelectableList(globalInstancesMap.allComponentsContainer);
@@ -152,4 +208,7 @@ function _initWidgetClasses(){
 
     const sideHandler = new SideHandler();
     globalInstancesMap.sideHandler = sideHandler;
+
+    const partNumberExtractor = new PartNumberPDFExtractor();
+    globalInstancesMap.partNumberExtractor = partNumberExtractor;
 }

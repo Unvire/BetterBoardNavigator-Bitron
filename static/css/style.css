@@ -37,7 +37,26 @@ body{
     -ms-user-select: none;
 }
 
-#load-file-input{
+ul{
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+li{
+    white-space: nowrap;
+    margin-left: 20px;
+    cursor: pointer;
+}
+
+p{
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    font-size: 0.8em;
+}
+
+
+#load-files-input{
     display: none;
 }
 

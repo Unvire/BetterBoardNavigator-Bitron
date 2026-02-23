@@ -37,7 +37,7 @@ class WidgetAdapter{
         const selectedComponentSpan = globalInstancesMap.selectedComponentSpan;
         const sideHandler = globalInstancesMap.sideHandler;
 
-        commonPrefixSpan.innerText = "";
+        commonPrefixSpan.innerText = '';
         currentSideSpan.innerText = sideHandler.currentSide();
 
         selectedComponentSpan.innerText = "";
@@ -101,7 +101,7 @@ class DynamicSelectableListAdapter{
         const itemName = DynamicSelectableListAdapter.generatePinoutTableForComponent(itemElement);
         EngineAdapter.findComponentByName(itemName, isSelectionModeSingle);
         EngineAdapter.componentInScreenCenter(itemName);
-        DynamicSelectableListAdapter.generateMarkedComponentsList()
+        DynamicSelectableListAdapter.generateMarkedComponentsList();
     }
 
     static onClickItemEvent(itemElement){
@@ -182,7 +182,7 @@ class TreeViewAdapter{
 
         netsTreeview.eventBeforeSelection = EngineAdapter.unselectNet;
         netsTreeview.netEvent = TreeViewAdapter.selectNetFromTreeviewEvent;
-        netsTreeview.componentEvent = TreeViewAdapter.selectNetComponentByName;
+        netsTreeview.componentEvent = EngineAdapter.selectNetComponentByName;
         netsTreeview.addBranches(netsMap);
         netsTreeview.generate();
     }
@@ -246,6 +246,12 @@ class InputModalBoxAdapter{
     }
 }
 
+class HelpModalAdapter{
+    static generateModalBox(modalboxInstance){
+        modalboxInstance.show();
+    }
+}
+
 class SimpleModalAdapter{
     static generateModalBox(modalboxInstance){
         modalboxInstance.show();
@@ -258,9 +264,9 @@ class PartNumberSpanAdapter{
             return;
         }
 
-        const partNumberSpan = globalInstancesMap.getPartNumberSpan();
-        const partNumberComponentNameSpan = globalInstancesMap.getPartNumberComponentNameSpan();
-        const partNumberExtractor = globalInstancesMap.getPdfPartNumberExtractor();
+        const partNumberSpan = globalInstancesMap.partNumberSpan;
+        const partNumberComponentNameSpan = globalInstancesMap.partNumberComponentNameSpan;
+        const partNumberExtractor = globalInstancesMap.partNumberExtractor;
 
         const partNumber = partNumberExtractor.getPartNumberOfComponent(componentName);
         if (partNumber == ""){

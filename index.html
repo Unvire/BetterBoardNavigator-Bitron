@@ -9,6 +9,7 @@
     
     <script type="text/javascript" src="./static/pyodide/pyodide.js"></script>
     <script type="text/javascript" src="./static/js/pdfjs/pdf.min.js"></script>
+    <script type="text/javascript" src="./static/js/main.js"></script>
     <script type="text/javascript" src="./static/js/loadingScreen.js"></script>
     <script type="text/javascript" src="./static/js/pythonConfigurator.js"></script>    
     <script type="text/javascript" src="./static/js/cadFileLoader.js"></script>
@@ -103,7 +104,6 @@
             <div class="item-header"> 
                 <p class="section-title">Lista siatek</p>
             </div>
-            <div id="net-treeview" class="tree-view"></div>
             <div id="net-treeview" class="tree-view"></div>
         </div>
         <div id="item-center" class="functionality-container">
@@ -296,6 +296,7 @@
         let loadedFileName = "";
         let resizeTimeout = null;
         let isTextModalInputFocused = false;
+        let isPdfFileLoaded = false;
         
         let loadingScreenInterval = null; 
 

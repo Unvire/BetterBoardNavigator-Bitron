@@ -3,7 +3,7 @@ class CadFileLoader{
         const fileName = `/${file.name}`;
         const reader = new FileReader();
 
-        LoadingScreen.setLoadingScreenMessage("Processing schematic file");
+        LoadingScreen.setLoadingScreenMessage("Przetwarzanie schematu");
         LoadingScreen.showLoadingDots();
 
         reader.onload = (event) => {

@@ -39,6 +39,6 @@ class PythonConfigurator{
         }
 
         LoadingScreen.hideLoadingDots();
-        LoadingScreen.setLoadingScreenMessage("Application initialized. Load a schematic file!")
+        LoadingScreen.setLoadingScreenMessage("Aplikacja załadowana. Wczytaj schemat!")
     }
 }

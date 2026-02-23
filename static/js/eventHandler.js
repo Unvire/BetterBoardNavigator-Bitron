@@ -43,13 +43,38 @@ class EventHandler{
         canvas.height = canvasParent.clientHeight;
     }
 
-    static loadFile(event, loadedFileName){
-        const file = event.target.files[0];
-        if (file) {
-            CadFileLoader.removePreviousFileFromFS(pyodide, loadedFileName);
-            CadFileLoader.openAndLoadCadFile(pyodide, file);
-            EventHandler.enableButtons();
-            return file.name;
+    static loadCadFile(loadedFileName){
+        const partNumberSearcherIframe = globalInstancesMap.partNumberSearcherIframe;
+        const partNumberSearcherButton = globalInstancesMap.partNumberSearcherButton;
+
+        CadFileLoader.removePreviousFileFromFS(pyodide, loadedFileName);
+        CadFileLoader.openAndLoadCadFile(pyodide, loadedFileName);
+        EventHandler.enableButtons();
+        
+        isPdfFileLoaded = false;
+        partNumberSearcherButton.disabled = true;
+        partNumberSearcherIframe.contentWindow.location.reload();
+        return loadedFileName.name;
+    }
+
+    static async loadPdfFile(loadedFileName){
+        const partNumberExtractor = globalInstancesMap.partNumberExtractor;
+        const partNumberSearcherButton = globalInstancesMap.partNumberSearcherButton;
+        const iframe = globalInstancesMap.partNumberSearcherIframe;
+        
+        const pnDict = await partNumberExtractor.getPartNumbers(loadedFileName);
+
+        if (Object.keys(pnDict).length === 0) {
+            partNumberSearcherButton.disabled = true;
+            isPdfFileLoaded = false;
+            alert("W pliku PDF nie ma tabel z part numberami!");
+        } else {
+            partNumberSearcherButton.disabled = false;
+            isPdfFileLoaded = true;
+            iframe.contentWindow.postMessage({
+                type: "PN_DICT",
+                payload: pnDict
+            }, "*");
         }
     }
 
@@ -125,6 +150,11 @@ class EventHandler{
         HelpModalAdapter.generateModalBox(modalHelp)
     }
 
+    static showPartNumberSearcherModalBox(){
+        const modalPartNumberSearcher = globalInstancesMap.modalPartNumberSearcher;
+        SimpleModalAdapter.generateModalBox(modalPartNumberSearcher);
+    }
+
     static loadDemoFile(loadedFileName){
         fetch("./static/cad_files/demo.cad")
             .then(response => response.blob())
@@ -132,12 +162,10 @@ class EventHandler{
                 const demofile = new File([blob], "demo.cad", {type: "application/octet-stream"});
                 EventHandler.loadCadFile(demofile);
                 
-                
-                const partNumberButton = globalInstancesMap.getPartNumberSearcherButton();
-                partNumberButton.disabled = false;
+                globalInstancesMap.partNumberSearcherButton.disabled = false;
                 isPdfFileLoaded = true;
 
-                const partNumberExtractor = globalInstancesMap.getPdfPartNumberExtractor();
+                const partNumberExtractor = globalInstancesMap.partNumberExtractor;
                 const pnDict = {
                     "R1": {"partNumber": "kod1", "description": "opis1"},
                     "R2": {"partNumber": "kod2", "description": "opis2"},
@@ -153,7 +181,7 @@ class EventHandler{
                 partNumberExtractor.pnDict = pnDict;
                 
                 
-                const iframe = globalInstancesMap.getPartNumberSearcherIframe();
+                const iframe = globalInstancesMap.partNumberSearcherIframe;
                 iframe.onload = () => {
                     iframe.contentWindow.postMessage({
                         type: "PN_DICT",
