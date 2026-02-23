@@ -37,27 +37,7 @@ body{
     -ms-user-select: none;
 }
 
-ul{
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-}
-
-li{
-    white-space: nowrap;
-    margin-left: 20px;
-    cursor: pointer;
-}
-
-p{
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
-    font-size: 0.8em;
-}
-
-
-
-input.hidden{
+#load-file-input{
     display: none;
 }
 
@@ -68,6 +48,7 @@ input.hidden{
     background-color: var(--COLOR-BUTTONS-FLEXBOX-BG);
     padding-top: var(--BUTTONS-ROW-VERTICAL-PADDING);
     padding-bottom: var(--BUTTONS-ROW-VERTICAL-PADDING);
+    gap: 1.5em;
     gap: 1.5em;
 }
 

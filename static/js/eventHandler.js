@@ -9,8 +9,8 @@ class EventHandler{
 
     static keyDown(event, isTextModalInputFocused){
         if (isTextModalInputFocused){
-            const textModalInput = globalInstancesMap.getTextModalInput();
-            const textModalSubmitButton = globalInstancesMap.getTextModalSubmitButton();
+            const textModalInput = globalInstancesMap.textModalInput;
+            const textModalSubmitButton = globalInstancesMap.textModalSubmitButton;
             
             if (event.key === "Backspace"){
                 textModalInput.value = textModalInput.value.slice(0, -1);
@@ -23,6 +23,12 @@ class EventHandler{
         }
     }
 
+    static isTextFieldEvent(event) {
+        const target = event.target;
+        const tag = (target?.tagName || "").toLowerCase();
+        return tag === "input" || tag === "textarea" || target?.isContentEditable;
+    }
+
     static async windowResize(){
         const RESCALE_AFTER_MS = 15;
         clearTimeout(resizeTimeout);
@@ -30,8 +36,8 @@ class EventHandler{
     }
 
     static setCanvasDimensions(){
-        const canvas = globalInstancesMap.getCanvas();
-        const canvasParent = globalInstancesMap.getCanvasParent();
+        const canvas = globalInstancesMap.canvas;
+        const canvasParent = globalInstancesMap.canvasParent;
 
         canvas.width = canvasParent.clientWidth;
         canvas.height = canvasParent.clientHeight;
@@ -73,21 +79,23 @@ class EventHandler{
     }
 
     static enableButtons(){
-        changeSideButton.disabled = false;
-        rotateButton.disabled = false;
-        mirrorSideButton.disabled = false;
-        toggleOutlinesButton.disabled = false;
-        resetViewButton.disabled = false;
-        areaFromComponentsButton.disabled = false;
-        preserveComponentMarkersButton.disabled = false;
-        clearMarkersButton.disabled = false;
-        unselectNetButton.disabled = false;
-        findComponentUsingNameButton.disabled = false;
-        prefixComponentsButton.disabled = false;
+        globalInstancesMap.changeSideButton.disabled = false;
+        globalInstancesMap.rotateButton.disabled = false;
+        globalInstancesMap.mirrorSideButton.disabled = false;
+        globalInstancesMap.toggleOutlinesButton.disabled = false;
+        globalInstancesMap.resetViewButton.disabled = false;
+        globalInstancesMap.areaFromComponentsButton.disabled = false;
+        globalInstancesMap.preserveComponentMarkersButton.disabled = false;
+        globalInstancesMap.clearMarkersButton.disabled = false;
+        globalInstancesMap.unselectNetButton.disabled = false;
+        globalInstancesMap.findComponentUsingNameButton.disabled = false;
+        globalInstancesMap.prefixComponentsButton.disabled = false;
+        globalInstancesMap.unselectPrefixComponentsButton.disabled = false;
     }
 
     static preserveComponentMarkers(isSelectionModeSingle){
-        const allComponentsList = globalInstancesMap.getAllComponentsList();
+        const allComponentsList = globalInstancesMap.allComponentsList;
+        const preserveComponentMarkersButton = globalInstancesMap.preserveComponentMarkersButton;
         const selectionModesMap = {true: "single", false: "multiple"};
     
         isSelectionModeSingle = !isSelectionModeSingle;
@@ -102,23 +110,25 @@ class EventHandler{
     }
 
     static findComponentUsingName(){
-        const modalSubmit = globalInstancesMap.getModalSubmit();
+        const modalSubmit = globalInstancesMap.modalSubmit;
         InputModalBoxAdapter.generateModalBox(modalSubmit, "Nazwa komponentu", InputModalBoxAdapter.getComponentNameFromInput);
     }
     
     static showCommonPrefixComponents(){
-        const modalSubmit = globalInstancesMap.getModalSubmit();
+        const modalSubmit = globalInstancesMap.modalSubmit;
         InputModalBoxAdapter.generateModalBox(modalSubmit, "Prefix", InputModalBoxAdapter.getCommonPrefixFromInput);
     }
     
     static hideCommonPrefixComponents(){
-        const commonPrefixSpan = globalInstancesMap.getCommonPrefixSpan();
+        const commonPrefixSpan = globalInstancesMap.commonPrefixSpan;
         
         EngineAdapter.hideCommonPrefixComponents();
         commonPrefixSpan.innerText = "";
     }
 
     static toggleOutlines(){
+        const toggleOutlinesButton = globalInstancesMap.toggleOutlinesButton;
+
         EngineAdapter.toggleOutlines();
         EventHandler.toggleButton(toggleOutlinesButton);
     }
@@ -136,13 +146,8 @@ class EventHandler{
     }
 
     static showHelpModalBox(){
-        const modalHelp = globalInstancesMap.getModalHelp();
-        SimpleModalAdapter.generateModalBox(modalHelp);
-    }
-
-    static showPartNumberSearcherModalBox(){
-        const modalPartNumberSearcher = globalInstancesMap.getModalPartNumberSearcher();
-        SimpleModalAdapter.generateModalBox(modalPartNumberSearcher);
+        const modalHelp = globalInstancesMap.modalHelp;
+        HelpModalAdapter.generateModalBox(modalHelp)
     }
 
     static loadDemoFile(loadedFileName){

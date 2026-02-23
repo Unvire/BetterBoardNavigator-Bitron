@@ -1,13 +1,15 @@
 function openAndLoadCadFile(pyodide, file) {
-    var fileName = `/${file.name}`;
-    const reader = new FileReader(); 
+    const fileName = `/${file.name}`;
+    const reader = new FileReader();
 
-    LoadingScreen.setLoadingScreenMessage("Przetwarzanie schematu");
+    LoadingScreen.setLoadingScreenMessage("Processing schematic file");
     LoadingScreen.showLoadingDots();
 
     reader.onload = (event) => {
         const fileContent = event.target.result;
         pyodide.FS.writeFile(fileName, new Uint8Array(fileContent));
+        
+        const sideHandler = globalInstancesMap.sideHandler;
         const side = sideHandler.currentSide();
 
         pyodide.runPython(`
@@ -34,15 +36,15 @@ function openAndLoadCadFile(pyodide, file) {
             engine.drawAndBlitInterface(SURFACE, '${side}')
             pygame.display.flip()
         `);
-        let allComponents = pyodide.globals.get("allComponents").toJs();
-        DynamicSelectableListAdapter.generateList(allComponentsList, allComponents, DynamicSelectableListAdapter.selectItemFromListEvent, "single");
+        const allComponents = pyodide.globals.get("allComponents").toJs();
+        DynamicSelectableListAdapter.generateList(globalInstancesMap.allComponentsList, allComponents, DynamicSelectableListAdapter.selectItemFromListEvent, "single");
 
         let netsMap = pyodide.globals.get("netsDict").toJs();
         TreeViewAdapter.generateTreeView(netsMap);
 
         WidgetAdapter.resetWidgets();
 
-        const toggleOutlinesButton = globalInstancesMap.getToggleOutlinesButton();
+        const toggleOutlinesButton = globalInstancesMap.toggleOutlinesButton;
         toggleOutlinesButton.classList.add("button-selected");
 
         LoadingScreen.hideLoadingDots();

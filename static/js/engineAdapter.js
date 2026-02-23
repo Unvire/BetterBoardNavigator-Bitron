@@ -1,5 +1,7 @@
 class EngineAdapter{
     static async resizeBoard(){
+        const sideHandler = globalInstancesMap.sideHandler;
+
         EventHandler.setCanvasDimensions();
         const side = sideHandler.currentSide();
         pyodide.runPythonAsync(`
@@ -10,6 +12,8 @@ class EngineAdapter{
     }
 
     static rotateBoard(){
+        const sideHandler = globalInstancesMap.sideHandler;
+
         const side = sideHandler.currentSide();
         pyodide.runPythonAsync(`
             engine.rotateBoardInterface(SURFACE, isClockwise=True, side='${side}', angleDeg=90)
@@ -17,9 +21,15 @@ class EngineAdapter{
         `);
     }
 
-    static findClickedComponents(x, y){
+    static findClickedComponents(x, y){        
+        const sideHandler = globalInstancesMap.sideHandler;
+
         const side = sideHandler.currentSide();
         pyodide.runPython(`
+            clickedComponents = []
+            if engine:
+                clickedXY = [int('${x}'), int('${y}')]
+                clickedComponents = engine.findComponentByClick(clickedXY, '${side}')
             clickedComponents = []
             if engine:
                 clickedXY = [int('${x}'), int('${y}')]
@@ -37,7 +47,9 @@ class EngineAdapter{
         `);
     }
 
-    static zoomInOut(event){
+    static zoomInOut(event){        
+        const sideHandler = globalInstancesMap.sideHandler;
+
         const x = event.offsetX; 
         const y = event.offsetY;
         const isZoomIn = event.deltaY < 0;
@@ -53,6 +65,8 @@ class EngineAdapter{
     }
 
     static changeSide(){
+        const sideHandler = globalInstancesMap.sideHandler;
+
         const side = sideHandler.changeSide();
         pyodide.runPythonAsync(`
             engine.changeSideInterface(SURFACE, '${side}')
@@ -61,6 +75,8 @@ class EngineAdapter{
     }
 
     static mirrorSide(){
+        const sideHandler = globalInstancesMap.sideHandler;
+        
         const side = sideHandler.currentSide();
         pyodide.runPythonAsync(`
             engine.flipUnflipCurrentSideInterface(SURFACE, '${side}')
@@ -69,6 +85,8 @@ class EngineAdapter{
     }
 
     static toggleOutlines(){
+        const sideHandler = globalInstancesMap.sideHandler;
+
         const side = sideHandler.currentSide();
         pyodide.runPythonAsync(`
             engine.showHideOutlinesInterface(SURFACE, '${side}')
@@ -77,6 +95,8 @@ class EngineAdapter{
     }
 
     static resetView(){
+        const sideHandler = globalInstancesMap.sideHandler;
+
         const side = sideHandler.currentSide();
         pyodide.runPython(`
             engine.resetToDefaultViewInterface(SURFACE, '${side}')
@@ -86,6 +106,8 @@ class EngineAdapter{
     }
 
     static areaFromComponents(){
+        const sideHandler = globalInstancesMap.sideHandler;
+
         const side = sideHandler.currentSide();
         pyodide.runPython(`
             engine.useComponentAreaInterface(SURFACE, '${side}')
@@ -95,6 +117,8 @@ class EngineAdapter{
     }
 
     static async clearMarkers(){
+        const sideHandler = globalInstancesMap.sideHandler;
+
         const side = sideHandler.currentSide();
         pyodide.runPython(`
             engine.clearFindComponentByNameInterface(SURFACE, '${side}')
@@ -104,6 +128,8 @@ class EngineAdapter{
     }
 
     static componentInScreenCenter(componentName){
+        const sideHandler = globalInstancesMap.sideHandler;
+
         const side = sideHandler.setComponentSideAsCurrentSide(componentName);
         pyodide.runPython(`
             engine.componentInScreenCenterInterface(SURFACE, '${componentName}', '${side}')
@@ -112,6 +138,8 @@ class EngineAdapter{
     }
 
     static selectNet(netName){
+        const sideHandler = globalInstancesMap.sideHandler;
+
         const side = sideHandler.currentSide();
         pyodide.runPython(`
             engine.selectNetByNameInterface(SURFACE, '${netName}', '${side}')
@@ -120,6 +148,8 @@ class EngineAdapter{
     }
 
     static selectNetComponentByName(componentName){
+        const sideHandler = globalInstancesMap.sideHandler;
+
         const side = sideHandler.setComponentSideAsCurrentSide(componentName);
         pyodide.runPython(`
             engine.selectNetComponentByNameInterface(SURFACE, '${componentName}', '${side}')
@@ -129,6 +159,8 @@ class EngineAdapter{
     }
 
     static unselectNet(){
+        const sideHandler = globalInstancesMap.sideHandler;
+
         const side = sideHandler.currentSide();
         pyodide.runPython(`
             engine.unselectNetInterface(SURFACE, '${side}')
@@ -137,6 +169,8 @@ class EngineAdapter{
     }
 
     static showCommonPrefixComponents(prefix){
+        const sideHandler = globalInstancesMap.sideHandler;
+        
         const side = sideHandler.currentSide();
         pyodide.runPython(`
             isPrefixExist = engine.checkIfPrefixExists('${prefix}')
@@ -149,6 +183,8 @@ class EngineAdapter{
     }
 
     static hideCommonPrefixComponents(){
+        const sideHandler = globalInstancesMap.sideHandler;
+
         const side = sideHandler.currentSide();
         pyodide.runPython(`
             engine.clearCommonTypeComponentsInterface(SURFACE, '${side}')
@@ -157,6 +193,8 @@ class EngineAdapter{
     }
 
     static findComponentByName(componentName, isSelectionModeSingle){
+        const sideHandler = globalInstancesMap.sideHandler;
+        
         const componentSide = sideHandler.getSideOfComponent(componentName);
         if (!componentSide){
             return false;

@@ -7,14 +7,14 @@
     <link rel="icon" type="image/png" href="./static/image/favicon.png">
     <link rel="stylesheet" href="./static/css/style.css"/>
     
-    <script src="./static/pyodide/pyodide.js"></script>
-    <script src="./static/js/pdfjs/pdf.min.js"></script>
+    <script type="text/javascript" src="./static/pyodide/pyodide.js"></script>
+    <script type="text/javascript" src="./static/js/pdfjs/pdf.min.js"></script>
     <script type="text/javascript" src="./static/js/loadingScreen.js"></script>
-    <script type="text/javascript" src="./static/js/configurePythonFunctions.js"></script>    
+    <script type="text/javascript" src="./static/js/pythonConfigurator.js"></script>    
     <script type="text/javascript" src="./static/js/fileFunctions.js"></script>
     <script type="text/javascript" src="./static/js/sideHandler.js"></script>
-    <script type="text/javascript" src="./static/js/events.js"></script>
-    <script type="text/javascript" src="./static/js/mouseEvents.js"></script>
+    <script type="text/javascript" src="./static/js/eventHandler.js"></script>
+    <script type="text/javascript" src="./static/js/mouseEventHandler.js"></script>
     <script type="text/javascript" src="./static/js/engineAdapter.js"></script>
     <script type="text/javascript" src="./static/js/dynamicSelectableList.js"></script>
     <script type="text/javascript" src="./static/js/pinoutTable.js"></script>
@@ -22,7 +22,6 @@
     <script type="text/javascript" src="./static/js/modals.js"></script>
     <script type="text/javascript" src="./static/js/dynamicSpanList.js"></script>
     <script type="text/javascript" src="./static/js/widgetAdapter.js"></script>
-    <script type="text/javascript" src="./static/js/globalInstancesMap.js"></script>
     <script type="text/javascript" src="./static/js/pdfPartNumberExtractor.js"></script>
 </head>
 <body>
@@ -105,6 +104,7 @@
                 <p class="section-title">Lista siatek</p>
             </div>
             <div id="net-treeview" class="tree-view"></div>
+            <div id="net-treeview" class="tree-view"></div>
         </div>
         <div id="item-center" class="functionality-container">
             <div id="loading-screen" class="app-loading">
@@ -135,6 +135,7 @@
                     <p>Siatka</p>
                 </div>
             </div>
+            <div id="pinout-table" class="table-body"></div>
             <div id="pinout-table" class="table-body"></div>
         </div>
     </div>
@@ -286,233 +287,25 @@
         </div>
     </div>
     <script>
-        LoadingScreen.showLoadingScreen();
-        LoadingScreen.showLoadingDots();
+        /* class or namespace for storing html elements and widget classes*/ 
+        class GlobalInstancesMap{};
 
-        EventHandler.compensateUserDevicePixelRatio();
 
-        // global variables. Global variables for mouse events are in the mouseEvents.js
+        /* global variables and flags */
         let pyodide = null;
         let loadedFileName = "";
         let resizeTimeout = null;
         let isTextModalInputFocused = false;
-        let isPdfFileLoaded = false;
         
+        let loadingScreenInterval = null; 
 
-        // buttons row
-        const loadFilesButton = document.getElementById("load-files-button");
-        const loadFilesInput = document.getElementById("load-files-input");
+        let isMousePressed = false;
+        let isMouseClickedFirstTime = false;
+        let isSelectionModeSingle = true;
 
-        const changeSideButton = document.getElementById("change-side-button");
-        const rotateButton = document.getElementById("rotate-button");
-        const mirrorSideButton = document.getElementById("mirror-side-button");
-        const toggleOutlinesButton = document.getElementById("toggle-outlines-button");
-
-        const resetViewButton = document.getElementById("default-view-button");    
-        const areaFromComponentsButton = document.getElementById("components-area-button");
-
-        const partNumberSearcherButton = document.getElementById("part-number-searcher-button");
-        const partNumberSearcherIframe = document.getElementById("part-number-searcher-iframe");
-        
-        const clearMarkersButton = document.getElementById("unselect-components-button");
-        const unselectNetButton = document.getElementById("unselect-net-button");
-
-        const prefixComponentsButton = document.getElementById("prefix-components-button");
-        const unselectPrefixComponentsButton = document.getElementById("unselect-prefix-components-button");
-
-        const helpButton = document.getElementById("help-button");
-
-        // middle
-        const canvas = document.getElementById("canvas");
-        const canvasParent = document.getElementById("item-center");
-
-        // left top
-        const currentSideSpan = document.getElementById("current-side-span");
-        const commonPrefixSpan = document.getElementById("common-prefix-span");
-        const partNumberSpan = document.getElementById("part-number-span");
-        const partNumberComponentNameSpan = document.getElementById("part-number-component-name-span");
-
-        // left middle
-        const allComponentsContainer = document.getElementById("scrollable-all-components-list");
-        const findComponentUsingNameButton = document.getElementById("find-component-by-name-button");
-        const preserveComponentMarkersButton = document.getElementById("toggle-leave-markers-button");
-
-        // left bot
-        const markedComponentsContainer = document.getElementById("scrollable-marked-components-list");
-
-        // right top
-        const clickedComponentContainer = document.getElementById("clicked-components");
-        
-        // right middle
-        const pinoutTableContainer = document.getElementById("pinout-table");
-        const selectedComponentSpan = document.getElementById("selected-component-span");
-
-        // right bot
-        const netTreeviewContainer = document.getElementById("net-treeview");
-
-        const textModalContainer = document.getElementById("text-modal");
-        const textModalCloseSpan = document.getElementById("text-modal-close-span");
-        const textModalPromptHeader = document.getElementById("text-modal-header");
-        const textModalInput = document.getElementById("text-modal-input");
-        const textModalSubmitButton = document.getElementById("text-modal-submit-text");
-
-        const paragraphModalContainer = document.getElementById("paragraph-modal");
-        const paragraphModalCloseSpan = document.getElementById("paragraph-modal-close-span");
-        const paragraphModalPromptHeader = document.getElementById("paragraph-modal-header");
-        const paragraphModalTextParagraph = document.getElementById("paragraph-modal-p");
-
-        const helpModalContainer = document.getElementById("help-modal");
-        const helpModalCloseSpan = document.getElementById("help-modal-close-span");
-        const helpModalHeader = document.getElementById("help-modal-header");
-        const showDemoBoardButton = document.getElementById("show-demo-board-button");
-        
-        const partNumberModalContainer = document.getElementById("part-number-searcher-modal");
-        const partNumberModalCloseSpan = document.getElementById("part-number-searcher-modal-close-span");
-        const partNumberModalHeader = document.getElementById("part-number-searcher-modal-header");
-        
-
-
-        var globalInstancesMap = new GlobalInstancesMap();
-        globalInstancesMap.setCanvas(canvas);
-        globalInstancesMap.setCanvasParent(canvasParent);
-        globalInstancesMap.setSelectedComponentSpan(selectedComponentSpan);
-        globalInstancesMap.setCommonPrefixSpan(commonPrefixSpan);
-        globalInstancesMap.setCurrentSideSpan(currentSideSpan);
-        globalInstancesMap.setToggleOutlinesButton(toggleOutlinesButton);
-        globalInstancesMap.setPartNumberSearcherIframe(partNumberSearcherIframe);
-        globalInstancesMap.setPartNumberSearcherButton(partNumberSearcherButton);
-        globalInstancesMap.setPartNumberSpan(partNumberSpan);
-        globalInstancesMap.setPartNumberComponentNameSpan(partNumberComponentNameSpan);
-
-        var modalSubmit = new ModalSubmit(textModalContainer, textModalCloseSpan, 
-                                            textModalPromptHeader, textModalInput, 
-                                            textModalSubmitButton);
-        globalInstancesMap.setModalSubmit(modalSubmit);
-        globalInstancesMap.setTextModalSubmitButton(textModalSubmitButton);
-        globalInstancesMap.setTextModalInput(textModalInput);
-
-        var modalHelp = new ModalHelp(helpModalContainer, helpModalCloseSpan, helpModalHeader, showDemoBoardButton);
-        modalHelp.eventParameter = loadedFileName;
-        modalHelp.setButtonEvent(EventHandler.loadDemoFile);
-        globalInstancesMap.setModalHelp(modalHelp);
-        globalInstancesMap.setShowDemoBoardButton(showDemoBoardButton);
-
-        var modalPartNumberSearcher = new ModalPartNumberSearcher(partNumberModalContainer, partNumberModalCloseSpan, partNumberModalHeader);
-        globalInstancesMap.setModalPartNumberSearcher(modalPartNumberSearcher);
-
-        var allComponentsList = DynamicSelectableListAdapter.initDynamicSelectableList(allComponentsContainer);
-        globalInstancesMap.setAllComponentsList(allComponentsList);
-
-        var markedComponentsList = DynamicSelectableListAdapter.initDynamicSelectableList(markedComponentsContainer);
-        globalInstancesMap.setMarkedComponentsList(markedComponentsList);
-
-        var pinoutTable = PinoutTableAdapter.initPinoutTable(pinoutTableContainer);
-        globalInstancesMap.setPinoutTable(pinoutTable);
-
-        var netsTreeview = TreeViewAdapter.initTreeView(netTreeviewContainer);
-        globalInstancesMap.setNetsTreeview(netsTreeview);
-
-        var clickedComponentSpanList = SpanListAdapter.initSpanList(clickedComponentContainer);
-        globalInstancesMap.setClickedComponentSpanList(clickedComponentSpanList);
-
-        var sideHandler = new SideHandler();
-
-        var partNumberExtractor = new PartNumberPDFExtractor();
-        globalInstancesMap.setPdfPartNumberExtractor(partNumberExtractor);
-
-        
-        document.addEventListener("DOMContentLoaded", async () => {
-            pinoutTable.generateTable();
-            
-            pyodide = await loadPyodide();
-            await configurePythonPath(pyodide);                      
-            await loadPygame(pyodide);            
-            await loadLocalModules(pyodide);
-
-            pyodide.canvas.setCanvas2D(canvas);
-            EventHandler.setCanvasDimensions();
-            
-            loadFilesButton.disabled = false;
-            helpButton.disabled = false;
-            
-
-            /* EVENTS */
-            window.addEventListener("resize", EventHandler.windowResize);
-            window.addEventListener("keydown", (event) =>{
-                EventHandler.keyDown(event, isTextModalInputFocused);
-                
-                // allow for text field events
-                if (isTextModalInputFocused){
-                    return;
-                }
-
-                // do not pass keydown event to pygame SDL
-                event.stopImmediatePropagation();
-            }, true); 
-
-            window.addEventListener("keyup", (event) => {
-                // do not pass keydown event to pygame SDL
-                event.stopImmediatePropagation();
-            }, true); 
-            
-
-            canvas.addEventListener("mousedown", mouseDownEvent);
-            canvas.addEventListener("mouseup", mouseUpEvent);       
-            canvas.addEventListener("mousemove", mouseMoveEvent);
-            canvas.addEventListener("wheel", EngineAdapter.zoomInOut);
-
-
-            loadFilesButton.addEventListener("click", () => {
-                loadFilesInput.click();
-            });
-            loadFilesInput.addEventListener("change", (event) => {
-                const files = [...event.target.files];
-
-                const cadFile = files.find(f =>
-                    /\.(cad|gcd|tgz|zip)$/i.test(f.name)
-                );
-
-                const pdfFile = files.find(f =>
-                    /\.pdf$/i.test(f.name)
-                );
-
-
-                if (!cadFile) {
-                    alert("Musisz wybrać plik ze schematem płytki");
-                    return;
-                }
-
-                EventHandler.loadCadFile(cadFile);
-                if (pdfFile) {
-                    EventHandler.loadPdfFile(pdfFile);
-                }
-            });
-
-
-            changeSideButton.addEventListener("click", EngineAdapter.changeSide);
-            rotateButton.addEventListener("click", EngineAdapter.rotateBoard);
-            mirrorSideButton.addEventListener("click", EngineAdapter.mirrorSide);
-            toggleOutlinesButton.addEventListener("click", EventHandler.toggleOutlines);
-            resetViewButton.addEventListener("click", EngineAdapter.resetView);
-            areaFromComponentsButton.addEventListener("click", EngineAdapter.areaFromComponents);
-            preserveComponentMarkersButton.addEventListener("click", () => {
-                isSelectionModeSingle = EventHandler.preserveComponentMarkers(isSelectionModeSingle);
-            });
-            clearMarkersButton.addEventListener("click", EngineAdapter.clearMarkers);
-            unselectNetButton.addEventListener("click", EventHandler.unselectNet);            
-            findComponentUsingNameButton.addEventListener("click", EventHandler.findComponentUsingName);
-            prefixComponentsButton.addEventListener("click", EventHandler.showCommonPrefixComponents);
-            unselectPrefixComponentsButton.addEventListener("click", EventHandler.hideCommonPrefixComponents);
-            helpButton.addEventListener("click", EventHandler.showHelpModalBox);
-            partNumberSearcherButton.addEventListener("click", EventHandler.showPartNumberSearcherModalBox);
-            
-            textModalInput.addEventListener("focus", () => {
-                isTextModalInputFocused = true;
-            });
-            textModalInput.addEventListener("blur", () => {
-                isTextModalInputFocused = false;
-            });
-        });
+    
+        const globalInstancesMap = new GlobalInstancesMap();
+        main();
     </script>
 </body>
 </html>

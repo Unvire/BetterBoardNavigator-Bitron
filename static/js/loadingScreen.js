@@ -1,8 +1,6 @@
-let loadingInterval = null; 
-
 class LoadingScreen{
     static showLoadingDots() {
-        if (loadingInterval !== null) {
+        if (loadingScreenInterval !== null) {
             return;
         }
         
@@ -10,28 +8,29 @@ class LoadingScreen{
         loadingScreenDots.style.display = ""; // reverts back to value from css
 
         let count = 0;
-        loadingInterval = setInterval(() => {
+        loadingScreenInterval = setInterval(() => {
             count = (count + 1) % 4;   // "" -> "." -> ".." -> "..." -> repeat
             loadingScreenDots.textContent = ".".repeat(count);
         }, 200);
     }
 
     static hideLoadingDots() {
-        if (loadingInterval === null) {
+        if (loadingScreenInterval === null) {
             return;
         }
 
         const loadingScreenDots = document.getElementById("loading-dots");
         loadingScreenDots.style.display = "none";
 
-        clearInterval(loadingInterval);
-        loadingInterval = null;
+        clearInterval(loadingScreenInterval);
+        loadingScreenInterval = null;
     }
+
 
     static setLoadingScreenMessage(message) {
         const loadingScreenText = document.getElementById("loading-text");
         loadingScreenText.textContent = message;
-        
+
         LoadingScreen.showLoadingScreen();
     }
 

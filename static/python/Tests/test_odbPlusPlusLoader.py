@@ -274,7 +274,7 @@ def test__getTarPathsToEdaComponents(exampleTarPaths):
         'odb/steps/pcb/layers/comp_+_top/components.Z',
         'odb/steps/pcb/profile'
         ]
-    assert instance._getTarPathsToEdaComponents(exampleTarPaths) == expected
+    assert instance._getArchivePathsToEdaComponents(exampleTarPaths) == expected
 
 def test__getComponentsFromCompBotTopFiles(exampleComponentsLines):
     botFileLines, topFileLines = exampleComponentsLines
