@@ -9,94 +9,11 @@ function main(){
         _bindHtmlElements();
         _initWidgetClasses();
         
-        pyodide = await loadPyodide();
-        await PythonConfigurator.configurePythonPath(pyodide);                      
-        await PythonConfigurator.loadPygame(pyodide);            
-        await PythonConfigurator.loadLocalModules(pyodide);
+        await _initPyodide();
 
-        pyodide.canvas.setCanvas2D(canvas);
-        EventHandler.setCanvasDimensions();
-        
-        globalInstancesMap.loadFilesButton.disabled = false;
-        globalInstancesMap.helpButton.disabled = false;
-        globalInstancesMap.boardHistoryButton.disabled = false;
-
-        /* EVENTS */
-        window.addEventListener("resize", EventHandler.windowResize);
-
-        window.addEventListener("keydown", (event) =>{
-            EventHandler.keyDown(event, isTextModalInputFocused);
-            
-            // allow for text field events
-            if (isTextModalInputFocused || EventHandler.isTextFieldEvent(event)){
-                return;
-            }
-
-            // do not pass keydown event to pygame SDL
-            event.stopImmediatePropagation();
-        }, true); 
-
-        window.addEventListener("keyup", (event) => {
-            // do not pass keydown event to pygame SDL
-            event.stopImmediatePropagation();
-        }, true);            
-
-
-        globalInstancesMap.canvas.addEventListener("mousedown", MouseEventHandler.mouseDownEvent);
-        globalInstancesMap.canvas.addEventListener("mouseup", MouseEventHandler.mouseUpEvent);       
-        globalInstancesMap.canvas.addEventListener("mousemove", MouseEventHandler.mouseMoveEvent);
-        globalInstancesMap.canvas.addEventListener("wheel", EngineAdapter.zoomInOut);
-
-        globalInstancesMap.loadFilesButton.addEventListener("click", () => {
-            globalInstancesMap.loadFilesInput.click();
-        });
-        globalInstancesMap.loadFilesInput.addEventListener("change", (event) => {
-            const files = [...event.target.files];
-
-            const cadFile = files.find(f =>
-                /\.(cad|gcd|tgz|zip)$/i.test(f.name)
-            );
-
-            const pdfFile = files.find(f =>
-                /\.pdf$/i.test(f.name)
-            );
-
-
-            if (!cadFile) {
-                alert("Musisz wybrać plik ze schematem płytki");
-                return;
-            }
-
-            EventHandler.loadCadFile(cadFile);
-            if (pdfFile) {
-                EventHandler.loadPdfFile(pdfFile);
-            }
-        });
-
-        globalInstancesMap.changeSideButton.addEventListener("click", EngineAdapter.changeSide);
-        globalInstancesMap.rotateButton.addEventListener("click", EngineAdapter.rotateBoard);
-        globalInstancesMap.mirrorSideButton.addEventListener("click", EngineAdapter.mirrorSide);
-        globalInstancesMap.toggleOutlinesButton.addEventListener("click", EventHandler.toggleOutlines);
-        globalInstancesMap.resetViewButton.addEventListener("click", EngineAdapter.resetView);
-        globalInstancesMap.areaFromComponentsButton.addEventListener("click", EngineAdapter.areaFromComponents);
-        globalInstancesMap.preserveComponentMarkersButton.addEventListener("click", () => {
-            isSelectionModeSingle = EventHandler.preserveComponentMarkers(isSelectionModeSingle);
-        });
-        globalInstancesMap.clearMarkersButton.addEventListener("click", EngineAdapter.clearMarkers);
-        globalInstancesMap.unselectNetButton.addEventListener("click", EventHandler.unselectNet);            
-        globalInstancesMap.findComponentUsingNameButton.addEventListener("click", EventHandler.findComponentUsingName);
-        globalInstancesMap.prefixComponentsButton.addEventListener("click", EventHandler.showCommonPrefixComponents);
-        globalInstancesMap.unselectPrefixComponentsButton.addEventListener("click", EventHandler.hideCommonPrefixComponents);
-        globalInstancesMap.helpButton.addEventListener("click", EventHandler.showHelpModalBox);
-        globalInstancesMap.partNumberSearcherButton.addEventListener("click", EventHandler.showPartNumberSearcherModalBox);
-        globalInstancesMap.boardHistoryButton.addEventListener("click", EventHandler.showBoardHistoryModalBox);
-        
-        globalInstancesMap.textModalInput.addEventListener("focus", () => {
-            isTextModalInputFocused = true;
-        });
-        globalInstancesMap.textModalInput.addEventListener("blur", () => {
-            isTextModalInputFocused = false;
-        });
+        _bindMouseAndKeyboardEvents();
+        _bindLoadFilesEvents();
+        _bindOnClickEvents();
     });
 }
 
@@ -241,4 +158,100 @@ function _initWidgetClasses(){
 
     const partNumberExtractor = new PartNumberPDFExtractor();
     globalInstancesMap.partNumberExtractor = partNumberExtractor;
+}
+
+async function _initPyodide(){
+    pyodide = await loadPyodide();
+    await PythonConfigurator.configurePythonPath(pyodide);                      
+    await PythonConfigurator.loadPygame(pyodide);            
+    await PythonConfigurator.loadLocalModules(pyodide);
+
+    pyodide.canvas.setCanvas2D(canvas);
+    EventHandler.setCanvasDimensions();
+    
+    globalInstancesMap.loadFilesButton.disabled = false;
+    globalInstancesMap.helpButton.disabled = false;
+    globalInstancesMap.boardHistoryButton.disabled = false;
+}
+
+function _bindMouseAndKeyboardEvents(){
+    window.addEventListener("resize", EventHandler.windowResize);
+
+        window.addEventListener("keydown", (event) =>{
+        EventHandler.keyDown(event, isTextModalInputFocused);
+        
+        // allow for text field events
+        if (isTextModalInputFocused || EventHandler.isTextFieldEvent(event)){
+            return;
+        }
+
+        // do not pass keydown event to pygame SDL
+        event.stopImmediatePropagation();
+    }, true); 
+
+    window.addEventListener("keyup", (event) => {
+        // do not pass keydown event to pygame SDL
+        event.stopImmediatePropagation();
+    }, true);            
+
+
+    globalInstancesMap.canvas.addEventListener("mousedown", MouseEventHandler.mouseDownEvent);
+    globalInstancesMap.canvas.addEventListener("mouseup", MouseEventHandler.mouseUpEvent);       
+    globalInstancesMap.canvas.addEventListener("mousemove", MouseEventHandler.mouseMoveEvent);
+    globalInstancesMap.canvas.addEventListener("wheel", EngineAdapter.zoomInOut);
+}
+
+function _bindLoadFilesEvents(){
+    globalInstancesMap.loadFilesButton.addEventListener("click", () => {
+            globalInstancesMap.loadFilesInput.click();
+    });
+    globalInstancesMap.loadFilesInput.addEventListener("change", (event) => {
+        const files = [...event.target.files];
+
+        const cadFile = files.find(f =>
+            /\.(cad|gcd|tgz|zip)$/i.test(f.name)
+        );
+
+        const pdfFile = files.find(f =>
+            /\.pdf$/i.test(f.name)
+        );
+
+
+        if (!cadFile) {
+            alert("Musisz wybrać plik ze schematem płytki");
+            return;
+        }
+
+        EventHandler.loadCadFile(cadFile);
+        if (pdfFile) {
+            EventHandler.loadPdfFile(pdfFile);
+        }
+    });
+}
+
+function _bindOnClickEvents(){
+    globalInstancesMap.changeSideButton.addEventListener("click", EngineAdapter.changeSide);
+    globalInstancesMap.rotateButton.addEventListener("click", EngineAdapter.rotateBoard);
+    globalInstancesMap.mirrorSideButton.addEventListener("click", EngineAdapter.mirrorSide);
+    globalInstancesMap.toggleOutlinesButton.addEventListener("click", EventHandler.toggleOutlines);
+    globalInstancesMap.resetViewButton.addEventListener("click", EngineAdapter.resetView);
+    globalInstancesMap.areaFromComponentsButton.addEventListener("click", EngineAdapter.areaFromComponents);
+    globalInstancesMap.preserveComponentMarkersButton.addEventListener("click", () => {
+        isSelectionModeSingle = EventHandler.preserveComponentMarkers(isSelectionModeSingle);
+    });
+    globalInstancesMap.clearMarkersButton.addEventListener("click", EngineAdapter.clearMarkers);
+    globalInstancesMap.unselectNetButton.addEventListener("click", EventHandler.unselectNet);            
+    globalInstancesMap.findComponentUsingNameButton.addEventListener("click", EventHandler.findComponentUsingName);
+    globalInstancesMap.prefixComponentsButton.addEventListener("click", EventHandler.showCommonPrefixComponents);
+    globalInstancesMap.unselectPrefixComponentsButton.addEventListener("click", EventHandler.hideCommonPrefixComponents);
+    globalInstancesMap.helpButton.addEventListener("click", EventHandler.showHelpModalBox);
+    globalInstancesMap.partNumberSearcherButton.addEventListener("click", EventHandler.showPartNumberSearcherModalBox);
+    globalInstancesMap.boardHistoryButton.addEventListener("click", EventHandler.showBoardHistoryModalBox);
+    
+    globalInstancesMap.textModalInput.addEventListener("focus", () => {
+        isTextModalInputFocused = true;
+    });
+    globalInstancesMap.textModalInput.addEventListener("blur", () => {
+        isTextModalInputFocused = false;
+        });
 }
