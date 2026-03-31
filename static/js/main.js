@@ -19,6 +19,7 @@ function main(){
         
         globalInstancesMap.loadFilesButton.disabled = false;
         globalInstancesMap.helpButton.disabled = false;
+        globalInstancesMap.boardHistoryButton.disabled = false;
 
         /* EVENTS */
         window.addEventListener("resize", EventHandler.windowResize);
@@ -88,6 +89,7 @@ function main(){
         globalInstancesMap.unselectPrefixComponentsButton.addEventListener("click", EventHandler.hideCommonPrefixComponents);
         globalInstancesMap.helpButton.addEventListener("click", EventHandler.showHelpModalBox);
         globalInstancesMap.partNumberSearcherButton.addEventListener("click", EventHandler.showPartNumberSearcherModalBox);
+        globalInstancesMap.boardHistoryButton.addEventListener("click", EventHandler.showBoardHistoryModalBox);
         
         globalInstancesMap.textModalInput.addEventListener("focus", () => {
             isTextModalInputFocused = true;
@@ -114,6 +116,8 @@ function _bindHtmlElements(){
 
     globalInstancesMap.partNumberSearcherButton = document.getElementById("part-number-searcher-button");
     globalInstancesMap.partNumberSearcherIframe = document.getElementById("part-number-searcher-iframe");
+    globalInstancesMap.boardHistoryButton = document.getElementById("board-history-button");
+    globalInstancesMap.boardHistoryIframe = document.getElementById("board-history-iframe");
 
     globalInstancesMap.clearMarkersButton = document.getElementById("unselect-components-button");
     globalInstancesMap.unselectNetButton = document.getElementById("unselect-net-button");
@@ -156,7 +160,7 @@ function _bindHtmlElements(){
     globalInstancesMap.textModalCloseSpan = document.getElementById("text-modal-close-span");
     globalInstancesMap.textModalPromptHeader = document.getElementById("text-modal-header");
     globalInstancesMap.textModalInput = document.getElementById("text-modal-input");
-    globalInstancesMap.textModalSubmitButton = document.getElementById("text-modal-submit-text");
+    globalInstancesMap.textModalSubmitButton = document.getElementById("text-modal-submit-text-button");
 
     // help modal box
     globalInstancesMap.helpModalContainer = document.getElementById("help-modal");
@@ -168,22 +172,48 @@ function _bindHtmlElements(){
     globalInstancesMap.partNumberModalContainer = document.getElementById("part-number-searcher-modal");
     globalInstancesMap.partNumberModalCloseSpan = document.getElementById("part-number-searcher-modal-close-span");
     globalInstancesMap.partNumberModalHeader = document.getElementById("part-number-searcher-modal-header");
+
+    // board history modal box
+    globalInstancesMap.boardHistoryModalContainer = document.getElementById("board-history-modal");
+    globalInstancesMap.boardHistoryCloseSpan = document.getElementById("board-history-modal-close-span");
+    globalInstancesMap.boardHistoryModalHeader = document.getElementById("board-history-modal-header");
+    globalInstancesMap.boardHistoryShowFailsButton = document.getElementById("board-history-show-fails-button");
 }
 
 function _initWidgetClasses(){
-    const modalSubmit = new ModalSubmit(globalInstancesMap.textModalContainer, globalInstancesMap.textModalCloseSpan, 
-        globalInstancesMap.textModalPromptHeader, globalInstancesMap.textModalInput, globalInstancesMap.textModalSubmitButton);
+    const modalSubmit = new ModalSubmit(
+        globalInstancesMap.textModalContainer, 
+        globalInstancesMap.textModalCloseSpan, 
+        globalInstancesMap.textModalPromptHeader, 
+        globalInstancesMap.textModalInput, 
+        globalInstancesMap.textModalSubmitButton
+    );
     globalInstancesMap.modalSubmit = modalSubmit;
     
-    const modalHelp = new ModalHelp(globalInstancesMap.helpModalContainer, globalInstancesMap.helpModalCloseSpan, 
-        globalInstancesMap.helpModalHeader, globalInstancesMap.showDemoBoardButton);
+    const modalHelp = new ModalHelp(
+        globalInstancesMap.helpModalContainer, 
+        globalInstancesMap.helpModalCloseSpan, 
+        globalInstancesMap.helpModalHeader, 
+        globalInstancesMap.showDemoBoardButton
+    );
     modalHelp.eventParameter = loadedFileName;
     modalHelp.setButtonEvent(EventHandler.loadDemoFile);
     globalInstancesMap.modalHelp = modalHelp;
 
-    const modalPartNumberSearcher = new ModalPartNumberSearcher(globalInstancesMap.partNumberModalContainer, 
-        globalInstancesMap.partNumberModalCloseSpan, globalInstancesMap.partNumberModalHeader);
+    const modalPartNumberSearcher = new ModalPartNumberSearcher(
+        globalInstancesMap.partNumberModalContainer, 
+        globalInstancesMap.partNumberModalCloseSpan, 
+        globalInstancesMap.partNumberModalHeader
+    );
     globalInstancesMap.modalPartNumberSearcher = modalPartNumberSearcher;
+
+    const modalBoardHistory = new ModalBoardHistory(
+        globalInstancesMap.boardHistoryModalContainer,
+        globalInstancesMap.boardHistoryCloseSpan,
+        globalInstancesMap.boardHistoryModalHeader,
+        globalInstancesMap.boardHistoryShowFailsButton
+    );
+    globalInstancesMap.modalBoardHistory = modalBoardHistory;
 
 
     const allComponentsList = DynamicSelectableListAdapter.initDynamicSelectableList(globalInstancesMap.allComponentsContainer);

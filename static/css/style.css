@@ -326,9 +326,14 @@ canvas{
     height: 700px;
 }
 
-#part-number-searcher-modal .modal-content-layout{
+.wide-modal .modal-content-layout{
     width: min(850px, calc(100vw - 40px));
     height: min(850px, calc(100vh - 40px));
+}
+
+.wider-modal .modal-content-layout{
+    width: min(1300px, calc(100vw - 40px));
+    height: min(1300px, calc(100vh - 40px));
 }
 
 .modal-head{

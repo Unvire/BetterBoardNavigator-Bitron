@@ -21,7 +21,6 @@ class ModalBox{
     }
 
     close(){
-        this.header.innerText = "";
         this.parentContainer.style.display = "none";
     }
 
@@ -50,7 +49,8 @@ class ModalSubmit extends ModalBox{
     }
 
     close(){
-        this.textInput.value = "";
+        this.textInput.value = "";        
+        this.header.innerText = "";
         super.close();
     }
 }
@@ -74,10 +74,6 @@ class ModalHelp extends ModalBox{
             this.close();
         });
     }
-
-    close(){
-        this.parentContainer.style.display = "none";
-    }
 }
 
 class ModalPartNumberSearcher extends ModalBox{
@@ -85,8 +81,20 @@ class ModalPartNumberSearcher extends ModalBox{
         super(parentContainer, closeSpan, header);
         this.header.innerText = "Wyszukiwarka part number";
     }
-    
-    close(){
-        this.parentContainer.style.display = "none";
+}
+
+class ModalBoardHistory extends ModalBox{
+    constructor(parentContainer, closeSpan, header, button){
+        super(parentContainer, closeSpan, header);
+        this.button = button;
+        this.header.innerText = "Historia płytki";
+    }
+
+    setButtonEvent(eventFunction){
+        this.buttonEvent = eventFunction;
+        this.button.addEventListener("click", () => {
+            this.buttonEvent(this.parameterConstant);
+            this.close();
+        });
     }
 }

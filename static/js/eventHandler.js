@@ -147,12 +147,17 @@ class EventHandler{
 
     static showHelpModalBox(){
         const modalHelp = globalInstancesMap.modalHelp;
-        HelpModalAdapter.generateModalBox(modalHelp)
+        SimpleModalAdapter.generateModalBox(modalHelp)
     }
 
     static showPartNumberSearcherModalBox(){
         const modalPartNumberSearcher = globalInstancesMap.modalPartNumberSearcher;
         SimpleModalAdapter.generateModalBox(modalPartNumberSearcher);
+    }
+
+    static showBoardHistoryModalBox(){
+        const boardHistory = globalInstancesMap.modalBoardHistory;
+        SimpleModalAdapter.generateModalBox(boardHistory);
     }
 
     static loadDemoFile(loadedFileName){

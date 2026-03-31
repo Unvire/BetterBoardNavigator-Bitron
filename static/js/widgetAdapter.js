@@ -246,12 +246,6 @@ class InputModalBoxAdapter{
     }
 }
 
-class HelpModalAdapter{
-    static generateModalBox(modalboxInstance){
-        modalboxInstance.show();
-    }
-}
-
 class SimpleModalAdapter{
     static generateModalBox(modalboxInstance){
         modalboxInstance.show();
