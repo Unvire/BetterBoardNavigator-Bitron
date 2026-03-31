@@ -2,8 +2,8 @@ class HistoryApp {
     constructor() {
         this.URL = "http://10.140.13.11:5556/api/";
 
-        this.submitBtn = document.getElementById('submitBtn');
-        this.userInput = document.getElementById('userInput');
+        this.submitButton = document.getElementById('submit-button');
+        this.userInput = document.getElementById('user-input');
         this.loader = document.getElementById('loader');
         
         this.tableContainer = document.getElementById('history-table');
@@ -18,19 +18,19 @@ class HistoryApp {
     }
 
     initEventListeners() {
-        userInput.addEventListener('keydown', (event) => {
+        this.userInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
                 event.preventDefault(); 
                 
-                submitBtn.click(); 
+                this.submitButton.click(); 
             }
         });
 
-        this.submitBtn.addEventListener('click', () => this.handleSearch());
+        this.submitButton.addEventListener('click', () => this.handleSearch());
     }
 
     async handleSearch() {
-        const serialNumber = userInput.value.trim();
+        const serialNumber = this.userInput.value.trim();
         if (!serialNumber) {
             alert('Pole nie może być puste!');
             return;
