@@ -287,4 +287,12 @@ class BoardHistoryAdapter{
             payload: tracebilityRootUrl
         }, targetOrigin);
     }
+
+    static getMeasurementsJsonRequest(){
+        const targetOrigin = window.location.origin;
+
+        globalInstancesMap.boardHistoryIframe.contentWindow.postMessage({ 
+            type: 'GET_DATA_REQUEST' 
+        }, targetOrigin);
+    }
 }

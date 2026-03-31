@@ -181,12 +181,13 @@ class EventHandler{
                 partNumberExtractor.pnDict = pnDict;
                 
                 
+                const targetOrigin = window.location.origin;
                 const iframe = globalInstancesMap.partNumberSearcherIframe;
                 iframe.onload = () => {
                     iframe.contentWindow.postMessage({
                         type: "PN_DICT",
                         payload: pnDict
-                    }, "*");
+                    }, targetOrigin);
                 };
 
                 if (iframe.contentWindow && iframe.contentDocument.readyState === "complete"){

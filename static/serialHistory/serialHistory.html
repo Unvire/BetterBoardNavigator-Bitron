@@ -48,11 +48,11 @@
                 break;
 
                 case 'GET_DATA_REQUEST':
-                    const currentData = { history: [1, 2, 3], timestamp: Date.now() };
+                    const currentMeasurementsJson = historyAppInstance.getMeasurementsJson();
                 
                     window.parent.postMessage({
                         type: 'DATA_RESPONSE',
-                        payload: currentData
+                        payload: currentMeasurementsJson
                     }, targetOrigin);
                 break;
             }

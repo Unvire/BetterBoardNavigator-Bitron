@@ -13,8 +13,9 @@ function main(){
         _bindBoardHistoryOnLoadEvent(TRACEBILITY_URL);
 
         await _initPyodide();
-
+            
         _initWidgetClasses();
+        _bindIframeResponseEvent();
         _bindMouseAndKeyboardEvents();
         _bindLoadFilesEvents();
         _bindOnClickEvents();
@@ -108,11 +109,6 @@ function _bindBoardHistoryOnLoadEvent(tracebilityRootUrl){
 }
 
 function _changeLanguage(){
-
-}
-
-function _setTracebilityUrlInBoardHistory(){
-    const targetOrigin = window.location.origin;
 
 }
 
@@ -221,6 +217,19 @@ function _bindMouseAndKeyboardEvents(){
     globalInstancesMap.canvas.addEventListener("wheel", EngineAdapter.zoomInOut);
 }
 
+function _bindIframeResponseEvent(){
+    const targetOrigin = window.location.origin;
+
+    window.addEventListener('message', (event) => {
+        if (event.origin !== targetOrigin) return;
+
+        if (event.data.type === 'DATA_RESPONSE') {
+            const receivedData = event.data.payload;
+            console.log("Otrzymano dane z iframe:", receivedData);
+        }
+    });
+}
+
 function _bindLoadFilesEvents(){
     globalInstancesMap.loadFilesButton.addEventListener("click", () => {
             globalInstancesMap.loadFilesInput.click();
@@ -267,11 +276,12 @@ function _bindOnClickEvents(){
     globalInstancesMap.helpButton.addEventListener("click", EventHandler.showHelpModalBox);
     globalInstancesMap.partNumberSearcherButton.addEventListener("click", EventHandler.showPartNumberSearcherModalBox);
     globalInstancesMap.boardHistoryButton.addEventListener("click", BoardHistoryAdapter.showModalBox);
+    globalInstancesMap.boardHistoryShowFailsButton.addEventListener("click", BoardHistoryAdapter.getMeasurementsJsonRequest);
     
     globalInstancesMap.textModalInput.addEventListener("focus", () => {
         isTextModalInputFocused = true;
     });
     globalInstancesMap.textModalInput.addEventListener("blur", () => {
         isTextModalInputFocused = false;
-        });
+    });
 }

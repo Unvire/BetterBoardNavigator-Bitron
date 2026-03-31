@@ -14,10 +14,11 @@ class HistoryApp {
         this.currentlySelectedWrapper = null;
         this.historyTable = null;
 
-        this.initEventListeners();
+        this.#initEventListeners();
     }
 
-    initEventListeners() {
+
+    #initEventListeners() {
         this.userInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
                 event.preventDefault(); 
@@ -26,25 +27,25 @@ class HistoryApp {
             }
         });
 
-        this.submitButton.addEventListener('click', () => this.handleSearch());
+        this.submitButton.addEventListener('click', () => this.#handleSearch());
     }
 
-    async handleSearch() {
+    async #handleSearch() {
         const serialNumber = this.userInput.value.trim();
         if (!serialNumber) {
             alert('Pole nie może być puste!');
             return;
         }
 
-        this.resetTableState();
+        this.#resetTableState();
         this.loader.classList.remove('hidden');
 
         const filteredJsons = await HistoryRequestWrapper.getBoardHistory(this.tracebilityRootUrl, serialNumber);
         this.wrapperInstancesList = filteredJsons.map(itemJson => {
             return new HistoryRecordWrapper(
                 itemJson, 
-                () => this.untoggleAllRows(), 
-                (wrapper) => this.storeExpandedRowInstance(wrapper)
+                () => this._untoggleAllRows(), 
+                (wrapper) => this._storeExpandedRowInstance(wrapper)
             );
         });
 
@@ -54,7 +55,7 @@ class HistoryApp {
         }
     }
 
-    resetTableState() {
+    #resetTableState() {
         this.wrapperInstancesList = [];
         this.currentlySelectedWrapper = null;
         this.tableHeaderContainer.innerHTML = "";
@@ -65,15 +66,24 @@ class HistoryApp {
         this.historyTable.addHeader(historyTableHeader);
     }
 
-    untoggleAllRows() {
+
+    _untoggleAllRows() {
         this.wrapperInstancesList.forEach(wrapperInstance => {
             wrapperInstance.collapse();
         });
         this.currentlySelectedWrapper = null;
     }
 
-    storeExpandedRowInstance(wrapperInstance) {
+    _storeExpandedRowInstance(wrapperInstance) {
         this.currentlySelectedWrapper = wrapperInstance;
-        console.log(this.currentlySelectedWrapper.getMeasurements());
+    }
+
+
+    getMeasurementsJson() {
+        if (!this.currentlySelectedWrapper) {
+            return {};
+        }
+
+        return this.currentlySelectedWrapper.getMeasurements();
     }
 }

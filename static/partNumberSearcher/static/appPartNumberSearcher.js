@@ -5,9 +5,12 @@ const tbody = document.getElementById("tbody");
 let allItems = [];
 let filteredItems = [];
 
+const targetOrigin = window.location.origin;
 
 /* ===== GET DATA FROM PARENT ===== */
 window.addEventListener("message", (event) => {
+    if (event.origin !== targetOrigin) return;
+
     if (!event.data || event.data.type !== "PN_DICT"){
         return;
     }
