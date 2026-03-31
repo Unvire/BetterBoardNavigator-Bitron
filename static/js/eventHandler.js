@@ -155,11 +155,6 @@ class EventHandler{
         SimpleModalAdapter.generateModalBox(modalPartNumberSearcher);
     }
 
-    static showBoardHistoryModalBox(){
-        const boardHistory = globalInstancesMap.modalBoardHistory;
-        SimpleModalAdapter.generateModalBox(boardHistory);
-    }
-
     static loadDemoFile(loadedFileName){
         fetch("./static/cad_files/demo.cad")
             .then(response => response.blob())

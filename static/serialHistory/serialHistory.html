@@ -30,8 +30,32 @@
     </div>
 
     <script>
+        const targetOrigin = window.location.origin;
+        let historyAppInstance = null;
+
         document.addEventListener('DOMContentLoaded', () => {
-            new HistoryApp();
+            historyAppInstance = new HistoryApp();
+        });
+
+
+        window.addEventListener('message', (event) => {
+            if (event.origin !== targetOrigin) return;
+
+            const { type, payload } = event.data;
+            switch (type) {
+                case 'SET_API_ROOT':
+                    historyAppInstance.tracebilityRootUrl = payload;
+                break;
+
+                case 'GET_DATA_REQUEST':
+                    const currentData = { history: [1, 2, 3], timestamp: Date.now() };
+                
+                    window.parent.postMessage({
+                        type: 'DATA_RESPONSE',
+                        payload: currentData
+                    }, targetOrigin);
+                break;
+            }
         });
     </script>
 </body>

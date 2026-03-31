@@ -1,4 +1,6 @@
 function main(){
+    const TRACEBILITY_URL = "http://10.140.13.11:5556/api/";
+
     LoadingScreen.showLoadingScreen();
     LoadingScreen.showLoadingDots();
 
@@ -7,10 +9,12 @@ function main(){
 
     document.addEventListener("DOMContentLoaded", async () => {
         _bindHtmlElements();
-        _initWidgetClasses();
-        
+        _changeLanguage();
+        _bindBoardHistoryOnLoadEvent(TRACEBILITY_URL);
+
         await _initPyodide();
 
+        _initWidgetClasses();
         _bindMouseAndKeyboardEvents();
         _bindLoadFilesEvents();
         _bindOnClickEvents();
@@ -96,6 +100,22 @@ function _bindHtmlElements(){
     globalInstancesMap.boardHistoryModalHeader = document.getElementById("board-history-modal-header");
     globalInstancesMap.boardHistoryShowFailsButton = document.getElementById("board-history-show-fails-button");
 }
+
+function _bindBoardHistoryOnLoadEvent(tracebilityRootUrl){
+    globalInstancesMap.boardHistoryIframe.onload = () => {
+        BoardHistoryAdapter.passTracebilityUrlToIframe(tracebilityRootUrl);
+    };
+}
+
+function _changeLanguage(){
+
+}
+
+function _setTracebilityUrlInBoardHistory(){
+    const targetOrigin = window.location.origin;
+
+}
+
 
 function _initWidgetClasses(){
     const modalSubmit = new ModalSubmit(
@@ -246,7 +266,7 @@ function _bindOnClickEvents(){
     globalInstancesMap.unselectPrefixComponentsButton.addEventListener("click", EventHandler.hideCommonPrefixComponents);
     globalInstancesMap.helpButton.addEventListener("click", EventHandler.showHelpModalBox);
     globalInstancesMap.partNumberSearcherButton.addEventListener("click", EventHandler.showPartNumberSearcherModalBox);
-    globalInstancesMap.boardHistoryButton.addEventListener("click", EventHandler.showBoardHistoryModalBox);
+    globalInstancesMap.boardHistoryButton.addEventListener("click", BoardHistoryAdapter.showModalBox);
     
     globalInstancesMap.textModalInput.addEventListener("focus", () => {
         isTextModalInputFocused = true;

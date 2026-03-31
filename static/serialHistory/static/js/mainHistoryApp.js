@@ -1,6 +1,6 @@
 class HistoryApp {
     constructor() {
-        this.URL = "http://10.140.13.11:5556/api/";
+        this.tracebilityRootUrl = "";
 
         this.submitButton = document.getElementById('submit-button');
         this.userInput = document.getElementById('user-input');
@@ -39,7 +39,7 @@ class HistoryApp {
         this.resetTableState();
         this.loader.classList.remove('hidden');
 
-        const filteredJsons = await HistoryRequestWrapper.getBoardHistory(this.URL, serialNumber);
+        const filteredJsons = await HistoryRequestWrapper.getBoardHistory(this.tracebilityRootUrl, serialNumber);
         this.wrapperInstancesList = filteredJsons.map(itemJson => {
             return new HistoryRecordWrapper(
                 itemJson, 

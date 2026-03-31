@@ -272,3 +272,19 @@ class PartNumberSpanAdapter{
         }
     }
 }
+
+class BoardHistoryAdapter{
+    static showModalBox(){
+        const boardHistoryInstance = globalInstancesMap.modalBoardHistory;
+        boardHistoryInstance.show();        
+    }
+
+    static passTracebilityUrlToIframe(tracebilityRootUrl){
+        const targetOrigin = window.location.origin; 
+
+        globalInstancesMap.boardHistoryIframe.contentWindow.postMessage({
+            type: 'SET_API_ROOT',
+            payload: tracebilityRootUrl
+        }, targetOrigin);
+    }
+}
