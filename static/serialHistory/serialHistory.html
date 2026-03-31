@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historia płytki</title>
+    <link rel="stylesheet" href="./static/css/style.css">
+
+    <script src="./static/js/mainHistoryApp.js"></script>
+    <script src="./static/js/historyRequestWrapper.js"></script>
+    <script src="./static/js/table.js"></script>
+    <script src="./static/js/tableHeader.js"></script>
+    <script src="./static/js/tableRow.js"></script>
+    <script src="./static/js/historyRecordWrapper.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Historia płytki</h1>
+
+        <div class="input-group">
+            <input type="text" id="userInput" placeholder="Wpisz numer seryjny...">
+            <button id="submitBtn">Szukaj</button>
+        </div>
+
+        <div id="loader" class="hidden">Przetwarzanie danych...</div>
+        
+        <div id="history-table" class="table-container">
+            <div id="table-header" class="table-header"></div>
+            <div id="table-body"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            new HistoryApp();
+        });
+    </script>
+</body>
+</html>
