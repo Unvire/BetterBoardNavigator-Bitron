@@ -7,7 +7,10 @@
     --bg-measurment-table-row: #374151;
     --bg-table-header: #101420;
     --bg-row-hover: #0d1220;
-    --bg-row-expanded: #161a25;
+    
+    --bg-row-expanded: #1f2533; 
+    --bg-nested-header: #242a38;
+    --bg-nested-header-hover: #2d3748; /* DODANE: Dedykowany, jaśniejszy kolor hovera nagłówka */
     --bg-input: #0f1118;
     
     /* button*/
@@ -19,25 +22,25 @@
     --text-main: #e8e8ea;
     --text-header: #e8e8ea;
     
-    /* Borders (oparte na --line ze styles.css) */
+    /* Borders */
     --border-main: #2a2e3b;
     --border-dashed: #3a3f50;
     --border-nested: #2a2e3b;
     --border-header: #2a2e3b;
     
-    /* Status Pass (Dopasowane do ciemnego tła) */
+    /* Status Pass */
     --status-pass-text: #4ade80;
-    --status-pass-bg: rgba(74, 222, 128, 0.1);
+    --status-pass-bg: rgba(74, 222, 128, 0.15);
     
-    /* Status Fail (Dopasowane do ciemnego tła) */
+    /* Status Fail */
     --status-fail-text: #f87171;
-    --status-fail-bg: rgba(248, 113, 113, 0.1);
+    --status-fail-bg: rgba(248, 113, 113, 0.15);
     
-    /* Status: N/A (Dopasowane do ciemnego tła) */
+    /* Status: N/A */
     --status-na-text: #facc15;
-    --status-na-bg: rgba(250, 204, 21, 0.1);
+    --status-na-bg: rgba(250, 204, 21, 0.15);
 
-    /* Zaokrąglenia ze styles.css */
+    /* Zaokrąglenia */
     --radius-main: 14px;
     --radius-inner: 12px;
 }
@@ -56,7 +59,6 @@ body {
 .container {
     width: 100%; 
     padding: 0px 20px;
-    /*box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);*/
 }
 
 .input-group {
@@ -112,7 +114,7 @@ button#submit-button:hover {
     border: 1px solid var(--border-main);
     border-radius: var(--radius-inner);
     overflow: hidden; 
-    background: var(--bg-input); /* Tabela ma tło bg-input (#0f1118) jak w styles.css */
+    background: var(--bg-input);
 }
 
 .table-header {
@@ -273,27 +275,45 @@ button#submit-button:hover {
     font-weight: 800;
 }
 
+/* Wymuszenie kolorów na statusach, aby nic ich nie nadpisało */
 .result-pass {
-    color: var(--status-pass-text);
-    background-color: var(--status-pass-bg);
+    color: var(--status-pass-text) !important;
+    background-color: var(--status-pass-bg) !important;
 }
 
 .result-fail {
-    color: var(--status-fail-text);
-    background-color: var(--status-fail-bg);
+    color: var(--status-fail-text) !important;
+    background-color: var(--status-fail-bg) !important;
 }
 
 .result-na {
-    color: var(--status-na-text); 
-    background-color: var(--status-na-bg);
+    color: var(--status-na-text) !important;
+    background-color: var(--status-na-bg) !important;
 }
+
+.hidden { display: none; }
+
+.unselectable {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+
+/* ==========================================================================
+   NESTED MEASUREMENTS CONTAINER
+   ========================================================================== */
 
 .nested-measurements-container {
     margin: 10px 10px 20px 40px; 
     border: 1px dashed var(--border-nested);
     border-radius: 6px;
-    background-color: var(--bg-input);
     overflow: hidden;
+}
+
+.nested-measurements-container .flex-table-row {
+    min-height: auto;
 }
 
 .nested-measurements-container .table-cell {
@@ -301,24 +321,90 @@ button#submit-button:hover {
     font-size: 0.85rem;
 }
 
-.nested-measurements-container .header-cell {
-    padding: 6px 15px; 
-    font-size: 0.7rem; 
+/* Kolory wierszy danych w zagnieżdżonej tabeli */
+.cell-measurement-name, .cell-measurement-value, .cell-measurement-unit {
+    background-color: var(--bg-measurment-table-row);
+}
+.cell-measurement-result {
+    background-color: var(--bg-input);
+}
+
+
+/* --- NAGŁÓWEK ZAGNIEŻDŻONEJ TABELI --- */
+
+.nested-measurements-container .table-header {
+    background-color: var(--bg-nested-header) !important;
+    border-bottom: 1px solid var(--border-nested) !important;
+}
+
+/* Wymuszenie tła i fontu na komórkach wewnątrz nagłówka zagnieżdżonego */
+.nested-measurements-container .table-header .table-cell,
+.nested-measurements-container .table-header .header-cell,
+.nested-measurements-container .table-header .header-cell.sort-asc,
+.nested-measurements-container .table-header .header-cell.sort-desc {
+    background-color: var(--bg-nested-header) !important;
+    color: var(--text-header) !important;
+    font-size: 0.7rem;
+    padding: 6px 15px;
 }
 
 .nested-measurements-container .header-cell::after {
     font-size: 0.65rem;
 }
 
-.nested-measurements-container .flex-table-row {
-    min-height: auto;
+/* Separatory (pionowe linie) w nagłówku */
+.nested-measurements-container .table-header .header-cell {
+    border-right: 1px solid var(--border-nested) !important;
+}
+.nested-measurements-container .table-header .header-cell:last-child {
+    border-right: none !important;
 }
 
-.hidden { display: none; }
 
-.unselectable {
-    user-select: none;           /* Standard (Chrome, Edge, Opera) */
-    -webkit-user-select: none;   /* Safari */
-    -moz-user-select: none;      /* Firefox */
-    -ms-user-select: none;       /* IE10+ */
+/* --- ZARZĄDZANIE EFEKTEM HOVER --- */
+
+/* 1. Całkowite wyłączenie hovera na wierszach danych w zagnieżdżonej tabeli */
+.nested-measurements-container .flex-table-body-row:hover,
+.nested-measurements-container .flex-table-row:hover,
+.nested-measurements-container .table-cell:hover,
+.nested-measurements-container .cell-measurement-name:hover,
+.nested-measurements-container .cell-measurement-value:hover,
+.nested-measurements-container .cell-measurement-unit:hover,
+.nested-measurements-container .cell-measurement-result:hover {
+    box-shadow: none !important;
+    z-index: auto !important;
+}
+
+.nested-measurements-container .flex-table-body-row:hover {
+    background-color: transparent !important;
+}
+
+/* 2. Włączenie hovera TYLKO dla komórek w nagłówku zagnieżdżonym */
+.nested-measurements-container .table-header .header-cell:hover {
+    background-color: var(--bg-nested-header-hover) !important; /* Używamy nowego koloru z :root */
+    cursor: pointer;
+}
+
+
+/* dimensions */
+::-webkit-scrollbar {
+    width: 0.5em;
+    height: 0.5em;
+}
+  
+/* Track */
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px grey;
+    border-radius: 0.4em;
+}
+  
+/* Handle */  
+::-webkit-scrollbar-thumb {
+    background: var(--button-border);
+    border-radius: 0.4em;
+}
+
+/* Scrollbar meeting point */
+::-webkit-scrollbar-corner {
+    background-color: transparent;
 }
