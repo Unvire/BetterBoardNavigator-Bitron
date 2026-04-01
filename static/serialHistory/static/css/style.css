@@ -1,8 +1,7 @@
 :root {
-    /* Zaimportowane kolory ze styles.css */
-    --primary-color: #2b6cff;
+    --arrow-color: #2b6cff;
     
-    /* Backgrounds (Ciemny motyw) */
+    /* Backgrounds */
     --bg-page: #4b5563;
     --bg-measurment-table-row: #374151;
     --bg-table-header: #101420;
@@ -10,7 +9,7 @@
     
     --bg-row-expanded: #1f2533; 
     --bg-nested-header: #242a38;
-    --bg-nested-header-hover: #2d3748; /* DODANE: Dedykowany, jaśniejszy kolor hovera nagłówka */
+    --bg-nested-header-hover: #2d3748;
     --bg-input: #0f1118;
     
     /* button*/
@@ -40,7 +39,7 @@
     --status-na-text: #facc15;
     --status-na-bg: rgba(250, 204, 21, 0.15);
 
-    /* Zaokrąglenia */
+    /* Roundings */
     --radius-main: 14px;
     --radius-inner: 12px;
 }
@@ -84,7 +83,7 @@ input#user-input::placeholder {
 }
 
 input#user-input:focus {
-    border-color: var(--primary-color);
+    border-color: var(--arrow-color);
     box-shadow: 0 0 0 3px rgba(43, 108, 255, 0.15);
 }
 
@@ -106,7 +105,7 @@ button#submit-button:hover {
     text-align: center;
     padding: 20px;
     font-weight: bold;
-    color: var(--primary-color);
+    color: var(--arrow-color);
 }
 
 .table-container {
@@ -193,13 +192,13 @@ button#submit-button:hover {
 .header-cell.sort-asc::after {
     content: "▲";
     opacity: 1;
-    color: var(--primary-color);
+    color: var(--arrow-color);
 }
 
 .header-cell.sort-desc::after {
     content: "▼";
     opacity: 1;
-    color: var(--primary-color);
+    color: var(--arrow-color);
 }
 
 .header-cell.sort-asc, .header-cell.sort-desc {
@@ -219,7 +218,7 @@ button#submit-button:hover {
 
 .flex-table-body-row:hover {
     background-color: var(--bg-row-hover); 
-    box-shadow: inset 4px 0 0 0 var(--primary-color);
+    box-shadow: inset 4px 0 0 0 var(--arrow-color);
     z-index: 1;
 }
 
@@ -232,7 +231,7 @@ button#submit-button:hover {
     display: inline-block;
     margin-right: 8px;
     font-size: 0.75rem;
-    color: var(--primary-color);
+    color: var(--arrow-color);
     transition: transform 0.2s ease;
     opacity: 0.8;
 }
@@ -247,7 +246,7 @@ button#submit-button:hover {
 
 .history-record-wrapper.expanded .flex-table-body-row {
     background-color: var(--bg-row-expanded);
-    box-shadow: inset 4px 0 0 0 var(--primary-color);
+    box-shadow: inset 4px 0 0 0 var(--arrow-color);
 }
 
 .history-record-wrapper.expanded > .flex-table-row {
@@ -275,7 +274,7 @@ button#submit-button:hover {
     font-weight: 800;
 }
 
-/* Wymuszenie kolorów na statusach, aby nic ich nie nadpisało */
+/* Forcing colors so they will work in nested table */
 .result-pass {
     color: var(--status-pass-text) !important;
     background-color: var(--status-pass-bg) !important;
@@ -301,9 +300,6 @@ button#submit-button:hover {
 }
 
 
-/* ==========================================================================
-   NESTED MEASUREMENTS CONTAINER
-   ========================================================================== */
 
 .nested-measurements-container {
     margin: 10px 10px 20px 40px; 
@@ -321,7 +317,7 @@ button#submit-button:hover {
     font-size: 0.85rem;
 }
 
-/* Kolory wierszy danych w zagnieżdżonej tabeli */
+
 .cell-measurement-name, .cell-measurement-value, .cell-measurement-unit {
     background-color: var(--bg-measurment-table-row);
 }
@@ -330,14 +326,13 @@ button#submit-button:hover {
 }
 
 
-/* --- NAGŁÓWEK ZAGNIEŻDŻONEJ TABELI --- */
 
 .nested-measurements-container .table-header {
     background-color: var(--bg-nested-header) !important;
     border-bottom: 1px solid var(--border-nested) !important;
 }
 
-/* Wymuszenie tła i fontu na komórkach wewnątrz nagłówka zagnieżdżonego */
+/* Force colors in nested table */
 .nested-measurements-container .table-header .table-cell,
 .nested-measurements-container .table-header .header-cell,
 .nested-measurements-container .table-header .header-cell.sort-asc,
@@ -352,7 +347,7 @@ button#submit-button:hover {
     font-size: 0.65rem;
 }
 
-/* Separatory (pionowe linie) w nagłówku */
+ /* Forced separator colors */
 .nested-measurements-container .table-header .header-cell {
     border-right: 1px solid var(--border-nested) !important;
 }
@@ -361,9 +356,9 @@ button#submit-button:hover {
 }
 
 
-/* --- ZARZĄDZANIE EFEKTEM HOVER --- */
 
-/* 1. Całkowite wyłączenie hovera na wierszach danych w zagnieżdżonej tabeli */
+
+/* Disable hover in nested rows (of body) */
 .nested-measurements-container .flex-table-body-row:hover,
 .nested-measurements-container .flex-table-row:hover,
 .nested-measurements-container .table-cell:hover,
@@ -379,9 +374,9 @@ button#submit-button:hover {
     background-color: transparent !important;
 }
 
-/* 2. Włączenie hovera TYLKO dla komórek w nagłówku zagnieżdżonym */
+/* Enable hover on table header cells*/
 .nested-measurements-container .table-header .header-cell:hover {
-    background-color: var(--bg-nested-header-hover) !important; /* Używamy nowego koloru z :root */
+    background-color: var(--bg-nested-header-hover) !important;
     cursor: pointer;
 }
 
