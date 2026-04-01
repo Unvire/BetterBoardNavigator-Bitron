@@ -364,6 +364,10 @@ canvas{
     padding: 0;
 }
 
+#board-history-modal .modal-main {
+    padding: 0;
+}
+
 
 
 .modal-main h3{
