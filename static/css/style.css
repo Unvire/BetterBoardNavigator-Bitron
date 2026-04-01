@@ -30,6 +30,10 @@ body{
     user-select: none;
     background-color: var(--COLOR-BG);
     color: var(--COLOR-TEXT-MAIN);
+
+    display: flex;
+    flex-direction: column;
+
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -65,12 +69,15 @@ p{
 .buttons-row-flexbox{
     display: flex;
     justify-content: space-evenly;
-    height: var(--BUTTONS-ROW-HEIGHT);
     background-color: var(--COLOR-BUTTONS-FLEXBOX-BG);
     padding-top: var(--BUTTONS-ROW-VERTICAL-PADDING);
     padding-bottom: var(--BUTTONS-ROW-VERTICAL-PADDING);
     gap: 1.5em;
-    gap: 1.5em;
+    
+    height: auto; 
+    min-height: var(--BUTTONS-ROW-HEIGHT); 
+    align-items: stretch; 
+
 }
 
 .buttons-flexbox{
@@ -78,6 +85,7 @@ p{
     margin: 0.4em 0.4em;
     flex-direction: row;
     justify-content: space-evenly;
+    align-items: stretch;
 }
 
 .vertical-buttons-flexbox{
@@ -92,6 +100,7 @@ p{
     color: var(--COLOR-BUTTON-TEXT);
     margin: 0.2em 0.2em;
     border-radius: 0.4em;
+    white-space: pre-line;
 }
 
 .main-button:disabled{
@@ -120,7 +129,8 @@ p{
     grid-template-columns: repeat(10, minmax(100px, 1fr));
     grid-gap: 0.75em;
     margin: var(--GRID-VERTICAL-MARGIN-PADDING);
-    height: calc(var(--GRID-CONTAINER-HEIGHT) - var(--BUTTONS-ROW-HEIGHT) - (var(--GRID-VERTICAL-MARGIN-PADDING) * 2) - (var(--BUTTONS-ROW-VERTICAL-PADDING) * 2));    
+    flex-grow: 1;
+    min-height: 0;
 }
 
 .functionality-container{
