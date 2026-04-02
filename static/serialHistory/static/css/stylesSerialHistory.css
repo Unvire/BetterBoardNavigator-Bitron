@@ -20,6 +20,7 @@
     /* Typography */
     --text-main: #e8e8ea;
     --text-header: #e8e8ea;
+    --input-placeholder: #7f818a;
     
     /* Borders */
     --border-main: #2a2e3b;
@@ -79,7 +80,7 @@ input#user-input {
 }
 
 input#user-input::placeholder {
-    color: #7f818a;
+    color: var(--button-hover);
 }
 
 input#user-input:focus {
