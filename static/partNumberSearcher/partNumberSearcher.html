@@ -12,18 +12,16 @@
       <input id="search-input" type="text" placeholder="Szukaj (nazwa / kod / opis)..." />
       <button id="clear-button">Wyczyść</button>
     </div>
-    
-    <div class="tableWrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Nazwa</th>
-            <th>Kod</th>
-            <th>Opis</th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
+
+    <div id="history-table" class="table-container">
+      <div id="table-header" class="table-header">
+        <div class="flex-table-row">
+          <div class="table-cell header-cell cell-name unselectable"><span>Komponent</span></div>
+          <div class="table-cell header-cell cell-part-number unselectable"><span>Part number</span></div>
+          <div class="table-cell header-cell cell-description unselectable"><span>Opis</span></div>
+        </div>
+      </div>
+      <div id="table-body"></div>
     </div>
   </div>
 
