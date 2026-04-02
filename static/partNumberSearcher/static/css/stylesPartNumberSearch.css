@@ -1,15 +1,21 @@
 :root {
-  --bg: #374151;
+  --body-bg: #4B5563;
+  --table-input-bg: #0f1118;
+
   --panel: #4B5563; 
+
   --text: #EEEEEE;
   --muted: #c0c0c5;
   --line: #1F2937;
+
   --btn: #52525B;
   --btnHover: #6b7280;
+  --btnBg: #1F2937;
+
   --primary: #2187A3;
   --primaryHover: #196B81;
+
   --radius: 8px;
-  --btnBg: #1F2937;
 }
 
 * { 
@@ -23,7 +29,7 @@ html, body {
 body {
   margin: 0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  background: var(--bg);
+  background: var(--body-bg);
   color: var(--text);
   display: flex;
   flex-direction: column;
