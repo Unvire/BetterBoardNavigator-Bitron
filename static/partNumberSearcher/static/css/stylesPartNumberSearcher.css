@@ -111,6 +111,13 @@ button#clear-button:hover {
     background-color: var(--bg-table-body);
 }
 
+.table-body .table-cell > div {
+    max-width: 100%;
+    overflow-wrap: anywhere; 
+    word-break: break-word;
+    line-height: 1.4em;
+}
+
 .flex-table-row {
     display: flex;
     flex-direction: row;
