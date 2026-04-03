@@ -82,6 +82,7 @@ button#clear-button:hover {
 
 .table-container {
     margin-top: 20px;
+    margin-bottom: 20px;
     border: 1px solid var(--border-main);
     border-radius: var(--radius-inner);
     overflow: hidden; 
@@ -167,7 +168,7 @@ button#clear-button:hover {
   
 /* Handle */  
 ::-webkit-scrollbar-thumb {
-    background: var(--btnBg);
+    background: var(--button-border);
     border-radius: 0.4em;
 }
 
