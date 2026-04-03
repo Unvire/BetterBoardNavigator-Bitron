@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Wyszukiwarka kodu komponentów</title>
   <link rel="stylesheet" href="static/css/stylesPartNumberSearcher.css" />
+  <script src="static/js/appPartNumberSearcher.js"></script>
 </head>
 <body>
   <div class="container">
@@ -13,7 +14,7 @@
       <button id="clear-button">Wyczyść</button>
     </div>
 
-    <div id="history-table" class="table-container">
+    <div id="part-number-table" class="table-container">
       <div id="table-header" class="table-header">
         <div class="flex-table-row">
           <div class="table-cell header-cell cell-name unselectable"><span>Komponent</span></div>
@@ -25,6 +26,27 @@
     </div>
   </div>
 
-  <script src="static/js/appPartNumberSearcher.js"></script>
+  <script>
+    const targetOrigin = window.location.origin;
+    let partNumberSearcherAppInstance = null;
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+      partNumberSearcherAppInstance = new partNumberApp();
+    });
+
+    window.addEventListener("message", (event) => {
+      if (event.origin !== targetOrigin) return;
+
+      if (!event.data || event.data.type !== "PN_DICT") {
+          return;
+      }
+
+      const pnDict = event.data.payload || {};
+
+      partNumberSearcherAppInstance.setPartNumberDict(pnDict);
+      partNumberSearcherAppInstance.renderTable();
+    });
+  </script>  
 </body>
 </html>
