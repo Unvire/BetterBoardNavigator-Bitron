@@ -1,6 +1,8 @@
 :root {
-  --body-bg: #4B5563;
+  --bg-body: #4B5563;
   --bg-input: #0f1118;
+  --bg-table-header: #242a38;
+  --bg-table-body: #374151;
 
   --panel: #4B5563; 
 
@@ -25,7 +27,7 @@
 body {
   margin: 0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  background: var(--body-bg);
+  background: var(--bg-body);
   color: var(--text);
   display: flex;
   justify-content: center;
@@ -106,6 +108,7 @@ button#clear-button:hover {
 .table-body {
     display: flex;
     flex-direction: column;
+    background-color: var(--bg-table-body);
 }
 
 .flex-table-row {
