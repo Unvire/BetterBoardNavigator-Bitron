@@ -1,6 +1,6 @@
 class PartNumberSearcherApp {
     constructor() {
-        this.userInput = document.getElementById("user-input");
+        this.userInput = document.getElementById("search-input");
         this.clearButton = document.getElementById("clear-button");
 
         this.tableContainer = document.getElementById("part-number-table");
@@ -14,6 +14,7 @@ class PartNumberSearcherApp {
 
     setPartNumberDict(rawPnDict) {
         this.allItems = this.#processRawPnDict(rawPnDict);
+        this.filteredItems = [...this.allItems];
     }
 
     renderBody() {
@@ -24,9 +25,9 @@ class PartNumberSearcherApp {
             row.className = "flex-table-row";
 
             const columns = [
-                { className: "cell-name", text: item.name },
-                { className: "cell-part-number", text: item.code },
-                { className: "cell-description", text: item.description }
+                { className: "cell-name", text: partNumberItem.name },
+                { className: "cell-part-number", text: partNumberItem.code },
+                { className: "cell-description", text: partNumberItem.description }
             ];
 
             columns.forEach(col => {
@@ -48,7 +49,7 @@ class PartNumberSearcherApp {
         this.clearButton.addEventListener("click", () => {
             this.userInput.value = "";
             this.filteredItems = [...this.allItems];
-            renderTable();
+            this.renderBody();
         });
 
         this.userInput.addEventListener("input", () => {
@@ -64,7 +65,7 @@ class PartNumberSearcherApp {
                 );
             }
 
-            renderTable();
+            this.renderBody();
         });
     }
 

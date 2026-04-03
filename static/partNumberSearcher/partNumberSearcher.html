@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Wyszukiwarka kodu komponentów</title>
   <link rel="stylesheet" href="static/css/stylesPartNumberSearcher.css" />
-  <script src="static/js/appPartNumberSearcher.js"></script>
+  <script src="static/js/mainPartNumberSearcherApp.js"></script>
 </head>
 <body>
   <div class="container">
@@ -32,20 +32,20 @@
 
 
     document.addEventListener('DOMContentLoaded', () => {
-      partNumberSearcherAppInstance = new partNumberApp();
+      partNumberSearcherAppInstance = new PartNumberSearcherApp();
     });
 
     window.addEventListener("message", (event) => {
       if (event.origin !== targetOrigin) return;
 
       if (!event.data || event.data.type !== "PN_DICT") {
-          return;
+        return;
       }
 
       const pnDict = event.data.payload || {};
 
       partNumberSearcherAppInstance.setPartNumberDict(pnDict);
-      partNumberSearcherAppInstance.renderTable();
+      partNumberSearcherAppInstance.renderBody();
     });
   </script>  
 </body>
