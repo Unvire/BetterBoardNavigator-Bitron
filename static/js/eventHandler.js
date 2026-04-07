@@ -63,6 +63,7 @@ class EventHandler{
         const iframe = globalInstancesMap.partNumberSearcherIframe;
         
         const pnDict = await partNumberExtractor.getPartNumbers(loadedFileName);
+        const targetOrigin = window.location.origin;
 
         if (Object.keys(pnDict).length === 0) {
             partNumberSearcherButton.disabled = true;
@@ -74,7 +75,7 @@ class EventHandler{
             iframe.contentWindow.postMessage({
                 type: "PN_DICT",
                 payload: pnDict
-            }, "*");
+            }, targetOrigin);
         }
     }
 
