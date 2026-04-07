@@ -165,6 +165,10 @@ class EventHandler{
                 globalInstancesMap.partNumberSearcherButton.disabled = false;
                 isPdfFileLoaded = true;
 
+                const targetOrigin = window.location.origin;
+
+
+                /* MOCK DATA FOR PN SEARCHER */    
                 const partNumberExtractor = globalInstancesMap.partNumberExtractor;
                 const pnDict = {
                     "R1": {"partNumber": "kod1", "description": "opis1"},
@@ -180,20 +184,59 @@ class EventHandler{
                 };
                 partNumberExtractor.pnDict = pnDict;
                 
-                
-                const targetOrigin = window.location.origin;
-                const iframe = globalInstancesMap.partNumberSearcherIframe;
-                iframe.onload = () => {
-                    iframe.contentWindow.postMessage({
+                const partNumberIframe = globalInstancesMap.partNumberSearcherIframe;
+                partNumberIframe.onload = () => {
+                    partNumberIframe.contentWindow.postMessage({
                         type: "PN_DICT",
                         payload: pnDict
                     }, targetOrigin);
                 };
 
-                if (iframe.contentWindow && iframe.contentDocument.readyState === "complete"){
-                    iframe.onload(); 
-                }   
+                if (partNumberIframe.contentWindow && partNumberIframe.contentDocument.readyState === "complete"){
+                    partNumberIframe.onload(); 
+                }
 
+
+                /* MOCK DATA (after processing) FOR HISTORY VIEWER */    
+                const historyDict =  [
+                    {	
+                        "processResult": 1,
+                        "testDate": 1614579662,
+                        "phaseDescription": "TEST 1",
+                        "machineName": "MACHINE 1",
+                        "serialNumber": "123456789",
+                        "internalCode": "product 1",
+                        "measures": [
+                            { "result": "pass", "item": "test result" }
+                        ]
+                    }, {
+                        "processResult": 0,
+                        "testDate": 1614608462,
+                        "phaseDescription": "TEST 1",
+                        "machineName": "MACHINE 1",
+                        "serialNumber": "123456789",
+                        "internalCode": "product 1",
+                        "measures": [
+                            { "result": "fail", "item": "C1", "measure": "10",  "unitMeasure": "uF" },
+                            { "result": "fail", "item": "C2", "measure": "15",  "unitMeasure": "nF" },
+                            { "result": "na",   "item": "Q1" },
+                            { "result": "fail", "item": "R1", "measure": "12",  "unitMeasure": "Ohm"  },
+                            { "result": "fail", "item": "R2", "measure": "10",  "unitMeasure": "kOhm" },
+                            { "result": "fail", "item": "R3", "measure": "7",   "unitMeasure": "kOhm" },
+                            { "result": "fail", "item": "R4", "measure": "1",   "unitMeasure": "kOhm" },
+                            { "result": "fail", "item": "R4", "measure": "100", "unitMeasure": "kOhm" }
+                        ]
+                    }	
+                ];
+
+                const historyIframe = globalInstancesMap.boardHistoryIframe;
+                historyIframe.contentWindow.postMessage({ 
+                        type: 'MOCK_HISTORY',
+                        payload: historyDict 
+                    }, 
+                targetOrigin);
+                    
+                
                 return "demo.cad";
             });
     }

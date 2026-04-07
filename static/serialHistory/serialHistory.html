@@ -54,6 +54,13 @@
                         payload: currentMeasurementsJson
                     }, targetOrigin);
                 break;
+
+                case 'MOCK_HISTORY':
+                    const mockHistoryJson = payload;
+
+                    historyAppInstance.resetTableState();
+                    historyAppInstance.setFilteredJsons(mockHistoryJson);
+                break;
             }
         });
     </script>

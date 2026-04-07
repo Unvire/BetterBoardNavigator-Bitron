@@ -17,6 +17,33 @@ class HistoryApp {
         this.#initEventListeners();
     }
 
+    
+    resetTableState() {
+        this.wrapperInstancesList = [];
+        this.currentlySelectedWrapper = null;
+        this.tableHeaderContainer.innerHTML = "";
+        this.tableBodyContainer.innerHTML = "";
+
+        this.historyTable = new HistoryTable(this.tableContainer, this.tableHeaderContainer, this.tableBodyContainer);
+        const historyTableHeader = new HistoryTableHeader(this.historyTable.applySortOnClickCallback);
+        this.historyTable.addHeader(historyTableHeader);
+    }
+
+    setFilteredJsons(filteredJsons) {
+        this.wrapperInstancesList = filteredJsons.map(itemJson => {
+            return new HistoryRecordWrapper(
+                itemJson, 
+                () => this._untoggleAllRows(), 
+                (wrapper) => this._storeExpandedRowInstance(wrapper)
+            );
+        });
+
+        this.loader.classList.add("hidden");
+        if (this.wrapperInstancesList.length > 0) {
+            this.historyTable.addRows(this.wrapperInstancesList);
+        }
+    }
+
 
     #initEventListeners() {
         this.userInput.addEventListener('keydown', (event) => {
@@ -37,35 +64,12 @@ class HistoryApp {
             return;
         }
 
-        this.#resetTableState();
+        this.resetTableState();
         this.loader.classList.remove('hidden');
 
         const filteredJsons = await HistoryRequestWrapper.getBoardHistory(this.tracebilityRootUrl, serialNumber);
-        this.wrapperInstancesList = filteredJsons.map(itemJson => {
-            return new HistoryRecordWrapper(
-                itemJson, 
-                () => this._untoggleAllRows(), 
-                (wrapper) => this._storeExpandedRowInstance(wrapper)
-            );
-        });
-
-        this.loader.classList.add("hidden");
-        if (this.wrapperInstancesList.length > 0) {
-            this.historyTable.addRows(this.wrapperInstancesList);
-        }
+        this.setFilteredJsons(filteredJsons);
     }
-
-    #resetTableState() {
-        this.wrapperInstancesList = [];
-        this.currentlySelectedWrapper = null;
-        this.tableHeaderContainer.innerHTML = "";
-        this.tableBodyContainer.innerHTML = "";
-
-        this.historyTable = new HistoryTable(this.tableContainer, this.tableHeaderContainer, this.tableBodyContainer);
-        const historyTableHeader = new HistoryTableHeader(this.historyTable.applySortOnClickCallback);
-        this.historyTable.addHeader(historyTableHeader);
-    }
-
 
     _untoggleAllRows() {
         this.wrapperInstancesList.forEach(wrapperInstance => {
