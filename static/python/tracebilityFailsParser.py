@@ -1,10 +1,37 @@
 import re
+from collections import defaultdict
+
+
+class _HashPrefixRemover:
+    PREFIXES_TO_REMOVE = ['OPEN', 'RES', 'LNK', 'IND', 'CAP', 'TRN', 'TRP', 'MOS', 'DIO', 'ZEN', 'LED', 'TRC', 'TRF']
+
+    def __init__(self):
+        self.prefixesByLength = defaultdict(set)
+        for p in self.PREFIXES_TO_REMOVE:
+            self.prefixesByLength[len(p)].add(p)
+            
+        self.lengths = sorted(self.prefixesByLength.keys(), reverse=True)
+
+    def clean(self, text:str) -> str:
+        textLen = len(text)
+        
+        for length in self.lengths:
+            if textLen < length:
+                continue
+                
+            if text[:length] in self.prefixesByLength[length]:
+                return text[length:].strip()
+                
+        return text
+    
+    
 
 class TracebilityFailsParser:
     def __init__(self):
         self.rules = [
             (r'^(SHO|FLOAT|LNK2TP)')
         ]
+        self.prefixRemover = _HashPrefixRemover()
 
     def parse(self, text:str) -> list[str]:
         for name, pattern, formatterHandle in self.rules:
@@ -36,3 +63,10 @@ class TracebilityFailsParser:
         sanitized = sanitized.strip()
         sanitized = ' '.join(sanitized.split())
         return sanitized
+
+    def _getComponentsFromSanitizedString(self, text:str) -> list[str]:
+        componentPattern = r'^[A-Z]+\d+$'
+        rawComponents = [item for item in text.split(' ') if re.search(componentPattern, item)]
+        return [self.prefixRemover.clean(item) for item in rawComponents]
+
+        
