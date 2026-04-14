@@ -5,7 +5,7 @@ from tracebilityFailsParser import TracebilityFailsParser
 def parser():
     return TracebilityFailsParser()
 
-@pytest.mark.parametrize("input_text, expected_output", [
+@pytest.mark.parametrize("inputText, expectedOutput", [
     ("FLOAT (303)", "FLOAT 303"),
     ("SHO-HighRes-LowCap (298 256)", "SHO HIGHRES LOWCAP 298 256"),
     ("LNK2TP 3.6V 305-37", "LNK2TP 3 6V 305 37"),
@@ -53,12 +53,20 @@ def parser():
     ("C303", "C303"),
     ("UNKNOWN FORMAT 123", "UNKNOWN FORMAT 123")
 ])
-def test__sanitize(parser, input_text, expected_output):
-    assert parser._sanitize(input_text) == expected_output
+def test__sanitizeToAlphaNumeric(parser, inputText, expectedOutput):
+    assert parser._sanitizeToAlphaNumeric(inputText) == expectedOutput
 
-    
+@pytest.mark.parametrize("inputText, expectedOutput", [
+    ("FLOAT (303)", ["303"]),
+    ("SHO-HighRes-LowCap (298 256)", ["298", "256"]),
+    ("LNK2TP 3.6V 305-37", ["305", "37"]),
+    ("LNK2TP +12V 325-341", ["325", "341"]),
+])
+def test__getTestPoints(parser, inputText, expectedOutput):
+    assert parser._getTestPoints(inputText) == expectedOutput
 
-@pytest.mark.parametrize("input_text, expected_output", [
+
+@pytest.mark.parametrize("inputText, expectedOutput", [
     ("FLOAT (303)", ["303"]),
     ("SHO-HighRes-LowCap (298 256)", ["298", "256"]),
     ("LNK2TP 3.6V 305-37", ["305", "37"]),
@@ -104,6 +112,6 @@ def test__sanitize(parser, input_text, expected_output):
     ("C303", ["C303"]),
     ("UNKNOWN FORMAT 123", ["UNKNOWN"])
 ])
-def test_component_parsing(parser, input_text, expected_output):
+def test_component_parsing(parser, inputText, expectedOutput):
     """Testuje, czy parser poprawnie wyciąga identyfikatory z różnych formatów."""
-    assert parser.parse(input_text) == expected_output
+    assert parser.parse(inputText) == expectedOutput
