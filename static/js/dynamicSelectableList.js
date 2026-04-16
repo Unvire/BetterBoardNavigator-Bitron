@@ -37,6 +37,10 @@ class AbstractDynamicList{
         this.children = this.parentContainer.querySelectorAll("div");
     }
 
+    includes(element){
+        return this.elements.includes(element);
+    }
+
     clearList(){
         this.parentContainer.innerHTML = "";
     }
@@ -119,11 +123,9 @@ class MarkedComponentSelectableList extends AbstractDynamicList{
         closeSpan.addEventListener("click", (event) => {
             event.stopPropagation();
 
-            const value = el;             
-            console.log("Kliknięto X dla wartości:", value);
-
+            const value = el;
             if (this.onCloseIconClick) {
-                this.onCloseIconClick(value, itemDiv);
+                this.onCloseIconClick(value);
             }
         });
 

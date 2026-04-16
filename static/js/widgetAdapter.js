@@ -92,6 +92,12 @@ class DynamicSelectableListAdapter{
 
     static selectItemFromListEvent(itemElement){
         const itemName = DynamicSelectableListAdapter.generatePinoutTableForComponent(itemElement);
+
+        const markedComponentsList = globalInstancesMap.markedComponentsList;
+        if (markedComponentsList.includes(itemName)){
+            return;
+        }
+
         EngineAdapter.findComponentByName(itemName, isSelectionModeSingle);
         EngineAdapter.componentInScreenCenter(itemName);
         DynamicSelectableListAdapter.generateMarkedComponentsList();
@@ -214,18 +220,27 @@ class InputModalBoxAdapter{
     static getComponentNameFromInput(componentName){
         const modalBoxComponentName = componentName.toUpperCase();
         const isComponentExist = EngineAdapter.findComponentByName(modalBoxComponentName, isSelectionModeSingle);
-        if (isComponentExist){            
-            const allComponentsList = globalInstancesMap.allComponentsList;
 
-            if (isSelectionModeSingle) {
-                allComponentsList.unselectAllItems();
-            }
-            allComponentsList.selectItemByName(modalBoxComponentName);
-
-            EngineAdapter.componentInScreenCenter(modalBoxComponentName);
-            PinoutTableAdapter.generatePinoutTable(modalBoxComponentName);
-            DynamicSelectableListAdapter.generateMarkedComponentsList();
+        if (!isComponentExist){ 
+            return;
         }
+
+        const markedComponentsList = globalInstancesMap.markedComponentsList;
+        if (markedComponentsList.includes(modalBoxComponentName)){
+            return;
+        }
+
+
+        const allComponentsList = globalInstancesMap.allComponentsList;
+
+        if (isSelectionModeSingle) {
+            allComponentsList.unselectAllItems();
+        }
+        allComponentsList.selectItemByName(modalBoxComponentName);
+
+        EngineAdapter.componentInScreenCenter(modalBoxComponentName);
+        PinoutTableAdapter.generatePinoutTable(modalBoxComponentName);
+        DynamicSelectableListAdapter.generateMarkedComponentsList();
     }
 
     static getCommonPrefixFromInput(commonPrefix){
