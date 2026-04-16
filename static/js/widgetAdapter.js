@@ -13,7 +13,10 @@ class WidgetAdapter{
         const preserveComponentMarkersButton = globalInstancesMap.preserveComponentMarkersButton;
         
         allComponentsList.unselectAllItems();
-        WidgetAdapter.setSelectionModeToSingle();
+        // change selection mode to single component
+        if (!isSelectionModeSingle){
+            isSelectionModeSingle = EventHandler.preserveComponentMarkers(isSelectionModeSingle);
+        };
 
         pinoutTable.unselectCurrentRows();
         pinoutTable.clearBody();
@@ -41,13 +44,6 @@ class WidgetAdapter{
         currentSideSpan.innerText = sideHandler.currentSide();
 
         selectedComponentSpan.innerText = "";
-    }
-
-    static setSelectionModeToSingle() {
-        const allComponentsList = globalInstancesMap.allComponentsList
-
-        isSelectionModeSingle = true;
-        allComponentsList.selectionMode = "single";
     }
 }
 
@@ -296,11 +292,30 @@ class BoardHistoryAdapter{
         }, targetOrigin);
     }
 
-    static extractNamesFromHistoryResponse(responseItemsList) {
-        if (responseItemsList.length == 0) {
+    static showFailedComponents(tracebiliyTestNames){
+        if (!tracebiliyTestNames){
             return;
         }
+
+        EngineAdapter.clearMarkers();
+        // change selection mode to multiple components
+        if (isSelectionModeSingle){
+            isSelectionModeSingle = EventHandler.preserveComponentMarkers(isSelectionModeSingle);
+        };
         
-        console.log("Otrzymano dane z iframe:", responseItemsList);
+
+        pyodide.globals.set("tracebiliyTestNames", tracebiliyTestNames);
+        pyodide.runPython(`
+            from tracebilityFailsParser import TracebilityFailsParser
+            
+            failsParser = TracebilityFailsParser()
+            failedComponents = failsParser.parse(tracebiliyTestNames)            
+        `);
+
+        const failedComponents = pyodide.globals.get("failedComponents").toJs();
+        failedComponents.forEach(componentName => {
+            EngineAdapter.findComponentByName(componentName, isSelectionModeSingle);
+        });
+        DynamicSelectableListAdapter.generateMarkedComponentsList();
     }
 }

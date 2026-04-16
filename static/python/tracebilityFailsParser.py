@@ -76,3 +76,14 @@ class TracebilityFailsParser:
         return [self.prefixRemover.clean(item) for item in rawComponents]
 
         
+if __name__ == '__main__':
+    fails = [
+        'CAP C138/C139 10.1u 20% -20%', 
+        'CAP C200/C229/C76/C77/C115/C117/C208/C75/C114/C116', 
+        'CAPC32 1u 10% -10%', 
+        'CAPC35 1u 10% -10%', 
+        'JSCAN D26-E'
+    ]
+
+    parser = TracebilityFailsParser()
+    print(parser.parse(fails))

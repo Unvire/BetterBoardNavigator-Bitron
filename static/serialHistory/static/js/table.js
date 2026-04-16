@@ -104,13 +104,7 @@ class MeasurementsTable extends AbstractTable {
     getMeasurementsForMainApp(){
         const measurementsItems = this.rows
             .filter(row => row.getValue("measurement-result") !== "Pass")
-            .map(row => {
-                return {
-                    "name": row.getValue("measurement-name"),
-                    "result": row.getValue("measurement-result")
-                };
-            });
-
+            .map(row => row.getValue("measurement-name"));
         return measurementsItems;
     }
 }

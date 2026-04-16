@@ -225,7 +225,7 @@ function _bindIframeResponseEvent(){
 
         if (event.data.type === 'DATA_RESPONSE') {
             const receivedData = event.data.payload;
-            BoardHistoryAdapter.extractNamesFromHistoryResponse(receivedData);
+            BoardHistoryAdapter.showFailedComponents(receivedData);
         }
     });
 }
