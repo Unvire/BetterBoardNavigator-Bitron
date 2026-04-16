@@ -28,17 +28,23 @@ class _HashPrefixRemover:
 
 class TracebilityFailsParser:
     def __init__(self):
-        self.rules = [
-            (r'^(SHO|FLOAT|LNK2TP)')
-        ]
         self.prefixRemover = _HashPrefixRemover()
 
-    def parse(self, text:str) -> list[str]:
-        for name, pattern, formatterHandle in self.rules:
-            match = re.search(pattern, text)
-            if match:
-                return formatterHandle(match)
-            return 'UNKNOWN'
+    def parse(self, texts:list[str]) -> list[str]:
+        testPointsPatetrn = r'^(SHO|FLOAT|LNK2TP)'
+        
+        componentsSet = set()
+        for text in texts:
+            if re.search(testPointsPatetrn, text):
+                subResult = self._getTestPoints(text)
+            else:
+                sanitizedText = self._sanitizeToAlphaNumeric(text)
+                subResult = self._getComponentsFromSanitizedString(sanitizedText)
+            
+            if subResult:
+                componentsSet.update(subResult)
+
+        return list(componentsSet)
     
     def _getTestPoints(self, text:str) -> list[str]:
         # 'FLOAT (303)' -> ['303'] and 'SHO-HighRes-LowCap (298 256)' -> ['298', '256']

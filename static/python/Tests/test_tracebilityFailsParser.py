@@ -117,3 +117,26 @@ def test__getTestPoints(parser, inputText, expectedOutput):
 def test__getComponentsFromSanitizedString(parser, inputText, expectedOutput):
     sanitized = parser._sanitizeToAlphaNumeric(inputText)
     assert parser._getComponentsFromSanitizedString(sanitized) == expectedOutput
+
+
+def test_parse(parser):
+    inputData = [
+        'LNKR16 182-183',
+        'RESRB1-1-8 10K 5%',
+        'RES R142/R143 50 1%',
+        'RESNTC1 4.7 20%',
+        'LNK R169 + RESR154 220K 5%', 
+        'RES TR42-RBE/TR48-RBE 25.85K 30%', 
+        'RESR270 // R275+C151 6.96K 10%',
+        'CAP EC1/C45/C63/C69/C97/C145/C154/C146/C147/C152/C153/ 89.8uF 15% -15%',
+        'C303-3',
+        'CAPC26+C28 69pF 5% -5%',
+        'DIOD1-D1 !BAV170_D'
+    ]
+    expected = sorted(['R16', 'RB1', 'R142', 'R143', 'NTC1', 'R169', 'R154', 'TR42', 'TR48', 'R270', 'R275', 'C151',
+        'EC1', 'C45', 'C63', 'C69', 'C97', 'C145', 'C154', 'C146', 'C147', 'C152', 'C153', 'C303', 'C26', 'C28', 'D1', 'BAV170'
+    ])
+
+    result = sorted(parser.parse(inputData))
+    assert expected == result
+    
