@@ -92,6 +92,7 @@ class EventHandler{
         globalInstancesMap.findComponentUsingNameButton.disabled = false;
         globalInstancesMap.prefixComponentsButton.disabled = false;
         globalInstancesMap.unselectPrefixComponentsButton.disabled = false;
+        globalInstancesMap.boardHistoryShowFailsButton.disabled = false;
     }
 
     static preserveComponentMarkers(isSelectionModeSingle){
