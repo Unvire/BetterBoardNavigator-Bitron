@@ -32,7 +32,7 @@ class HistoryRecordWrapper {
     }
 
     getMeasurements() {
-        return this.mainRow.getMeasurements();
+        return this.measurementsTable.getMeasurementsForMainApp();
     }
 
     collapse() {

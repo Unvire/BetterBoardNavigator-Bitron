@@ -295,4 +295,12 @@ class BoardHistoryAdapter{
             type: 'GET_DATA_REQUEST' 
         }, targetOrigin);
     }
+
+    static extractNamesFromHistoryResponse(responseItemsList) {
+        if (responseItemsList.length == 0) {
+            return;
+        }
+        
+        console.log("Otrzymano dane z iframe:", responseItemsList);
+    }
 }

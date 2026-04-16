@@ -32,7 +32,7 @@ class PythonConfigurator{
 
         const modulesList = ['geometryObjects', 'abstractShape', 'pin', 'component', 'board', 'unlzw3', 
                             'camcadLoader', 'gencadLoader', 'odbPlusPlusLoader', 'visecadLoader',
-                            'loaderSelectorFactory','boardWrapper', 'pygameDrawBoard']
+                            'loaderSelectorFactory','boardWrapper', 'pygameDrawBoard', 'tracebilityFailsParser']
         
         for (const moduleName of modulesList) {
             await copyModuleToVirtualMemory(pyodide, moduleName);

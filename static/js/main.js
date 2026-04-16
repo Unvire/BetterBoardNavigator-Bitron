@@ -225,7 +225,7 @@ function _bindIframeResponseEvent(){
 
         if (event.data.type === 'DATA_RESPONSE') {
             const receivedData = event.data.payload;
-            console.log("Otrzymano dane z iframe:", receivedData);
+            BoardHistoryAdapter.extractNamesFromHistoryResponse(receivedData);
         }
     });
 }

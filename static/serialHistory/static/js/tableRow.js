@@ -100,10 +100,7 @@ class HistoryRow extends AbstractTableRow {
         return valuesMap[keyName];
     }
 
-    getMeasurements() {
-        return this.measures;
-    }
-
+    
     _rowOnClickEvent() {
         this.parentRowOnClickEvent();
     }
