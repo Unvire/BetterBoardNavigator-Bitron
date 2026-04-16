@@ -295,7 +295,7 @@ class BoardHistoryAdapter{
     }
 
     static showFailedComponents(tracebiliyTestNames){
-        if (!tracebiliyTestNames){
+        if (!Array.isArray(tracebiliyTestNames) || tracebiliyTestNames.length === 0){
             return;
         }
 
@@ -304,7 +304,11 @@ class BoardHistoryAdapter{
         if (isSelectionModeSingle){
             isSelectionModeSingle = EventHandler.preserveComponentMarkers(isSelectionModeSingle);
         };
-        
+
+        const allComponentsList = globalInstancesMap.allComponentsList;
+        const modalBoardHistory = globalInstancesMap.modalBoardHistory;
+
+        allComponentsList.unselectAllItems();
 
         pyodide.globals.set("tracebiliyTestNames", tracebiliyTestNames);
         pyodide.runPython(`
@@ -313,14 +317,17 @@ class BoardHistoryAdapter{
             failsParser = TracebilityFailsParser()
             failedComponents = failsParser.parse(tracebiliyTestNames)            
         `);
-
+        
         const failedComponents = pyodide.globals.get("failedComponents").toJs();
         failedComponents.forEach(componentName => {
-            EngineAdapter.findComponentByName(componentName, isSelectionModeSingle);
+            const ifComponentExist = EngineAdapter.findComponentByName(componentName, isSelectionModeSingle);
+            if (ifComponentExist){
+                allComponentsList.selectItemByName(componentName);
+            }
         });
-        DynamicSelectableListAdapter.generateMarkedComponentsList();
 
-        const modalBoardHistory = globalInstancesMap.modalBoardHistory;
+        DynamicSelectableListAdapter.generateMarkedComponentsList();        
+        
         modalBoardHistory.close()
     }
 }
