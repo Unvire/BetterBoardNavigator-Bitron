@@ -317,5 +317,8 @@ class BoardHistoryAdapter{
             EngineAdapter.findComponentByName(componentName, isSelectionModeSingle);
         });
         DynamicSelectableListAdapter.generateMarkedComponentsList();
+
+        const modalBoardHistory = globalInstancesMap.modalBoardHistory;
+        modalBoardHistory.close()
     }
 }
