@@ -104,7 +104,7 @@ class DynamicSelectableListAdapter{
     }
 
     static generatePinoutTableForComponent(itemElement){
-        let itemName = itemElement.textContent;
+        let itemName = itemElement.getAttribute("data-key");
         PinoutTableAdapter.generatePinoutTable(itemName);
         return itemName;
     }
@@ -293,16 +293,17 @@ class BoardHistoryAdapter{
         if (!Array.isArray(tracebiliyTestNames) || tracebiliyTestNames.length === 0){
             return;
         }
+        
 
-        EngineAdapter.clearMarkers();
+        const allComponentsList = globalInstancesMap.allComponentsList;
+        const modalBoardHistory = globalInstancesMap.modalBoardHistory;
+
         // change selection mode to multiple components
         if (isSelectionModeSingle){
             isSelectionModeSingle = EventHandler.preserveComponentMarkers(isSelectionModeSingle);
         };
 
-        const allComponentsList = globalInstancesMap.allComponentsList;
-        const modalBoardHistory = globalInstancesMap.modalBoardHistory;
-
+        EngineAdapter.clearMarkers();
         allComponentsList.unselectAllItems();
 
         pyodide.globals.set("tracebiliyTestNames", tracebiliyTestNames);

@@ -30,15 +30,8 @@ class AbstractDynamicList{
         this.clearList()
 
         this.elements.forEach(el => {
-            const itemDiv = document.createElement("div");
-            itemDiv.setAttribute("data-key", el);
-
-            const itemChildParagraph = document.createElement("p");
-            itemChildParagraph.innerText = el;
-            
-            itemDiv.appendChild(itemChildParagraph);
+            const itemDiv = this._createItemNode(el);
             this.parentContainer.appendChild(itemDiv);
-            itemDiv.addEventListener("click", () => this._bindOnClickEvent(itemDiv));
         });
 
         this.children = this.parentContainer.querySelectorAll("div");
@@ -46,6 +39,19 @@ class AbstractDynamicList{
 
     clearList(){
         this.parentContainer.innerHTML = "";
+    }
+
+    _createItemNode(el) {
+        const itemDiv = document.createElement("div");
+        itemDiv.setAttribute("data-key", el);
+
+        const itemChildParagraph = document.createElement("p");
+        itemChildParagraph.innerText = el;
+        
+        itemDiv.appendChild(itemChildParagraph);
+        itemDiv.addEventListener("click", () => this._bindOnClickEvent(itemDiv));
+        
+        return itemDiv;
     }
 }
 
@@ -95,9 +101,33 @@ class MarkedComponentSelectableList extends AbstractDynamicList{
     constructor(parentContainer){
         super(parentContainer);
 
-        this.selectionModesMap = {"no": this.#noSelectionMode};   
+        this.selectionModesMap = {"no": this.#noSelectionMode}; 
+        this.onCloseIconClick = null;  
     }
 
     #noSelectionMode(itemDiv){
+    }
+
+    _createItemNode(el) {
+        const itemDiv = super._createItemNode(el);
+        itemDiv.classList.add("flex-list-item");
+
+        const closeSpan = document.createElement("span");
+        closeSpan.className = "close";
+        closeSpan.innerHTML = "&times;";
+
+        closeSpan.addEventListener("click", (event) => {
+            event.stopPropagation();
+
+            const value = el;             
+            console.log("Kliknięto X dla wartości:", value);
+
+            if (this.onCloseIconClick) {
+                this.onCloseIconClick(value, itemDiv);
+            }
+        });
+
+        itemDiv.appendChild(closeSpan);
+        return itemDiv;
     }
 }
