@@ -79,11 +79,6 @@ class SpanListAdapter{
 }
 
 class DynamicSelectableListAdapter{
-    static initDynamicSelectableList(parentContainer){
-        let listInstance = new DynamicSelectableList(parentContainer);
-        return listInstance;
-    }
-
     static generateList(listInstance, dataList, onClickEvent, selectionMode){
         listInstance.elementsList = dataList;
         listInstance.callbackEventFunction = onClickEvent;

@@ -1,7 +1,6 @@
-class DynamicSelectableList{
+class AbstractDynamicList{
     constructor(parentContainer){
         this.parentContainer = parentContainer;
-        this.selectionModesMap = {"no": this.#noSelectionMode, "single": this.#singleSelectionMode, "multiple":this.#multipleSelectionMode};
         this.selectionFunction = null;
         this.elements = [];
         this.callbackEventFunction = null;
@@ -19,28 +18,11 @@ class DynamicSelectableList{
     set selectionMode(mode){
         this.selectionFunction = this.selectionModesMap[mode];
     }
-
-    #bindOnClickEvent(itemDiv){
+    
+    _bindOnClickEvent(itemDiv){
         this.selectionFunction(itemDiv);
         if (this.callbackEventFunction){
             this.callbackEventFunction(itemDiv);
-        }
-    }
-
-    #noSelectionMode(itemDiv){
-
-    }
-
-    #singleSelectionMode(itemDiv){
-        this.unselectAllItems();
-        itemDiv.classList.add("selected");
-    }
-
-    #multipleSelectionMode(itemDiv){
-        if (itemDiv.classList.contains("selected")){
-            itemDiv.classList.remove("selected");
-        } else {
-            itemDiv.classList.add("selected");
         }
     }
 
@@ -56,7 +38,7 @@ class DynamicSelectableList{
             
             itemDiv.appendChild(itemChildParagraph);
             this.parentContainer.appendChild(itemDiv);
-            itemDiv.addEventListener("click", () => this.#bindOnClickEvent(itemDiv));
+            itemDiv.addEventListener("click", () => this._bindOnClickEvent(itemDiv));
         });
 
         this.children = this.parentContainer.querySelectorAll("div");
@@ -65,15 +47,26 @@ class DynamicSelectableList{
     clearList(){
         this.parentContainer.innerHTML = "";
     }
+}
 
-    get selectedItems(){
-        selectedItems = [];
-        this.children.forEach(el => {
-            if (el.classList.contains("selected")){
-                this.selectedItems.push(el);
-            }
-        });
-        return this.selectedItems;
+class AllComponentDynamicSelectableList extends AbstractDynamicList{
+    constructor(parentContainer){
+        super(parentContainer);
+        
+        this.selectionModesMap = {"single": this.#singleSelectionMode, "multiple":this.#multipleSelectionMode};   
+    }
+
+    #singleSelectionMode(itemDiv){
+        this.unselectAllItems();
+        itemDiv.classList.add("selected");
+    }
+
+    #multipleSelectionMode(itemDiv){
+        if (itemDiv.classList.contains("selected")){
+            itemDiv.classList.remove("selected");
+        } else {
+            itemDiv.classList.add("selected");
+        }
     }
 
     unselectAllItems(){
@@ -85,5 +78,26 @@ class DynamicSelectableList{
         if (potentialDiv){
             this.selectionFunction(potentialDiv);
         }
+    }
+
+    get selectedItems(){
+        selectedItems = [];
+        this.children.forEach(el => {
+            if (el.classList.contains("selected")){
+                this.selectedItems.push(el);
+            }
+        });
+        return this.selectedItems;
+    }
+}
+
+class MarkedComponentSelectableList extends AbstractDynamicList{
+    constructor(parentContainer){
+        super(parentContainer);
+
+        this.selectionModesMap = {"no": this.#noSelectionMode};   
+    }
+
+    #noSelectionMode(itemDiv){
     }
 }

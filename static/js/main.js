@@ -149,11 +149,11 @@ function _initWidgetClasses(){
     );
     globalInstancesMap.modalBoardHistory = modalBoardHistory;
 
-
-    const allComponentsList = DynamicSelectableListAdapter.initDynamicSelectableList(globalInstancesMap.allComponentsContainer);
+    
+    const allComponentsList = new AllComponentDynamicSelectableList(globalInstancesMap.allComponentsContainer);
     globalInstancesMap.allComponentsList = allComponentsList;
 
-    const markedComponentsList = DynamicSelectableListAdapter.initDynamicSelectableList(globalInstancesMap.markedComponentsContainer);
+    const markedComponentsList = new MarkedComponentSelectableList(globalInstancesMap.markedComponentsContainer);
     globalInstancesMap.markedComponentsList = markedComponentsList;
 
 
