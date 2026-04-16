@@ -13,6 +13,8 @@ class WidgetAdapter{
         const preserveComponentMarkersButton = globalInstancesMap.preserveComponentMarkersButton;
         
         allComponentsList.unselectAllItems();
+        EngineAdapter.clearMarkers();
+
         // change selection mode to single component
         if (!isSelectionModeSingle){
             isSelectionModeSingle = EventHandler.preserveComponentMarkers(isSelectionModeSingle);
@@ -24,7 +26,7 @@ class WidgetAdapter{
         SpanListAdapter.clearSpanList(clickedComponentSpanList);
         selectedComponentSpan.innerText = "";
 
-        EventHandler.forcedUntoggleButton(preserveComponentMarkersButton)
+        EventHandler.forcedUntoggleButton(preserveComponentMarkersButton);
     }
 
     static resetSelectedNet(){

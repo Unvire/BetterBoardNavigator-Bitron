@@ -124,7 +124,6 @@ class EngineAdapter{
             engine.clearFindComponentByNameInterface(SURFACE, '${side}')
             pygame.display.flip()
         `);
-        WidgetAdapter.resetSelectedComponentsWidgets();
     }
 
     static componentInScreenCenter(componentName){

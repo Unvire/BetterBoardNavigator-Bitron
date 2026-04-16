@@ -93,6 +93,7 @@ class EventHandler{
         globalInstancesMap.prefixComponentsButton.disabled = false;
         globalInstancesMap.unselectPrefixComponentsButton.disabled = false;
         globalInstancesMap.boardHistoryShowFailsButton.disabled = false;
+        globalInstancesMap.unselectAllComponentsButton.disabled = false;
     }
 
     static preserveComponentMarkers(isSelectionModeSingle){
@@ -225,8 +226,7 @@ class EventHandler{
                             { "result": "fail", "item": "R1", "measure": "12",  "unitMeasure": "Ohm"  },
                             { "result": "fail", "item": "R2", "measure": "10",  "unitMeasure": "kOhm" },
                             { "result": "fail", "item": "R3", "measure": "7",   "unitMeasure": "kOhm" },
-                            { "result": "fail", "item": "R4", "measure": "1",   "unitMeasure": "kOhm" },
-                            { "result": "fail", "item": "R4", "measure": "100", "unitMeasure": "kOhm" }
+                            { "result": "fail", "item": "R4", "measure": "1",   "unitMeasure": "kOhm" }
                         ]
                     }	
                 ];

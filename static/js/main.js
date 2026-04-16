@@ -62,6 +62,7 @@ function _bindHtmlElements(){
 
     // left bottom
     globalInstancesMap.markedComponentsContainer = document.getElementById("scrollable-marked-components-list");
+    globalInstancesMap.unselectAllComponentsButton = document.getElementById("unselect-all-components-button");
 
     // middle
     globalInstancesMap.canvas = document.getElementById("canvas");
@@ -277,6 +278,7 @@ function _bindOnClickEvents(){
     globalInstancesMap.partNumberSearcherButton.addEventListener("click", EventHandler.showPartNumberSearcherModalBox);
     globalInstancesMap.boardHistoryButton.addEventListener("click", BoardHistoryAdapter.showModalBox);
     globalInstancesMap.boardHistoryShowFailsButton.addEventListener("click", BoardHistoryAdapter.getMeasurementsJsonRequest);
+    globalInstancesMap.unselectAllComponentsButton.addEventListener("click", WidgetAdapter.resetSelectedComponentsWidgets);
     
     globalInstancesMap.textModalInput.addEventListener("focus", () => {
         isTextModalInputFocused = true;

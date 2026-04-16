@@ -63,9 +63,7 @@ class DynamicSelectableList{
     }
 
     clearList(){
-        while (this.parentContainer.firstChild) {
-            this.parentContainer.removeChild(this.parentContainer.firstChild);
-        }
+        this.parentContainer.innerHTML = "";
     }
 
     get selectedItems(){
