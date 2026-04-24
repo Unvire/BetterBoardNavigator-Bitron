@@ -49,6 +49,8 @@ class WidgetAdapter{
     }
 }
 
+
+
 class SpanListAdapter{
     static initSpanList(parentContainer){
         let spanList =  new DynamicSpanList(parentContainer);
@@ -77,6 +79,8 @@ class SpanListAdapter{
         spanListParent.innerText = "";
     }
 }
+
+
 
 class DynamicSelectableListAdapter{
     static generateList(listInstance, dataList, onClickEvent, selectionMode){
@@ -123,8 +127,16 @@ class DynamicSelectableListAdapter{
         `);
         const componentsList = pyodide.globals.get("componentsList").toJs();
         DynamicSelectableListAdapter.generateList(markedComponentsList, componentsList, DynamicSelectableListAdapter.onClickItemEvent, "no");
+        markedComponentsList.onCloseIconClick = DynamicSelectableListAdapter.unselectComponentAndRemoveItemFromList;
+    }
+
+    static unselectComponentAndRemoveItemFromList(componentName){
+        EngineAdapter.findComponentByName(componentName, isSelectionModeSingle);
+        DynamicSelectableListAdapter.generateMarkedComponentsList();
     }
 }
+
+
 
 class PinoutTableAdapter{
     static initPinoutTable(parentContainer){
@@ -170,6 +182,8 @@ class PinoutTableAdapter{
     }
 }
 
+
+
 class TreeViewAdapter{
     static initTreeView(parentContainer){
         let treeview = new NetTreeView(parentContainer);
@@ -209,6 +223,8 @@ class TreeViewAdapter{
         netsTreeview.unselectCurrentItem();
     }
 }
+
+
 
 class InputModalBoxAdapter{
     static generateModalBox(modalboxInstance, headerString, submitEvent){
@@ -254,11 +270,15 @@ class InputModalBoxAdapter{
     }
 }
 
+
+
 class SimpleModalAdapter{
     static generateModalBox(modalboxInstance){
         modalboxInstance.show();
     }
 }
+
+
 
 class PartNumberSpanAdapter{
     static displayPartNumberOfComponent(componentName){
@@ -280,6 +300,8 @@ class PartNumberSpanAdapter{
         }
     }
 }
+
+
 
 class BoardHistoryAdapter{
     static showModalBox(){

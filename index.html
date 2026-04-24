@@ -46,10 +46,6 @@
             <button type="button" class="main-button" id="board-history-button" disabled="true">Historia płytki</button>
         </div>
         <div class="buttons-flexbox">
-            <button type="button" class="main-button" id="unselect-components-button" disabled="true">Usuń znaczniki komponentów</button>
-            <button type="button" class="main-button" id="unselect-net-button" disabled="true">Odznacz siatkę</button>
-        </div>
-        <div class="buttons-flexbox">
             <button type="button" class="main-button" id="prefix-components-button" disabled="true">Prefix komponenty</button>
             <button type="button" class="main-button" id="unselect-prefix-components-button" disabled="true">Odznacz prefix komponenty</button>
         </div>
@@ -109,6 +105,9 @@
                 <p class="section-title">Lista siatek</p>
             </div>
             <div id="net-treeview" class="tree-view"></div>
+            <div class="buttons-flexbox vertical-buttons-flexbox">
+                <button type="button" class="main-button" id="unselect-net-button" disabled="true">Odznacz siatkę</button>
+            </div>
         </div>
         <div id="item-center" class="functionality-container">
             <div id="loading-screen" class="app-loading">
@@ -140,7 +139,7 @@
                 </div>
             </div>
             <div id="pinout-table" class="table-body"></div>
-            <div id="pinout-table" class="table-body"></div>
+            <div id="pinout-table" class="table-body"></div>        
         </div>
     </div>
     <div id="text-modal" class="modal">

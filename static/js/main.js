@@ -41,7 +41,6 @@ function _bindHtmlElements(){
     globalInstancesMap.boardHistoryButton = document.getElementById("board-history-button");
     globalInstancesMap.boardHistoryIframe = document.getElementById("board-history-iframe");
 
-    globalInstancesMap.clearMarkersButton = document.getElementById("unselect-components-button");
     globalInstancesMap.unselectNetButton = document.getElementById("unselect-net-button");
 
     globalInstancesMap.prefixComponentsButton = document.getElementById("prefix-components-button");
@@ -269,7 +268,6 @@ function _bindOnClickEvents(){
     globalInstancesMap.preserveComponentMarkersButton.addEventListener("click", () => {
         isSelectionModeSingle = EventHandler.preserveComponentMarkers(isSelectionModeSingle);
     });
-    globalInstancesMap.clearMarkersButton.addEventListener("click", EngineAdapter.clearMarkers);
     globalInstancesMap.unselectNetButton.addEventListener("click", EventHandler.unselectNet);            
     globalInstancesMap.findComponentUsingNameButton.addEventListener("click", EventHandler.findComponentUsingName);
     globalInstancesMap.prefixComponentsButton.addEventListener("click", EventHandler.showCommonPrefixComponents);

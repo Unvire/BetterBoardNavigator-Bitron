@@ -87,7 +87,6 @@ class EventHandler{
         globalInstancesMap.resetViewButton.disabled = false;
         globalInstancesMap.areaFromComponentsButton.disabled = false;
         globalInstancesMap.preserveComponentMarkersButton.disabled = false;
-        globalInstancesMap.clearMarkersButton.disabled = false;
         globalInstancesMap.unselectNetButton.disabled = false;
         globalInstancesMap.findComponentUsingNameButton.disabled = false;
         globalInstancesMap.prefixComponentsButton.disabled = false;
