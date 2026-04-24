@@ -102,7 +102,7 @@ class DynamicSelectableListAdapter{
             return;
         }
 
-        EngineAdapter.findComponentByName(itemName, isSelectionModeSingle);
+        EngineAdapter.findComponentByName(itemName);
         EngineAdapter.componentInScreenCenter(itemName);
         DynamicSelectableListAdapter.generateMarkedComponentsList();
     }
@@ -131,8 +131,11 @@ class DynamicSelectableListAdapter{
     }
 
     static unselectComponentAndRemoveItemFromList(componentName){
-        EngineAdapter.findComponentByName(componentName, isSelectionModeSingle);
+        EngineAdapter.findComponentByName(componentName);
         DynamicSelectableListAdapter.generateMarkedComponentsList();
+
+        const allComponentsList = globalInstancesMap.allComponentsList;
+        allComponentsList.unselectItemByName(componentName);
     }
 }
 
@@ -235,7 +238,7 @@ class InputModalBoxAdapter{
 
     static getComponentNameFromInput(componentName){
         const modalBoxComponentName = componentName.toUpperCase();
-        const isComponentExist = EngineAdapter.findComponentByName(modalBoxComponentName, isSelectionModeSingle);
+        const isComponentExist = EngineAdapter.findComponentByName(modalBoxComponentName);
 
         if (!isComponentExist){ 
             return;
@@ -353,7 +356,7 @@ class BoardHistoryAdapter{
         
         const failedComponents = pyodide.globals.get("failedComponents").toJs();
         failedComponents.forEach(componentName => {
-            const ifComponentExist = EngineAdapter.findComponentByName(componentName, isSelectionModeSingle);
+            const ifComponentExist = EngineAdapter.findComponentByName(componentName);
             if (ifComponentExist){
                 allComponentsList.selectItemByName(componentName);
             }

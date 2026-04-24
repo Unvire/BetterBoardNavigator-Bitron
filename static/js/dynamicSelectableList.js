@@ -83,11 +83,18 @@ class AllComponentDynamicSelectableList extends AbstractDynamicList{
         this.children.forEach(el => el.classList.remove("selected"));
     }
 
-    async selectItemByName(name){
-        let potentialDiv = await this.parentContainer.querySelector(`div[data-key="${name}"]`);
+    selectItemByName(name){
+        let potentialDiv = this.parentContainer.querySelector(`div[data-key="${name}"]`);
         if (potentialDiv){
             this.selectionFunction(potentialDiv);
         }
+    }
+
+    unselectItemByName(name) {
+        const item = this.parentContainer.querySelector(`div[data-key="${name}"]`);
+            if (item) {
+                item.classList.remove("selected");
+            }
     }
 
     get selectedItems(){
