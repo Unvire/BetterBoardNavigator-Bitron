@@ -62,6 +62,7 @@ def test__sanitizeToAlphaNumeric(parser, inputText, expectedOutput):
     ('SHO-HighRes-LowCap (298 256)', ['298', '256']),
     ('LNK2TP 3.6V 305-37', ['305', '37']),
     ('LNK2TP +12V 325-341', ['325', '341']),
+    ('SHO NET GND (TP 22) (TP 6-2,42,55,162-163) (1.0000', ['22', '6', '2', '42', '55', '162', '163'])
 ])
 def test__getTestPoints(parser, inputText, expectedOutput):
     assert parser._getTestPoints(inputText) == expectedOutput
