@@ -201,6 +201,9 @@ class EngineAdapter{
         
         const side = sideHandler.setComponentSideAsCurrentSide(componentName);
         pyodide.runPython(`
+            if '${isSelectionModeSingle}' == 'true':
+                engine.clearFindComponentByNameInterface(SURFACE, '${side}')
+                
             engine.findComponentByNameInterface(SURFACE, '${componentName}', '${side}')
             pygame.display.flip()
         `);
