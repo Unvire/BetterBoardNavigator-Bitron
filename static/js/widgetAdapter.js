@@ -354,7 +354,14 @@ class BoardHistoryAdapter{
             failedComponents = failsParser.parse(tracebiliyTestNames)            
         `);
         
+        // short and float fails return number of testpoint, so prefix mostCommonPrefix must be added
         const failedComponents = pyodide.globals.get("failedComponents").toJs();
+        failedComponents.forEach((item, index, array) => {
+            if (/^\d+$/.test(item)) {
+                array[index] = `${mostCommonPrefix}${item}`;
+            }
+        });
+
         failedComponents.forEach(componentName => {
             const ifComponentExist = EngineAdapter.findComponentByName(componentName);
             if (ifComponentExist){

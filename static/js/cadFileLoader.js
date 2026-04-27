@@ -36,12 +36,16 @@ class CadFileLoader{
 
                 engine.drawAndBlitInterface(SURFACE, '${side}')
                 pygame.display.flip()
+
+                mostCommonPrefix = engine.getMostCommonPrefixInterface()
             `);
             const allComponents = pyodide.globals.get("allComponents").toJs();
             DynamicSelectableListAdapter.generateList(globalInstancesMap.allComponentsList, allComponents, DynamicSelectableListAdapter.selectItemFromListEvent, "single");
 
-            let netsMap = pyodide.globals.get("netsDict").toJs();
+            const netsMap = pyodide.globals.get("netsDict").toJs();
             TreeViewAdapter.generateTreeView(netsMap);
+            
+            mostCommonPrefix = pyodide.globals.get("mostCommonPrefix");
 
             WidgetAdapter.resetWidgets();
 

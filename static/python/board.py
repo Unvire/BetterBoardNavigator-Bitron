@@ -10,6 +10,7 @@ class Board:
         self.nets = []
         self.sideGroupedComponents = {}
         self.commonTypeGroupedComponents = {}
+        self.mostCommonPrefix = ''
     
     def setArea(self, bottomLeftPoint:gobj.Point, topRightPoint:gobj.Point):
         self.area = [bottomLeftPoint, topRightPoint]
@@ -53,11 +54,22 @@ class Board:
         self.sideGroupedComponents = sideGroupedComponents
         self.commonTypeGroupedComponents = commonTypeGroupedComponents
 
+        countedPrefixes = {}
+        for sideGroups in commonTypeGroupedComponents.values():
+            for prefixGroupName, prefixGroupElements in sideGroups.items():
+                countedPrefixes.setdefault(prefixGroupName, 0)
+                countedPrefixes[prefixGroupName] += len(prefixGroupElements)
+        
+        self.mostCommonPrefix = max(countedPrefixes, key=countedPrefixes.get)
+
     def getSideGroupedComponents(self) -> dict:
         return self.sideGroupedComponents
     
     def getCommonTypeGroupedComponents(self) -> dict:
         return self.commonTypeGroupedComponents
+    
+    def getMostCommonPrefix(self) -> str:
+        return self.mostCommonPrefix
     
     def calculateAreaFromComponents(self) -> tuple[gobj.Point, gobj.Point]:
         bottomLeftPoint, topRightPoint = gobj.getDefaultBottomLeftTopRightPoints()

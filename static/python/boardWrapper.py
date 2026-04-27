@@ -18,6 +18,7 @@ class BoardWrapper():
         self.sideComponents = {}
         self.commonTypeComponents = {}
         self.isCheckForPositiveCoordsActive = True
+        self.mostCommonPrefix = ''
         self._resetGroupsToDefault()
 
     def setIsCheckForPositiveCoordsActive(self, state:bool):
@@ -60,6 +61,9 @@ class BoardWrapper():
     
     def getCommonTypeComponents(self) -> dict:
         return self.commonTypeComponents
+    
+    def getMostCommonPrefix(self) -> str:
+        return self.board.getMostCommonPrefix()
         
     def _loadBaseBoard(self, filePath:str) -> board.Board:
         fileExtension  = filePath.split('.')[-1]

@@ -140,6 +140,9 @@ class DrawBoardEngine:
         screenWidth, screenHeight = self.screenDimensions
         self.surfaceDimensions = [screenWidth, screenHeight]
     
+    def getMostCommonPrefixInterface(self) -> str:
+        return self.boardData.getMostCommonPrefix()
+
     def moveBoardInterface(self, targetSurface:pygame.Surface, relativeXY:list[int, int]) -> pygame.Surface:
         self._updateOffsetVector(relativeXY)                    
         return self._blitBoardSurfacesIntoTarget(targetSurface)

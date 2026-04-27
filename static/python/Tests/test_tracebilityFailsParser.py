@@ -8,6 +8,7 @@ def parser():
 @pytest.mark.parametrize('inputText, expectedOutput', [
     ('FLOAT (303)', 'FLOAT 303'),
     ('SHO-HighRes-LowCap (298 256)', 'SHO HIGHRES LOWCAP 298 256'),
+    ('SHO NET GND (TP 22) (TP 6-2,42,55,162-163) (1.0000', 'SHO NET GND TP 22 TP 6 2 42 55 162 163 1 0000'),
     ('LNK2TP 3.6V 305-37', 'LNK2TP 3 6V 305 37'),
     ('LNK2TP +12V 325-341', 'LNK2TP 12V 325 341'),
     ('OPENSW1-1 (TP 3-50)', 'OPENSW1 1 TP 3 50'),
@@ -73,6 +74,7 @@ def test__getTestPoints(parser, inputText, expectedOutput):
     ('SHO-HighRes-LowCap (298 256)', []),
     ('LNK2TP 3.6V 305-37', []),
     ('LNK2TP +12V 325-341', []),
+    ('SHO NET GND (TP 22) (TP 6-2,42,55,162-163) (1.0000', []),
     ('OPENSW1-1 (TP 3-50)', ['SW1']),
     ('OPENJ6 (TP 193-197) Do Not Mount!', ['J6']),
     ('RESR122 150K 1%', ['R122']),

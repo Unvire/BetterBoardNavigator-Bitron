@@ -47,6 +47,15 @@ class TracebilityFailsParser:
         return list(componentsSet)
     
     def _getTestPoints(self, text:str) -> list[str]:
+        # SHO NET GND (TP 22) (TP 6-2,42,55,162-163) (1.0000 -> ['22', '6', '2', '42', '55', '162', '163']
+        preixedGroupsPattern = r'\([A-Z]+\s*([\d\s,-]+)\)'
+        prefixedBlocks = re.findall(preixedGroupsPattern, text)
+        if prefixedBlocks:
+            result = []
+            for block in prefixedBlocks:
+                result.extend(re.findall(r'\d+', block))
+            return result
+
         # 'FLOAT (303)' -> ['303'] and 'SHO-HighRes-LowCap (298 256)' -> ['298', '256']
         testPointsInLastBracketPattern = r'\(([\d\s]+)\)'
         bracketGroup = re.search(testPointsInLastBracketPattern, text)
