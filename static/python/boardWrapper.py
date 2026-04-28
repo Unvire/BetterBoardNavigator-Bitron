@@ -18,7 +18,6 @@ class BoardWrapper():
         self.sideComponents = {}
         self.commonTypeComponents = {}
         self.isCheckForPositiveCoordsActive = True
-        self.mostCommonPrefix = ''
         self._resetGroupsToDefault()
 
     def setIsCheckForPositiveCoordsActive(self, state:bool):
