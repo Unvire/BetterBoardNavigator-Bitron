@@ -1,6 +1,4 @@
-async function main(){
-    const TRACEBILITY_URL = await loadServerIP();
-    
+async function main(){    
     LoadingScreen.showLoadingScreen();
     LoadingScreen.showLoadingDots();
 
@@ -10,6 +8,8 @@ async function main(){
     document.addEventListener("DOMContentLoaded", async () => {
         _bindHtmlElements();
         _changeLanguage();
+        
+        const TRACEBILITY_URL = await loadServerIP();
         _bindBoardHistoryOnLoadEvent(TRACEBILITY_URL);
 
         await _initPyodide();
