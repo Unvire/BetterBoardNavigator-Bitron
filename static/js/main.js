@@ -1,6 +1,6 @@
-function main(){
-    const TRACEBILITY_URL = "http://10.140.13.11:5556/api/";
-
+async function main(){
+    const TRACEBILITY_URL = await loadServerIP();
+    
     LoadingScreen.showLoadingScreen();
     LoadingScreen.showLoadingDots();
 
@@ -22,6 +22,19 @@ function main(){
     });
 }
 
+async function loadServerIP() {
+    try {
+        const response = await fetch('config/traceabilityIP.txt');
+        if (!response.ok) throw new Error('Brak pliku IP');
+        
+        const ip = (await response.text()).trim();
+        return ip;
+
+    } catch (error) {
+        console.error("Błąd wczytywania IP:", error);
+        return "";
+    }
+}
 
 function _bindHtmlElements(){
     // buttons row
