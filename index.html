@@ -52,7 +52,23 @@
         <div class="buttons-flexbox">
             <button type="button" class="main-button" id="help-button" disabled="true">Pomoc</button>
         </div>
+        <div class="buttons-flexbox vertical-buttons-flexbox">
+            <div class="custom-dropdown lang-style" id="lang-picker">
+                <button class="dropdown-btn">
+                    <span class="btn-content">
+                        <span class="icon-badge">--</span>
+                        <span id="current-lang">Język...</span>
+                    </span>
+                    <span class="arrow">▼</span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li data-value="pl" data-icon="PL" data-label="Polski">Polski</li>
+                    <li data-value="en" data-icon="EN" data-label="English">English</li>
+                </ul>
+            </div>
+        </div>
     </div>
+
     <div class="grid-container">
         <div id="item-left-top" class="functionality-container">
             <div class="table-body">

@@ -90,6 +90,8 @@ p{
 
 .vertical-buttons-flexbox{
     flex-direction: column;
+    justify-content: center;
+    gap: 5px;
 }
 
 .main-button{
@@ -498,4 +500,119 @@ canvas{
 /* Scrollbar meeting point */
 ::-webkit-scrollbar-corner {
     background-color: transparent;
+}
+
+/* ==========================================================================
+   DROPDOWN SELECTORS STYLES
+   ========================================================================== */
+
+.custom-dropdown {
+    position: relative;
+    user-select: none;
+    margin: 0 0.2em;
+}
+
+.dropdown-label {
+    font-size: 0.7em;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: var(--COLOR-BUTTON-TEXT-DISABLED);
+    margin-bottom: 2px;
+    padding-left: 2px;
+}
+
+.dropdown-btn {
+    width: 100%;
+    min-width: 160px;
+    padding: 4px 10px;
+    cursor: pointer;
+    background-color: var(--COLOR-BUTTON-BG);
+    border: 1px solid var(--COLOR-BUTTON-BORDER);
+    color: var(--COLOR-BUTTON-TEXT);
+    border-radius: 0.4em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--FONT-FAMILY);
+    font-size: 0.9em;
+    transition: background-color 0.2s;
+}
+
+.dropdown-btn:hover {
+    background-color: var(--COLOR-BUTTON-TEXT-DISABLED);
+}
+
+.btn-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Badge (PL, EN, SRV) */
+.icon-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 16px;
+    font-size: 9px;
+    font-weight: 800;
+    border-radius: 3px;
+    line-height: 1;
+}
+
+/* Kolorystyka dla języka (Niebieski badge) */
+.lang-style .icon-badge {
+    background-color: var(--COLOR-BUTTON-ACTIVE);
+    color: var(--COLOR-TEXT-SELECTED);
+}
+
+/* Kolorystyka dla serwera (Zielony badge) */
+.server-style .icon-badge {
+    background-color: #10b981; /* Zielony dla odróżnienia */
+    color: white;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 4px;
+    padding: 5px 0;
+    background-color: var(--COLOR-BUTTON-BG);
+    border: 1px solid var(--COLOR-BUTTON-BORDER);
+    border-radius: 0.4em;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    z-index: 9999; /* Musi być nad canvasem i gridem */
+    display: none;
+}
+
+.dropdown-menu.show {
+    display: block;
+}
+
+.dropdown-menu li {
+    padding: 8px 12px;
+    margin: 2px 5px;
+    border-radius: 3px;
+    color: var(--COLOR-BUTTON-TEXT);
+    font-size: 0.85em;
+    transition: background-color 0.1s;
+}
+
+.dropdown-menu li:hover {
+    background-color: var(--COLOR-ITEM-SELECTED);
+    color: var(--COLOR-TEXT-SELECTED);
+}
+
+.dropdown-menu li.active {
+    background-color: var(--COLOR-BUTTON-ACTIVE);
+    font-weight: bold;
+}
+
+.arrow {
+    font-size: 8px;
+    color: var(--COLOR-BUTTON-TEXT-DISABLED);
+    margin-left: 10px;
 }
