@@ -502,10 +502,10 @@ canvas{
     background-color: transparent;
 }
 
+
 /* ==========================================================================
    DROPDOWN SELECTORS STYLES
    ========================================================================== */
-
 .custom-dropdown {
     position: relative;
     user-select: none;
@@ -548,7 +548,7 @@ canvas{
     gap: 8px;
 }
 
-/* Badge (PL, EN, SRV) */
+
 .icon-badge {
     display: inline-flex;
     align-items: center;
@@ -561,16 +561,9 @@ canvas{
     line-height: 1;
 }
 
-/* Kolorystyka dla języka (Niebieski badge) */
 .lang-style .icon-badge {
     background-color: var(--COLOR-BUTTON-ACTIVE);
     color: var(--COLOR-TEXT-SELECTED);
-}
-
-/* Kolorystyka dla serwera (Zielony badge) */
-.server-style .icon-badge {
-    background-color: #10b981; /* Zielony dla odróżnienia */
-    color: white;
 }
 
 .dropdown-menu {
