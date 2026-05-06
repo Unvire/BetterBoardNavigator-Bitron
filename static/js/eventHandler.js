@@ -241,4 +241,8 @@ class EventHandler{
                 return "demo.cad";
             });
     }
+
+    static changeLanguage(selectedLanguage){
+        console.log(selectedLanguage)
+    }
 }

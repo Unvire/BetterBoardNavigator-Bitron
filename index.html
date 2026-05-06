@@ -24,6 +24,7 @@
     <script type="text/javascript" src="./static/js/dynamicSpanList.js"></script>
     <script type="text/javascript" src="./static/js/widgetAdapter.js"></script>
     <script type="text/javascript" src="./static/js/pdfPartNumberExtractor.js"></script>
+    <script type="text/javascript" src="./static/js/languageChanger.js"></script>
 </head>
 <body>
     <div class="buttons-row-flexbox">
@@ -53,15 +54,15 @@
             <button type="button" class="main-button" id="help-button" disabled="true" data-i18n="help-button-text">Pomoc</button>
         </div>
         <div class="buttons-flexbox vertical-buttons-flexbox">
-            <div class="custom-dropdown lang-style" id="lang-picker">
-                <button class="dropdown-btn">
+            <div class="custom-dropdown lang-style" id="language-picker-container">
+                <button class="dropdown-btn" id="language-picker-button">
                     <span class="btn-content">
-                        <span class="icon-badge">--</span>
-                        <span id="current-lang">Język...</span>
+                        <span class="icon-badge" id="language-picker-badge-span">--</span>
+                        <span id="language-picker-current-language-span">Język...</span>
                     </span>
                     <span class="arrow">▼</span>
                 </button>
-                <ul class="dropdown-menu">
+                <ul class="dropdown-menu" id="language-picker-menu">
                     <li data-value="pl" data-icon="PL" data-label="Polski">Polski</li>
                     <li data-value="en" data-icon="EN" data-label="English">English</li>
                 </ul>
@@ -379,6 +380,7 @@
         let isMouseClickedFirstTime = false;
         let isSelectionModeSingle = true;
 
+        let translationsDict = null;
     
         const globalInstancesMap = new GlobalInstancesMap();
         main();

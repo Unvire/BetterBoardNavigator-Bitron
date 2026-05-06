@@ -7,7 +7,7 @@ async function main(){
 
     document.addEventListener("DOMContentLoaded", async () => {
         _bindHtmlElements();
-        _changeLanguage();
+        await _loadTranslations();
         
         const TRACEBILITY_URL = await loadServerIP();
         _bindBoardHistoryOnLoadEvent(TRACEBILITY_URL);
@@ -113,6 +113,13 @@ function _bindHtmlElements(){
     globalInstancesMap.boardHistoryCloseSpan = document.getElementById("board-history-modal-close-span");
     globalInstancesMap.boardHistoryModalHeader = document.getElementById("board-history-modal-header");
     globalInstancesMap.boardHistoryShowFailsButton = document.getElementById("board-history-show-fails-button");
+
+    // language changer
+    globalInstancesMap.languagePickerContainer = document.getElementById("language-picker-container");
+    globalInstancesMap.languagePickerButton = document.getElementById("language-picker-button");
+    globalInstancesMap.languagePickerBadgeSpan = document.getElementById("language-picker-badge-span");
+    globalInstancesMap.languagePickerCurrentLanguageSpan = document.getElementById("language-picker-current-language-span");
+    globalInstancesMap.languagePickerMenu = document.getElementById("language-picker-menu");
 }
 
 function _bindBoardHistoryOnLoadEvent(tracebilityRootUrl){
@@ -121,8 +128,9 @@ function _bindBoardHistoryOnLoadEvent(tracebilityRootUrl){
     };
 }
 
-function _changeLanguage(){
-
+async function _loadTranslations(){
+    const response = await fetch('config/lang.json');
+    translationsDict = await response.json();
 }
 
 
@@ -187,6 +195,15 @@ function _initWidgetClasses(){
 
     const partNumberExtractor = new PartNumberPDFExtractor();
     globalInstancesMap.partNumberExtractor = partNumberExtractor;
+
+    const languageChanger = new LanguageChanger(
+        globalInstancesMap.languagePickerContainer,
+        globalInstancesMap.languagePickerButton,
+        globalInstancesMap.languagePickerMenu,
+        globalInstancesMap.languagePickerBadgeSpan,
+        globalInstancesMap.languagePickerCurrentLanguageSpan,
+        EventHandler.changeLanguage
+    )
 }
 
 async function _initPyodide(){
@@ -204,6 +221,10 @@ async function _initPyodide(){
 }
 
 function _bindMouseAndKeyboardEvents(){
+    document.addEventListener('click', () => {
+        globalInstancesMap.languagePickerMenu.classList.remove('show');
+    });
+
     window.addEventListener("resize", EventHandler.windowResize);
 
         window.addEventListener("keydown", (event) =>{
@@ -296,5 +317,10 @@ function _bindOnClickEvents(){
     });
     globalInstancesMap.textModalInput.addEventListener("blur", () => {
         isTextModalInputFocused = false;
+    });
+
+    globalInstancesMap.languagePickerButton.addEventListener("click", (e) => {
+        e.stopPropagation();
+        globalInstancesMap.languagePickerMenu.classList.toggle('show');
     });
 }
