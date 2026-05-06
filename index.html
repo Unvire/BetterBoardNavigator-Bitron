@@ -28,29 +28,29 @@
 <body>
     <div class="buttons-row-flexbox">
         <div class="buttons-flexbox">
-            <button type="button" class="main-button" id="load-files-button" disabled="true">Wczytaj schemat i part number PDF</button>
+            <button type="button" class="main-button" id="load-files-button" disabled="true" data-i18n="load-files-button-text">Wczytaj schemat i part number PDF</button>
             <input type="file" class="main-button hidden" id="load-files-input" accept=".cad,.gcd,.tgz,.zip,.pdf" multiple/>
         </div>
         <div class="buttons-flexbox">
-            <button type="button" class="main-button" id="rotate-button" disabled="true">Obróć</button>
-            <button type="button" class="main-button" id="change-side-button" disabled="true">Zmień stronę</button>
-            <button type="button" class="main-button" id="mirror-side-button" disabled="true">Lustrzane odbicie</button>
-            <button type="button" class="main-button" id="toggle-outlines-button" disabled="true">Krawędzie płytki</button>
+            <button type="button" class="main-button" id="rotate-button" disabled="true" data-i18n="rotate-button-text">Obróć</button>
+            <button type="button" class="main-button" id="change-side-button" disabled="true" data-i18n="change-side-button-text">Zmień stronę</button>
+            <button type="button" class="main-button" id="mirror-side-button" disabled="true" data-i18n="mirror-side-button-text">Lustrzane odbicie</button>
+            <button type="button" class="main-button" id="toggle-outlines-button" disabled="true" data-i18n="toggle-outlines-button-text">Krawędzie płytki</button>
         </div>
         <div class="buttons-flexbox">
-            <button type="button" class="main-button" id="default-view-button" disabled="true">Domyślny widok</button>
-            <button type="button" class="main-button" id="components-area-button" disabled="true">Domyślny widok z komponentów</button>
+            <button type="button" class="main-button" id="default-view-button" disabled="true" data-i18n="default-view-button-text">Domyślny widok</button>
+            <button type="button" class="main-button" id="components-area-button" disabled="true" data-i18n="components-default-view-button-text">Domyślny widok z komponentów</button>
         </div>
         <div class="buttons-flexbox">
-            <button type="button" class="main-button" id="part-number-searcher-button" disabled="true">Wyszukiwarka part number</button>
-            <button type="button" class="main-button" id="board-history-button" disabled="true">Historia płytki</button>
+            <button type="button" class="main-button" id="part-number-searcher-button" disabled="true" data-i18n="part-number-searcher-button-text">Wyszukiwarka part number</button>
+            <button type="button" class="main-button" id="board-history-button" disabled="true" data-i18n="board-history-button-text">Historia płytki</button>
         </div>
         <div class="buttons-flexbox">
-            <button type="button" class="main-button" id="prefix-components-button" disabled="true">Prefix komponenty</button>
-            <button type="button" class="main-button" id="unselect-prefix-components-button" disabled="true">Odznacz prefix komponenty</button>
+            <button type="button" class="main-button" id="prefix-components-button" disabled="true" data-i18n="prefix-components-button-text">Prefix komponenty</button>
+            <button type="button" class="main-button" id="unselect-prefix-components-button" disabled="true" data-i18n="unselect-prefix-components-button-text">Odznacz prefix komponenty</button>
         </div>
         <div class="buttons-flexbox">
-            <button type="button" class="main-button" id="help-button" disabled="true">Pomoc</button>
+            <button type="button" class="main-button" id="help-button" disabled="true" data-i18n="help-button-text">Pomoc</button>
         </div>
         <div class="buttons-flexbox vertical-buttons-flexbox">
             <div class="custom-dropdown lang-style" id="lang-picker">
@@ -74,7 +74,7 @@
             <div class="table-body">
                 <div class="table-row">
                     <div>
-                        <p class="section-title">Strona</p>
+                        <p class="section-title" data-i18n="current-side-text">Strona</p>
                     </div>
                     <div>
                         <p><span class="highlighted-text section-title" id="current-side-span"></span></p>
@@ -82,7 +82,7 @@
                 </div>
                 <div class="table-row">
                     <div>
-                        <p class="section-title">Prefix</p>
+                        <p class="section-title" data-i18n="current-prefix-text">Prefix</p>
                     </div>
                     <div>
                         <p><span class="highlighted-text section-title" id="common-prefix-span"></span></p>
@@ -90,7 +90,7 @@
                 </div>
                 <div class="table-row">
                     <div>
-                        <p class="section-title"><span id="part-number-component-name-span">Kod</span></p>
+                        <p class="section-title"><span id="part-number-component-name-span" data-i18n="current-code-text">Kod</span></p>
                     </div>
                     <div>
                         <p><span class="highlighted-text section-title" id="part-number-span"></span></p>
@@ -100,35 +100,35 @@
         </div>
         <div id="item-left-middle"  class="functionality-container">
             <div class="item-header">
-                <p class="section-title">Wszystkie komponenty</p> 
+                <p class="section-title" data-i18n="all-components-text">Wszystkie komponenty</p> 
             </div>
             <div class="scrollable-list" id="scrollable-all-components-list"></div>     
             <div class="buttons-flexbox vertical-buttons-flexbox">       
-                <button type="button" class="main-button" id="find-component-by-name-button" disabled="true">Znajdź komponent po nazwie</button>
-                <button type="button" class="main-button" id="toggle-leave-markers-button" disabled="true">Zaznacz wiele komponentów</button>
+                <button type="button" class="main-button" id="find-component-by-name-button" disabled="true" data-i18n="find-component-button-text">Znajdź komponent po nazwie</button>
+                <button type="button" class="main-button" id="toggle-leave-markers-button" disabled="true" data-i18n="selection-mode-button-text">Zaznacz wiele komponentów</button>
             </div>
         </div>
         <div id="item-left-bottom" class="functionality-container"><div class="item-header">
-                <p class="section-title">Zaznaczone komponenty</p>
+                <p class="section-title" data-i18n="selected-components-text">Zaznaczone komponenty</p>
             </div>
             <div class="scrollable-list" id="scrollable-marked-components-list"></div>
             <div class="buttons-flexbox vertical-buttons-flexbox">       
-                <button type="button" class="main-button" id="unselect-all-components-button" disabled="true">Odznacz komponenty</button>
+                <button type="button" class="main-button" id="unselect-all-components-button" disabled="true" data-i18n="unselect-all-components-button-text">Odznacz komponenty</button>
             </div>
         </div>
         <div id="item-right-bottom" class="functionality-container">
             <div class="item-header"> 
-                <p class="section-title">Lista siatek</p>
+                <p class="section-title" data-i18n="nets-list-text">Lista siatek</p>
             </div>
             <div id="net-treeview" class="tree-view"></div>
             <div class="buttons-flexbox vertical-buttons-flexbox">
-                <button type="button" class="main-button" id="unselect-net-button" disabled="true">Odznacz siatkę</button>
+                <button type="button" class="main-button" id="unselect-net-button" disabled="true" data-i18n="unselect-nets-button-text">Odznacz siatkę</button>
             </div>
         </div>
         <div id="item-center" class="functionality-container">
             <div id="loading-screen" class="app-loading">
                 <p>
-                    <span id="loading-text">Ładowanie aplikacji</span>
+                    <span id="loading-text" data-i18n="loading-screen-init-text">Ładowanie aplikacji</span>
                     <span id="loading-dots"></span>
                 </p>
             </div>
@@ -136,7 +136,7 @@
         </div>
         <div id="item-right-top" class="functionality-container">
             <div class="item-header">
-                <p class="section-title">Kliknięte komponenty</p>
+                <p class="section-title" data-i18n="clicked-components-text">Kliknięte komponenty</p>
             </div>
             <div id="clicked-components">
                 <p></p>
@@ -144,14 +144,17 @@
         </div>
         <div id="item-right-middle" class="functionality-container">
             <div class="item-header"> 
-                <p class="section-title">Piny komponentu <span id="selected-component-span"></span></p>
+                <p class="section-title">
+                    <span data-i18n="component-pins-table-header">Piny komponentu</span> 
+                    <span id="selected-component-span"></span>
+                </p>
             </div>
             <div class="table-row">
                 <div>
-                    <p>Pin</p>
+                    <p data-i18n="component-pin-table-subheader">Pin</p>
                 </div>
                 <div>
-                    <p>Siatka</p>
+                    <p data-i18n="component-net-table-subheader">Siatka</p>
                 </div>
             </div>
             <div id="pinout-table" class="table-body"></div>
@@ -168,7 +171,7 @@
                 <input type="text" id="text-modal-input" placeholder="">
             </div>
             <div class="modal-footer">
-                <button class="main-button" id="text-modal-submit-text-button">Ok</button>
+                <button class="main-button" id="modal-submit-text-button" data-i18n="text-modal-submit-text-button">Ok</button>
             </div>
         </div>
     </div>
@@ -179,117 +182,155 @@
                 <span class="close" id="help-modal-close-span">&times;</span>
             </div>
             <div class="modal-main">
-                <h3>Pomoc</h3>
+                <h3 data-i18n="help-modal-header">Pomoc</h3>
                 <p class="new-line">
-                    Better Board Navigator to aplikacja służąca do przeglądania płytek PCB zapisanych w postaci plików schematów. Obsługuje pliki CamCad (.cad), GenCad (.gcd), ODB++ (.tgz) oraz ViseCAD (.ccz).
-                    <b>Należy uważać w przypadku plików .tgz, ponieważ komponenty mogą być obrócone o 180 stopni.</b>
+                    <span data-i18n="help-modal-about-text">Better Board Navigator to aplikacja służąca do przeglądania płytek PCB zapisanych w postaci plików schematów. Obsługuje pliki CamCad (.cad), GenCad (.gcd), ODB++ (.tgz) oraz ViseCAD (.ccz).</span>
+                    <b data-i18n="help-modal-about-warning">Należy uważać w przypadku plików .tgz, ponieważ komponenty mogą być obrócone o 180 stopni.</b>
                 </p>
-                <p class="new-line">
+                <p class="new-line" data-i18n="help-modal-about-text2">
                     Program można używać, gdy tylko się załaduje - odblokują się przyciski "Wczytaj schemat" oraz "Pomoc".
                 </p>
                 </br>
                 <p class="new-line">
-                    Autor programu - <span class="highlighted-text">Krzysztof Balcerzak</span>.
+                    <span data-i18n="help-modal-author">Autor programu - </span>
+                    <span class="highlighted-text">Krzysztof Balcerzak.</span>
                 </p>
                 </br>
 
-                <h3>Opis akcji i przycisków</h3>
+                <h3 data-i18n="help-modal-buttons-description-header">Opis akcji i przycisków</h3>
                 <p class="new-line">
-                    <span class="highlighted-text">Przesuwanie z wciśniętym lewym przyciskiem myszki</span> - przesuwanie płytki na ekranie.
+                    <span class="highlighted-text" data-i18n="help-modal-moving-description">Przesuwanie z wciśniętym lewym przyciskiem myszki</span> 
+                    <span data-i18n="help-modal-moving-description2"> - przesuwanie płytki na ekranie.</span>
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Wczytaj schemat</span> - Wczytuje schemat i wyświetla go na ekranie. 
+                    <span class="highlighted-text" data-i18n="help-modal-clicking-description">Klikanie na komponent na schemacie</span> 
+                    <span data-i18n="help-modal-clicking-description2"> - W prawym, górnym rogu pojawią się nazwa klikniętego komponentu. W lewym, górnym rogu pojawi się kod komponentu (o ile jest zdefiniowany).</span>
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Obróć</span> - Obraca płytkę o 90 stopni zgodnie z ruchem wskazówek zegara.
+                    <span class="highlighted-text" data-i18n="load-files-button-text">Wczytaj schemat</span>
+                    <span data-i18n="help-modal-loading-description"> - Wczytuje schemat i wyświetla go na ekranie.</span>
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Zmień stronę</span> - Zmienia obecnie wyświetlaną stronę.
+                    <span class="highlighted-text" data-i18n="rotate-button-text">Obróć</span>
+                    <span data-i18n="help-modal-rotate-description"> - Obraca płytkę o 90 stopni zgodnie z ruchem wskazówek zegara.</span>
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Lustrzane odbicie</span> - Robi lustrzane odbicie w osi X.
+                    <span class="highlighted-text" data-i18n="change-side-button-text">Zmień stronę</span>
+                    <span data-i18n="help-modal-change-side-description"> - Zmienia obecnie wyświetlaną stronę.</span>
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Krawędzie płytki</span> - Pokazuje / Chowa krawędzie płytki.
+                    <span class="highlighted-text" data-i18n="mirror-side-button-text">Lustrzane odbicie</span>
+                    <span data-i18n="help-modal-flip-description"> - Robi lustrzane odbicie w osi X.</span>
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Domyślny widok</span> - Resetuje widok do domyślnego (po załadowaniu schematu).
+                    <span class="highlighted-text" data-i18n="toggle-outlines-button-text">Krawędzie płytki</span>
+                    <span data-i18n="help-modal-toggle-outlines-description"> - Pokazuje / Chowa krawędzie płytki.</span>
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Domyślny widok z komponentów</span> - Wyznacza domyślny widok na podstawie pozycji komponentów.
+                    <span class="highlighted-text" data-i18n="default-view-button-text">Domyślny widok</span>
+                    <span data-i18n="help-modal-default-view-description"> - Resetuje widok do domyślnego (po załadowaniu schematu).</span>
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Znajdź komponent po nazwie</span> - Szuka komponentu o zadanej nazwie i pokazuje go na środku ekranu, jeśli istnieje.
-                <p class="new-line">
-                    <span class="highlighted-text">Zaznacz wiele komponentów</span> - Zmienia tryb zaznaczania pomiędzy wieloma i jednym komponentem.
+                    <span class="highlighted-text" data-i18n="components-default-view-button-text">Domyślny widok z komponentów</span>
+                    <span data-i18n="help-modal-default-view-components-description"> - Wyznacza domyślny widok na podstawie pozycji komponentów.</span>
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Usuń znaczniki komponentów</span> - Usuwa zaznaczone komponenty.
+                    <span class="highlighted-text" data-i18n="part-number-searcher-button-text">Wyszukiwarka part number</span>
+                    <span data-i18n="help-modal-part-numbers-description"> - Otwiera listę z tabelą kodów komponentów.</span>
+                </p><p class="new-line">
+                    <span class="highlighted-text" data-i18n="board-history-button-text">Historia płytki</span>
+                    <span data-i18n="help-modal-board-history-description"> - Otwiera narzędzie do sprawdzania historii płytki.</span>
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Odznacz siatkę</span> - Usuwa zaznaczoną siatkę potencjałową.
+                    <span class="highlighted-text" data-i18n="prefix-components-button-text">Prefix komponenty</span>
+                    <span data-i18n="help-modal-prefix-components-description"> - Zaznacza komponenty o wspólnym przyrostku.</span>
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Prefix komponenty</span> - Zaznacza komponenty o wspólnym przyrostku.
+                    <span class="highlighted-text" data-i18n="unselect-prefix-components-button-text">Odznacz prefix komponenty</span>
+                    <span data-i18n="help-modal-unselect-prefix-components-description"> - Usuwa zaznaczone komponenty o wspólnym przyrostku.</span>
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Odznacz prefix komponenty</span> - Usuwa zaznaczone komponenty o wspólnym przyrostku.
+                    <span class="highlighted-text" data-i18n="find-component-button-text">Znajdź komponent po nazwie</span>
+                    <span data-i18n=""> - Szuka komponentu o zadanej nazwie i pokazuje go na środku ekranu, jeśli istnieje.</span>
+                <p class="new-line">
+                    <span class="highlighted-text" data-i18n="selection-mode-button-text">Zaznacz wiele komponentów</span> 
+                    <span data-i18n="help-modal-selection-mode-description"> - Zmienia tryb zaznaczania pomiędzy wieloma i jednym komponentem. Podświetlenie oznacza tryb wielu komponentów.</span>
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Demo płytka</span> - Wyświetla przykładowy schemat wzmacniacza audio na bazie tranzystora NPN.
+                    <span class="highlighted-text" data-i18n="unselect-all-components-button-text">Odznacz komponenty</span>
+                    <span data-i18n="help-modal-unselect-components-description"> - Usuwa zaznaczone komponenty.</span>
+                </p>
+                <p class="new-line">
+                    <span class="highlighted-text" data-i18n="unselect-nets-button-text">Odznacz siatkę</span>
+                    <span data-i18n="help-modal-unselect-net-description"> - Usuwa zaznaczoną siatkę potencjałową.</span>
+                </p>
+                
+                <p class="new-line">
+                    <span class="highlighted-text" data-i18n="help-modal-demo-button-text">Demo płytka</span>
+                    <span data-i18n="help-modal-demo-description"> - Wyświetla przykładowy schemat wzmacniacza audio na bazie tranzystora NPN.</span>
                 </p>
                 </br>
 
-                <h3>Panele i akcje</h3>
+                <h3 data-i18n="help-panels-header">Panele i akcje</h3>
                 <p class="new-line">
-                    <span class="highlighted-text">Strona i zaznaczony prefix</span> - Pokazuje obecnie wyświetlaną stronę i zaznaczony prefix.
+                    <span class="highlighted-text" data-i18n="help-modal-panels-site-prefx-code">Strona i zaznaczony prefix</span>
+                    <span data-i18n="help-modal-panels-site-prefx-code-description"> - Pokazuje obecnie wyświetlaną stronę i zaznaczony prefix.</span>
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Wszystkie komponenty</span> - Lista wszystkich komponentów. Kliknięcie elementu listy pokazuje komponent na środku ekarnu. Dodatkowo, po kliknięciu w trybie zaznaczania wielu komponentów uzupełniana jest lista "Zaznaczonych komponentów".
+                    <span class="highlighted-text" data-i18n="help-modal-panels-all-components">Wszystkie komponenty</span>
+                    <span data-i18n="help-modal-panels-all-components-description"> - Lista wszystkich komponentów. Kliknięcie elementu listy pokazuje komponent na środku ekarnu. Dodatkowo, po kliknięciu w trybie zaznaczania wielu komponentów uzupełniana jest lista "Zaznaczonych komponentów".</span>
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Klikanie na komponent</span> - Pokazuje jego nazwę w panelu "Kliknięte komponenty".
+                    <span class="highlighted-text" data-i18n="help-modal-panels-marked-components">Zaznaczone komponenty</span>
+                    <span data-i18n="help-modal-panels-marked-components-description"> - Pokazuje kompopnenty zaznaczone czerwoną strzałką. Kliknięcie na element listy pokaże go na środku ekranu i wygeneruje tabelę pinoutu.</span>
+                </p>
+                <p class="new-line" data-i18n="">
+                    <span class="highlighted-text" data-i18n="help-modal-panels-clicked-components">Kliknięte komponenty</span>
+                    <span data-i18n="help-modal-panels-clicked-components-description"> - Pokazuje kliknięte komponenty. Dodatkowo, kliknięcie na nazwę wygeneruje tablę pinoutu.</span>
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Piny komponentu</span> - Pokazuje pinout komponentu. Kliknięcie na nazwę siatki, zaznaczy ją.
+                    <span class="highlighted-text" data-i18n="help-modal-panels-pinout-table">Piny komponentu</span>
+                    <span data-i18n="help-modal-panels-pinout-table-description"> - Pokazuje pinout komponentu. Kliknięcie na nazwę siatki, zaznaczy ją.</span>
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Kliknięte komponenty</span> - Pokazuje kliknięte komponenty. Dodatkowo, kliknięcie na nazwę wygeneruje tablę pinoutu.
-                </p>
-                <p class="new-line">
-                    <span class="highlighted-text">Zaznaczone komponenty</span> - Pokazuje kompopnenty zaznaczone czerwoną strzałką. Kliknięcie na element listy pokaże go na środku ekranu i wygeneruje tabelę pinoutu.
-                </p>
-                <p class="new-line">
-                    <span class="highlighted-text">Lista siatek</span> - Pokazuje siatki potencjałowe i komponenty przypisane do nich. Kliknięcie na nazwę siatki, zaznaczy ją i rozwinie listę komponentów przypisanych do niej. Kliknięcie na nazwę komponentu przypisanego do siatki, zaznaczy go i ustawi na środku ekranu.
+                    <span class="highlighted-text" data-i18n="help-modal-panels-nets-list">Lista siatek</span>
+                    <span data-i18n="help-modal-panels-nets-list-description"> - Pokazuje siatki potencjałowe i komponenty przypisane do nich. Kliknięcie na nazwę siatki, zaznaczy ją i rozwinie listę komponentów przypisanych do niej. Kliknięcie na nazwę komponentu przypisanego do siatki, zaznaczy go i ustawi na środku ekranu.</span>
                 </p>
                 </br>
 
-                <h3>Opisy kolorów</h3>
+                <h3 data-i18n="help-modal-colors-header">Opisy kolorów</h3>
                 <p class="new-line">
-                    <span class="highlighted-text">Pogrubiony biały</span> - Krawędzie płytki.
+                    <span class="highlighted-text" data-i18n="help-modal-colors-white">Pogrubiony biały</span>
+                    <span data-i18n="help-modal-colors-white-description"> - Krawędzie płytki.</span>
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Zielony</span> - Obrys komponentów. Kształt jest uproszczony do prostokątów i okręgów.
+                    <span class="highlighted-text" data-i18n="help-modal-colors-">Zielony</span>
+                    <span data-i18n="help-modal-colors-description"> - Obrys komponentów. Kształt jest uproszczony do prostokątów i okręgów.</span>
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Żółty</span> - Pady SMT.
+                    <span class="highlighted-text" data-i18n="help-modal-colors-yellow">Żółty</span>
+                    <span data-i18n="help-modal-colors-yellow-description"> - Pady SMT.</span>
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Niebieski</span> - Pady TH.
+                    <span class="highlighted-text" data-i18n="help-modal-colors-blue">Niebieski</span>
+                    <span data-i18n="help-modal-colors-blue-description"> - Pady TH.</span>
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Czerwone strzałki</span> - Zaznaczone komponenty.
+                    <span class="highlighted-text" data-i18n="help-modal-colors-red">Czerwone strzałki</span>
+                    <span data-i18n="help-modal-colors-red-description"> - Zaznaczone komponenty.</span>
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Fioletowy</span> - Pady zaznaczonej siatki potencjałów.
+                    <span class="highlighted-text" data-i18n="help-modal-colors-violet">Fioletowy</span>
+                    <span data-i18n="help-modal-colors-violet-description"> - Pady zaznaczonej siatki potencjałów.</span>
                 </p>
                 <p class="new-line">
-                    <span class="highlighted-text">Fioletowa strzałka</span> - Komponent, którego pady należą do zaznaczonej siatki.
+                    <span class="highlighted-text" data-i18n="help-modal-colors-violet-mark">Fioletowa strzałka</span>
+                    <span data-i18n="help-modal-colors-violet-mark-description"> - Komponent, którego pady należą do zaznaczonej siatki.</span>
                 </p>
                 </br>
             </div>
             <div class="modal-footer">
-                <button class="main-button" id="show-demo-board-button">Płytka demo</button>
+                <button class="main-button" id="show-demo-board-button" data-i18n="help-modal-demo-button-text">Płytka demo</button>
             </div>
         </div>
     </div>
@@ -315,7 +356,7 @@
                 <iframe src="static/serialHistory/serialHistory.html" id="board-history-iframe"></iframe>
             </div>
             <div class="modal-footer">
-                <button class="main-button" id="board-history-show-fails-button" disabled="true">Pokaż komponenty "Fail" dla zaznaczonej fazy</button>
+                <button class="main-button" id="board-history-show-fails-button" disabled="true" data-i18n="modal-board-history-fail-components-button-text">Pokaż komponenty "Fail" dla zaznaczonej fazy</button>
             </div>
         </div>
     </div>
