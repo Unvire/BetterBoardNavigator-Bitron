@@ -16,14 +16,14 @@ class HistoryRequestWrapper{
     static async _executeHistoryRequest(requestUrl){
         try {
             const response = await fetch(requestUrl, {
-                method: 'GET',
+                method: "GET",
                 headers: {
-                    'Content-type': 'application/json; charset=UTF-8',
+                    "Content-type": "application/json; charset=UTF-8",
                 },
             });
 
             if (!response.ok) {
-                throw new Error('Problem z serwerem');
+                throw new Error("Problem z serwerem");
             }
             
             const data = await response.json();
@@ -38,12 +38,12 @@ class HistoryRequestWrapper{
         try {
             const historySubJson = responseJson?.payload?.history;
             if (!Array.isArray(historySubJson)) {
-                console.warn("Brak 'payload.history' w odpowiedzi lub nie jest tablicą.");
+                console.warn("Brak \"payload.history\" w odpowiedzi lub nie jest tablicą.");
                 return [];
             }
 
             const processedList = historySubJson
-                .filter(item => item.hasOwnProperty('testDate'))
+                .filter(item => item.hasOwnProperty("testDate"))
                 .map(item => {
                     return {
                         processResult: item.result,

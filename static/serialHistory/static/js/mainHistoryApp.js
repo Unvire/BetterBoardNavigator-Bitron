@@ -2,13 +2,13 @@ class HistoryApp {
     constructor() {
         this.tracebilityRootUrl = "";
 
-        this.submitButton = document.getElementById('submit-button');
-        this.userInput = document.getElementById('user-input');
-        this.loader = document.getElementById('loader');
+        this.submitButton = document.getElementById("submit-button");
+        this.userInput = document.getElementById("user-input");
+        this.loader = document.getElementById("loader");
         
-        this.tableContainer = document.getElementById('history-table');
-        this.tableHeaderContainer = document.getElementById('table-header');
-        this.tableBodyContainer = document.getElementById('table-body');
+        this.tableContainer = document.getElementById("history-table");
+        this.tableHeaderContainer = document.getElementById("table-header");
+        this.tableBodyContainer = document.getElementById("table-body");
 
         this.wrapperInstancesList = [];
         this.currentlySelectedWrapper = null;
@@ -46,26 +46,26 @@ class HistoryApp {
 
 
     #initEventListeners() {
-        this.userInput.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
+        this.userInput.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
                 event.preventDefault(); 
                 
                 this.submitButton.click(); 
             }
         });
 
-        this.submitButton.addEventListener('click', () => this.#handleSearch());
+        this.submitButton.addEventListener("click", () => this.#handleSearch());
     }
 
     async #handleSearch() {
         const serialNumber = this.userInput.value.trim();
         if (!serialNumber) {
-            alert('Pole nie może być puste!');
+            alert("Pole nie może być puste!");
             return;
         }
 
         this.resetTableState();
-        this.loader.classList.remove('hidden');
+        this.loader.classList.remove("hidden");
 
         const filteredJsons = await HistoryRequestWrapper.getBoardHistory(this.tracebilityRootUrl, serialNumber);
         this.setFilteredJsons(filteredJsons);

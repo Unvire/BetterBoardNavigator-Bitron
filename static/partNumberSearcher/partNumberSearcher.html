@@ -11,15 +11,21 @@
   <div class="container">
     <div class="input-group">
       <input id="search-input" type="text" placeholder="Szukaj (nazwa / kod / opis)..." />
-      <button id="clear-button">Wyczyść</button>
+      <button id="clear-button" data-i18n="part-number-searcher-clear-button-text">Wyczyść</button>
     </div>
 
     <div id="part-number-table" class="table-container">
       <div id="table-header" class="table-header">
         <div class="flex-table-row">
-          <div class="table-cell header-cell cell-name unselectable"><span>Komponent</span></div>
-          <div class="table-cell header-cell cell-part-number unselectable"><span>Part number</span></div>
-          <div class="table-cell header-cell cell-description unselectable"><span>Opis</span></div>
+          <div class="table-cell header-cell cell-name unselectable">
+            <span data-i18n="part-number-searcher-component-text">Komponent</span>
+          </div>
+          <div class="table-cell header-cell cell-part-number unselectable">
+            <span data-i18n="part-number-searcher-part-number-text">Part number</span>
+          </div>
+          <div class="table-cell header-cell cell-description unselectable">
+            <span data-i18n="part-number-searcher-description-text">Opis</span>
+          </div>
         </div>
       </div>
       <div id="table-body" class="table-body"></div>

@@ -48,11 +48,11 @@ class AbstractTableHeader {
 class HistoryTableHeader extends AbstractTableHeader {
     constructor(sortMethodHandle) {
         const headerLabels = [
-            { key: "result", value: 'Status' },
-            { key: "date", value: 'Data testu' },
-            { key: "phase", value: 'Faza' },
-            { key: "sn", value: 'Numer seryjny' },
-            { key: "internal-code", value: 'Kod' }
+            { key: "result", value: "Status" },
+            { key: "date", value: "Data testu" },
+            { key: "phase", value: "Faza" },
+            { key: "sn", value: "Numer seryjny" },
+            { key: "internal-code", value: "Kod" }
         ];
 
         super(sortMethodHandle, headerLabels);
@@ -62,10 +62,10 @@ class HistoryTableHeader extends AbstractTableHeader {
 class MeasurementsTableHeader extends AbstractTableHeader {
     constructor(sortMethodHandle) {
         const headerLabels = [
-            { key: "measurement-result", value: 'Status' },
-            { key: "measurement-name", value: 'Nazwa testu' },
-            { key: "measurement-value", value: 'Wartość' },
-            { key: "measurement-unit", value: 'Jednostka' }
+            { key: "measurement-result", value: "Status" },
+            { key: "measurement-name", value: "Nazwa testu" },
+            { key: "measurement-value", value: "Wartość" },
+            { key: "measurement-unit", value: "Jednostka" }
         ];
 
         super(sortMethodHandle, headerLabels);

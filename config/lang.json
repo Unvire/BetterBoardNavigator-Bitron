@@ -91,5 +91,39 @@
         "help-modal-colors-violet-mark": "Fioletowa strzałka",
         "help-modal-colors-violet-mark-description": " - Komponent, którego pady należą do zaznaczonej siatki.",
 
+        "js-loading-screen-in-progress": "Przetwarzanie schematu",
+        "js-loading-screen-success": "Aplikacja załadowana. Wczytaj schemat!",
+        "js-no-part-numbers-in-pdf-alert": "W pliku PDF nie ma tabel z part numberami!",
+        "js-find-component-by-name-modal-title": "Nazwa komponentu",
+        "js-find-prefix-modal-title": "Wspólny prefix",
+        "js-no-ip-adress-alert": "Błąd wczytywania IP:",
+        "js-no-cad-file-selected-alert": "Musisz wybrać plik ze schematem płytki",
+        "js-help-modal-title": "Better Board Navigator - pomoc",
+        "js-part-number-searcher-modal-title": "Wyszukiwarka part number",
+        "js-board-history-modal-title": "Historia płytki",
+
+
+        "part-number-searcher-clear-button-text": "Wyczyść",
+        "part-number-searcher-component-text": "Komponent",
+        "part-number-searcher-part-number-text": "Part number",
+        "part-number-searcher-description-text": "Opis",
+
+        "board-history-search-button-text": "Szukaj",
+        "board-history-searching-in-progress-text": "Przetwarzanie danych...",
+        "js-serial-number-input-placeholder": "Wpisz numer seryjny...",
+        "js-history-request-alert": "Problem z requestem historii płytki!",
+        "js-no-payload-warning": "Brak 'payload.history' w odpowiedzi lub nie jest tablicą.",
+        "js-request-json-parsing-error": "Błąd podczas przetwarzania JSON:",
+        "js-no-serial-number-alert": "Pole nie może być puste!",
+        "js-history-table-header-row-status": "Status",
+        "js-history-table-header-test-date": "Data testu",
+        "js-history-table-header-phase": "Faza",
+        "js-history-table-header-serial-number": "Numer seryjny",
+        "js-history-table-header-internal-code": "Kod",
+        "js-history-table-header-test-name": "Nazwa testu",
+        "js-history-table-header-test-value": "Wartość",
+        "js-history-table-header-test-unit": "Jednostka",
+        "js-history-table-phase-description-phase": "Faza:",
+        "js-history-table-phase-description-machine": "Maszyna:"
     }
 }
