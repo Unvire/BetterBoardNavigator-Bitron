@@ -34,13 +34,15 @@
 
     <script>
         const targetOrigin = window.location.origin;
-
         let partNumberSearcherAppInstance = null;
-        let translationsDict = PartNumberSearcherApp.loadTranslations();
+        let translationsDict = null;
 
-        document.addEventListener("DOMContentLoaded", () => {
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            translationsDict = await PartNumberSearcherApp.loadTranslations();
             partNumberSearcherAppInstance = new PartNumberSearcherApp();
         });
+
 
         window.addEventListener("message", (event) => {
             if (event.origin !== targetOrigin) return;
@@ -48,10 +50,10 @@
             const { type, payload } = event.data;
             switch (type) {
                 case "PN_DICT":
-                const pnDict = payload || {};
+                    const pnDict = payload || {};
 
-                partNumberSearcherAppInstance.setPartNumberDict(pnDict);
-                partNumberSearcherAppInstance.renderBody();
+                    partNumberSearcherAppInstance.setPartNumberDict(pnDict);
+                    partNumberSearcherAppInstance.renderBody();
                 break;
 
                 case "CHANGE_LANGUAGE":
@@ -64,6 +66,9 @@
                             el.innerText = translationsDict[lang][key];
                         }
                     });
+
+                    const serialInput = document.getElementById("search-input");
+                    serialInput.placeholder = translationsDict[lang]?.["js-part-number-input-placeholder"] || "Szukaj (nazwa / kod / opis)...";
                 break;
             }
         });

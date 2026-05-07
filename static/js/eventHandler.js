@@ -53,7 +53,13 @@ class EventHandler{
         
         isPdfFileLoaded = false;
         partNumberSearcherButton.disabled = true;
-        partNumberSearcherIframe.contentWindow.location.reload();
+
+        const targetOrigin = window.location.origin;
+        partNumberSearcherIframe.contentWindow.postMessage({
+                type: "PN_DICT",
+                payload: {}
+            }, targetOrigin);
+
         return loadedFileName.name;
     }
 

@@ -107,6 +107,7 @@
         "part-number-searcher-component-text": "Komponent",
         "part-number-searcher-part-number-text": "Part number",
         "part-number-searcher-description-text": "Opis",
+        "js-part-number-input-placeholder": "Szukaj (nazwa / kod / opis)...",
 
         "board-history-search-button-text": "Szukaj",
         "board-history-searching-in-progress-text": "Przetwarzanie danych...",
@@ -232,6 +233,7 @@
         "part-number-searcher-component-text": "Component",
         "part-number-searcher-part-number-text": "Part number",
         "part-number-searcher-description-text": "Description",
+        "js-part-number-input-placeholder": "Search (component / code / description)...",
 
         "board-history-search-button-text": "Search",
         "board-history-searching-in-progress-text": "Processing data...",
