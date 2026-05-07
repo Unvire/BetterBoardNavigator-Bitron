@@ -123,7 +123,7 @@
         "js-history-table-header-test-name": "Nazwa testu",
         "js-history-table-header-test-value": "Wartość",
         "js-history-table-header-test-unit": "Jednostka",
-        "js-history-table-phase-description-phase": "Faza:",
-        "js-history-table-phase-description-machine": "Maszyna:"
+        "js-history-table-phase-description-phase": "Faza",
+        "js-history-table-phase-description-machine": "Maszyna"
     }
 }

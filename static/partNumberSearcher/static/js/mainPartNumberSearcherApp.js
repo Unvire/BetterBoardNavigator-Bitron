@@ -103,4 +103,9 @@ class PartNumberSearcherApp {
         const numPart = parseInt(name.slice(i), 10);
         return resultWeight + (Number.isFinite(numPart) ? numPart : 0);
     }
+
+    static async loadTranslations(){
+        const response = await fetch("/config/lang.json");
+        return await response.json();
+    }
 }

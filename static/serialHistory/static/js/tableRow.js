@@ -48,8 +48,12 @@ class AbstractTableRow {
 
 class HistoryRow extends AbstractTableRow {
     constructor(itemJson, rowOnClickEvent) {
+        const lang = document.documentElement.lang;
+        const phaseLabel = translationsDict[lang]?.["js-history-table-phase-description-phase"] || "Faza";
+        const machineLabel = translationsDict[lang]?.["js-history-table-phase-description-machine"] || "Maszyna";
+
         const processResult = HistoryRow.normalizeResult(itemJson.processResult);
-        const phaseDescription = `Faza: ${itemJson.phaseDescription}\nMaszyna: [${itemJson.machineName}]`;
+        const phaseDescription = `${phaseLabel}: ${itemJson.phaseDescription}\n${machineLabel}: [${itemJson.machineName}]`;
         const serialNumber = itemJson.serialNumber;
         const internalCode = itemJson.internalCode;
         const testDate = itemJson.testDate;

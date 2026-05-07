@@ -261,6 +261,16 @@ class EventHandler{
             }
         });
 
-        console.log(document.documentElement.lang)
+
+        const targetOrigin = window.location.origin;
+        const lang = document.documentElement.lang;
+        globalInstancesMap.partNumberSearcherIframe.contentWindow.postMessage({
+            type: "CHANGE_LANGUAGE",
+            payload: lang
+        }, targetOrigin);
+        globalInstancesMap.boardHistoryIframe.contentWindow.postMessage({
+            type: "CHANGE_LANGUAGE",
+            payload: lang
+        }, targetOrigin);
     }
 }

@@ -47,6 +47,14 @@ class AbstractTableHeader {
 
 class HistoryTableHeader extends AbstractTableHeader {
     constructor(sortMethodHandle) {
+        const lang = document.documentElement.lang;
+
+        const status = translationsDict[lang]?.["js-history-table-header-row-status"] || "Status";
+        const testDate = translationsDict[lang]?.["js-history-table-header-test-date"] || "Data testu";
+        const phase = translationsDict[lang]?.["js-history-table-header-phase"] || "Faza";
+        const msn = translationsDict[lang]?.["js-history-table-header-serial-number"] || "Numer seryjny";
+        const internalCode = translationsDict[lang]?.["js-history-table-header-internal-code"] || "Kod";
+
         const headerLabels = [
             { key: "result", value: "Status" },
             { key: "date", value: "Data testu" },
@@ -61,11 +69,18 @@ class HistoryTableHeader extends AbstractTableHeader {
 
 class MeasurementsTableHeader extends AbstractTableHeader {
     constructor(sortMethodHandle) {
+        const lang = document.documentElement.lang;
+
+        const status = translationsDict[lang]?.["js-history-table-header-row-status"] || "Status";
+        const testname = translationsDict[lang]?.["js-history-table-header-test-name"] || "Nazwa testu";
+        const value = translationsDict[lang]?.["js-history-table-header-test-value"] || "Wartość";
+        const unit = translationsDict[lang]?.["js-history-table-header-test-unit"] || "Jednostka";
+
         const headerLabels = [
-            { key: "measurement-result", value: "Status" },
-            { key: "measurement-name", value: "Nazwa testu" },
-            { key: "measurement-value", value: "Wartość" },
-            { key: "measurement-unit", value: "Jednostka" }
+            { key: "measurement-result", value: status },
+            { key: "measurement-name", value: testname },
+            { key: "measurement-value", value: value },
+            { key: "measurement-unit", value: unit }
         ];
 
         super(sortMethodHandle, headerLabels);

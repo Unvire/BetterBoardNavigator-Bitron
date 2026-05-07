@@ -4,7 +4,10 @@ class HistoryRequestWrapper{
 
         const responseJson = await HistoryRequestWrapper._executeHistoryRequest(requestUrl)
         if (responseJson == "") {
-            alert("Problem z requestem historii płytki!");
+            const lang = document.documentElement.lang;
+            const alertMessage = translationsDict[lang]?.["js-history-request-alert"] || "Problem z requestem historii płytki!";
+
+            alert(alertMessage);
             return []
         }
 
@@ -38,7 +41,10 @@ class HistoryRequestWrapper{
         try {
             const historySubJson = responseJson?.payload?.history;
             if (!Array.isArray(historySubJson)) {
-                console.warn("Brak \"payload.history\" w odpowiedzi lub nie jest tablicą.");
+                const lang = document.documentElement.lang;
+                const warnMessage = translationsDict[lang]?.["js-no-payload-warning"] || "Brak \"payload.history\" w odpowiedzi lub nie jest tablicą.";
+
+                console.warn(warnMessage);
                 return [];
             }
 
@@ -59,7 +65,10 @@ class HistoryRequestWrapper{
                 return processedList;
 
         } catch (error) {
-            console.error("Błąd podczas przetwarzania JSON:", error);
+            const lang = document.documentElement.lang;
+            const errorMessage = translationsDict[lang]?.["js-request-json-parsing-error"] || "Błąd podczas przetwarzania JSON:";
+
+            console.error(errorMessage, error);
             return [];
         }
     }

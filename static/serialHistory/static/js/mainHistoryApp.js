@@ -60,7 +60,10 @@ class HistoryApp {
     async #handleSearch() {
         const serialNumber = this.userInput.value.trim();
         if (!serialNumber) {
-            alert("Pole nie może być puste!");
+            const lang = document.documentElement.lang;
+            const alertMessage = translationsDict[lang]?.["js-no-serial-number-alert"] || "Pole nie może być puste!";
+
+            alert(alertMessage);
             return;
         }
 
@@ -89,5 +92,10 @@ class HistoryApp {
         }
 
         return this.currentlySelectedWrapper.getMeasurements();
+    }
+
+    static async loadTranslations(){
+        const response = await fetch("/config/lang.json");
+        return await response.json();
     }
 }

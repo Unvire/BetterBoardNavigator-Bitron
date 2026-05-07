@@ -1,58 +1,72 @@
 <!doctype html>
 <html lang="pl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Wyszukiwarka kodu komponentów</title>
-  <link rel="stylesheet" href="static/css/stylesPartNumberSearcher.css" />
-  <script src="static/js/mainPartNumberSearcherApp.js"></script>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Wyszukiwarka kodu komponentów</title>
+    <link rel="stylesheet" href="static/css/stylesPartNumberSearcher.css" />
+    <script src="static/js/mainPartNumberSearcherApp.js"></script>
 </head>
 <body>
-  <div class="container">
-    <div class="input-group">
-      <input id="search-input" type="text" placeholder="Szukaj (nazwa / kod / opis)..." />
-      <button id="clear-button" data-i18n="part-number-searcher-clear-button-text">Wyczyść</button>
-    </div>
-
-    <div id="part-number-table" class="table-container">
-      <div id="table-header" class="table-header">
-        <div class="flex-table-row">
-          <div class="table-cell header-cell cell-name unselectable">
-            <span data-i18n="part-number-searcher-component-text">Komponent</span>
-          </div>
-          <div class="table-cell header-cell cell-part-number unselectable">
-            <span data-i18n="part-number-searcher-part-number-text">Part number</span>
-          </div>
-          <div class="table-cell header-cell cell-description unselectable">
-            <span data-i18n="part-number-searcher-description-text">Opis</span>
-          </div>
+    <div class="container">
+        <div class="input-group">
+            <input id="search-input" type="text" placeholder="Szukaj (nazwa / kod / opis)..." />
+            <button id="clear-button" data-i18n="part-number-searcher-clear-button-text">Wyczyść</button>
         </div>
-      </div>
-      <div id="table-body" class="table-body"></div>
+
+        <div id="part-number-table" class="table-container">
+            <div id="table-header" class="table-header">
+                <div class="flex-table-row">
+                    <div class="table-cell header-cell cell-name unselectable">
+                        <span data-i18n="part-number-searcher-component-text">Komponent</span>
+                    </div>
+                    <div class="table-cell header-cell cell-part-number unselectable">
+                        <span data-i18n="part-number-searcher-part-number-text">Part number</span>
+                    </div>
+                    <div class="table-cell header-cell cell-description unselectable">
+                        <span data-i18n="part-number-searcher-description-text">Opis</span>
+                    </div>
+                </div>
+            </div>
+            <div id="table-body" class="table-body"></div>
+        </div>
     </div>
-  </div>
 
-  <script>
-    const targetOrigin = window.location.origin;
-    let partNumberSearcherAppInstance = null;
+    <script>
+        const targetOrigin = window.location.origin;
 
+        let partNumberSearcherAppInstance = null;
+        let translationsDict = PartNumberSearcherApp.loadTranslations();
 
-    document.addEventListener('DOMContentLoaded', () => {
-      partNumberSearcherAppInstance = new PartNumberSearcherApp();
-    });
+        document.addEventListener("DOMContentLoaded", () => {
+            partNumberSearcherAppInstance = new PartNumberSearcherApp();
+        });
 
-    window.addEventListener("message", (event) => {
-      if (event.origin !== targetOrigin) return;
+        window.addEventListener("message", (event) => {
+            if (event.origin !== targetOrigin) return;
 
-      if (!event.data || event.data.type !== "PN_DICT") {
-        return;
-      }
+            const { type, payload } = event.data;
+            switch (type) {
+                case "PN_DICT":
+                const pnDict = payload || {};
 
-      const pnDict = event.data.payload || {};
+                partNumberSearcherAppInstance.setPartNumberDict(pnDict);
+                partNumberSearcherAppInstance.renderBody();
+                break;
 
-      partNumberSearcherAppInstance.setPartNumberDict(pnDict);
-      partNumberSearcherAppInstance.renderBody();
-    });
-  </script>  
+                case "CHANGE_LANGUAGE":
+                    const lang = payload;
+                    document.documentElement.lang = lang;
+
+                    document.querySelectorAll('[data-i18n]').forEach(el => {
+                        const key = el.getAttribute('data-i18n');
+                        if (translationsDict[lang]?.[key]) {
+                            el.innerText = translationsDict[lang][key];
+                        }
+                    });
+                break;
+            }
+        });
+    </script>  
 </body>
 </html>
