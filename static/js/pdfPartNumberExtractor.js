@@ -27,7 +27,7 @@ class PartNumberPDFExtractor {
             const page = await pdf.getPage(i);
             const content = await page.getTextContent();
 
-            const pageText = content.items.map(item => item.str).join('\n');
+            const pageText = content.items.map(item => item.str).join("\n");
             fullText += pageText + "\n";
         }
 
@@ -43,10 +43,10 @@ class PartNumberPDFExtractor {
         let i = 0;
         while (i < text.length) {
             const isTableHeader =
-                text[i]?.toLowerCase() === 'refdes' &&
-                text[i - 1]?.toLowerCase() === 'quantity' &&
-                text[i - 2]?.toLowerCase() === 'description' &&
-                text[i - 3]?.toLowerCase() === 'ipn';
+                text[i]?.toLowerCase() === "refdes" &&
+                text[i - 1]?.toLowerCase() === "quantity" &&
+                text[i - 2]?.toLowerCase() === "description" &&
+                text[i - 3]?.toLowerCase() === "ipn";
 
             i++;
 
@@ -60,7 +60,7 @@ class PartNumberPDFExtractor {
                 let components = text[i + 3];
 
                 i += 4;
-                while (text[i]?.includes(',')) {
+                while (text[i]?.includes(",")) {
                     components += text[i];
                     i++;
                 }
@@ -74,7 +74,7 @@ class PartNumberPDFExtractor {
 
     _updatePartNumberDictInPlace(pnDict, components, bitronCode, description) {
         const componentsList = components
-            .split(',')
+            .split(",")
             .map(c => c.trim());
 
         for (const component of componentsList) {

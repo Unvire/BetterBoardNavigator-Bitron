@@ -24,8 +24,8 @@ async function main(){
 
 async function loadServerIP() {
     try {
-        const response = await fetch('config/traceabilityIP.txt');
-        if (!response.ok) throw new Error('Brak pliku IP');
+        const response = await fetch("config/traceabilityIP.txt");
+        if (!response.ok) throw new Error("Brak pliku IP");
         
         const ip = (await response.text()).trim();
         return ip;
@@ -129,7 +129,7 @@ function _bindBoardHistoryOnLoadEvent(tracebilityRootUrl){
 }
 
 async function _loadTranslations(){
-    const response = await fetch('config/lang.json');
+    const response = await fetch("config/lang.json");
     translationsDict = await response.json();
 }
 
@@ -221,8 +221,8 @@ async function _initPyodide(){
 }
 
 function _bindMouseAndKeyboardEvents(){
-    document.addEventListener('click', () => {
-        globalInstancesMap.languagePickerMenu.classList.remove('show');
+    document.addEventListener("click", () => {
+        globalInstancesMap.languagePickerMenu.classList.remove("show");
     });
 
     window.addEventListener("resize", EventHandler.windowResize);
@@ -254,10 +254,10 @@ function _bindMouseAndKeyboardEvents(){
 function _bindIframeResponseEvent(){
     const targetOrigin = window.location.origin;
 
-    window.addEventListener('message', (event) => {
+    window.addEventListener("message", (event) => {
         if (event.origin !== targetOrigin) return;
 
-        if (event.data.type === 'DATA_RESPONSE') {
+        if (event.data.type === "DATA_RESPONSE") {
             const receivedData = event.data.payload;
             BoardHistoryAdapter.showFailedComponents(receivedData);
         }
@@ -321,6 +321,6 @@ function _bindOnClickEvents(){
 
     globalInstancesMap.languagePickerButton.addEventListener("click", (e) => {
         e.stopPropagation();
-        globalInstancesMap.languagePickerMenu.classList.toggle('show');
+        globalInstancesMap.languagePickerMenu.classList.toggle("show");
     });
 }

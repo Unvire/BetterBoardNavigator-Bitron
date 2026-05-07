@@ -19,7 +19,7 @@ class SideHandler{
 
     getSideOfComponent(componentName){
         pyodide.runPython(`
-            componentSide = engine.getSideOfComponent('${componentName}')
+            componentSide = engine.getSideOfComponent("${componentName}")
         `);
         return pyodide.globals.get("componentSide");
     }

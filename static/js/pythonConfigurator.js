@@ -2,12 +2,12 @@ class PythonConfigurator{
     static async configurePythonPath(pyodide){
         await pyodide.runPythonAsync(`
             import sys
-            sys.path.append('/')
+            sys.path.append("/")
 
             engine = None
 
             from js import document
-            canvas = document.getElementById('canvas')
+            canvas = document.getElementById("canvas")
         `);
     }
 
@@ -30,9 +30,9 @@ class PythonConfigurator{
             pyodide.FS.writeFile(`/${moduleName}.py`, moduleCode);
         }
 
-        const modulesList = ['geometryObjects', 'abstractShape', 'pin', 'component', 'board', 'unlzw3', 
-                            'camcadLoader', 'gencadLoader', 'odbPlusPlusLoader', 'visecadLoader',
-                            'loaderSelectorFactory','boardWrapper', 'pygameDrawBoard', 'tracebilityFailsParser']
+        const modulesList = ["geometryObjects", "abstractShape", "pin", "component", "board", "unlzw3", 
+                            "camcadLoader", "gencadLoader", "odbPlusPlusLoader", "visecadLoader",
+                            "loaderSelectorFactory","boardWrapper", "pygameDrawBoard", "tracebilityFailsParser"]
         
         for (const moduleName of modulesList) {
             await copyModuleToVirtualMemory(pyodide, moduleName);

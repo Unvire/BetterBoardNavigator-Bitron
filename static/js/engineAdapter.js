@@ -6,7 +6,7 @@ class EngineAdapter{
         const side = sideHandler.currentSide();
         pyodide.runPythonAsync(`
             if engine:
-                engine.changeScreenDimensionsInterface(SURFACE, [canvas.width, canvas.height], '${side}')
+                engine.changeScreenDimensionsInterface(SURFACE, [canvas.width, canvas.height], "${side}")
                 pygame.display.flip()
         `);
     }
@@ -16,7 +16,7 @@ class EngineAdapter{
 
         const side = sideHandler.currentSide();
         pyodide.runPythonAsync(`
-            engine.rotateBoardInterface(SURFACE, isClockwise=True, side='${side}', angleDeg=90)
+            engine.rotateBoardInterface(SURFACE, isClockwise=True, side="${side}", angleDeg=90)
             pygame.display.flip()
         `);
     }
@@ -28,12 +28,12 @@ class EngineAdapter{
         pyodide.runPython(`
             clickedComponents = []
             if engine:
-                clickedXY = [int('${x}'), int('${y}')]
-                clickedComponents = engine.findComponentByClick(clickedXY, '${side}')
+                clickedXY = [int("${x}"), int("${y}")]
+                clickedComponents = engine.findComponentByClick(clickedXY, "${side}")
             clickedComponents = []
             if engine:
-                clickedXY = [int('${x}'), int('${y}')]
-                clickedComponents = engine.findComponentByClick(clickedXY, '${side}')
+                clickedXY = [int("${x}"), int("${y}")]
+                clickedComponents = engine.findComponentByClick(clickedXY, "${side}")
         `);
         return pyodide.globals.get("clickedComponents").toJs();
     }
@@ -41,7 +41,7 @@ class EngineAdapter{
     static moveBoard(x, y){
         pyodide.runPythonAsync(`
             if engine:
-                deltaVector = [int('${x}'), int('${y}')]
+                deltaVector = [int("${x}"), int("${y}")]
                 engine.moveBoardInterface(SURFACE, deltaVector)
                 pygame.display.flip()
         `);
@@ -57,9 +57,9 @@ class EngineAdapter{
         const side = sideHandler.currentSide();
         pyodide.runPythonAsync(`
         if engine:
-            pointXY = [int('${x}'), int('${y}')]
-            isScaleUp = '${isZoomIn}' == 'true'
-            engine.scaleUpDownInterface(SURFACE, isScaleUp=isScaleUp, pointXY=pointXY, side='${side}')
+            pointXY = [int("${x}"), int("${y}")]
+            isScaleUp = "${isZoomIn}" == "true"
+            engine.scaleUpDownInterface(SURFACE, isScaleUp=isScaleUp, pointXY=pointXY, side="${side}")
             pygame.display.flip()
         `);
     }
@@ -69,7 +69,7 @@ class EngineAdapter{
 
         const side = sideHandler.changeSide();
         pyodide.runPythonAsync(`
-            engine.changeSideInterface(SURFACE, '${side}')
+            engine.changeSideInterface(SURFACE, "${side}")
             pygame.display.flip()
         `);
     }
@@ -79,7 +79,7 @@ class EngineAdapter{
         
         const side = sideHandler.currentSide();
         pyodide.runPythonAsync(`
-            engine.flipUnflipCurrentSideInterface(SURFACE, '${side}')
+            engine.flipUnflipCurrentSideInterface(SURFACE, "${side}")
             pygame.display.flip()
         `);
     }
@@ -89,7 +89,7 @@ class EngineAdapter{
 
         const side = sideHandler.currentSide();
         pyodide.runPythonAsync(`
-            engine.showHideOutlinesInterface(SURFACE, '${side}')
+            engine.showHideOutlinesInterface(SURFACE, "${side}")
             pygame.display.flip()
         `);
     }
@@ -99,7 +99,7 @@ class EngineAdapter{
 
         const side = sideHandler.currentSide();
         pyodide.runPython(`
-            engine.resetToDefaultViewInterface(SURFACE, '${side}')
+            engine.resetToDefaultViewInterface(SURFACE, "${side}")
             pygame.display.flip()
         `);
         WidgetAdapter.resetWidgets();
@@ -110,7 +110,7 @@ class EngineAdapter{
 
         const side = sideHandler.currentSide();
         pyodide.runPython(`
-            engine.useComponentAreaInterface(SURFACE, '${side}')
+            engine.useComponentAreaInterface(SURFACE, "${side}")
             pygame.display.flip()
         `);
         WidgetAdapter.resetWidgets();
@@ -121,7 +121,7 @@ class EngineAdapter{
 
         const side = sideHandler.currentSide();
         pyodide.runPython(`
-            engine.clearFindComponentByNameInterface(SURFACE, '${side}')
+            engine.clearFindComponentByNameInterface(SURFACE, "${side}")
             pygame.display.flip()
         `);
     }
@@ -131,7 +131,7 @@ class EngineAdapter{
 
         const side = sideHandler.setComponentSideAsCurrentSide(componentName);
         pyodide.runPython(`
-            engine.componentInScreenCenterInterface(SURFACE, '${componentName}', '${side}')
+            engine.componentInScreenCenterInterface(SURFACE, "${componentName}", "${side}")
             pygame.display.flip()
         `);
     }
@@ -141,7 +141,7 @@ class EngineAdapter{
 
         const side = sideHandler.currentSide();
         pyodide.runPython(`
-            engine.selectNetByNameInterface(SURFACE, '${netName}', '${side}')
+            engine.selectNetByNameInterface(SURFACE, "${netName}", "${side}")
             pygame.display.flip()
         `);
     }
@@ -151,7 +151,7 @@ class EngineAdapter{
 
         const side = sideHandler.setComponentSideAsCurrentSide(componentName);
         pyodide.runPython(`
-            engine.selectNetComponentByNameInterface(SURFACE, '${componentName}', '${side}')
+            engine.selectNetComponentByNameInterface(SURFACE, "${componentName}", "${side}")
             pygame.display.flip()
         `);
         EngineAdapter.componentInScreenCenter(componentName);
@@ -162,7 +162,7 @@ class EngineAdapter{
 
         const side = sideHandler.currentSide();
         pyodide.runPython(`
-            engine.unselectNetInterface(SURFACE, '${side}')
+            engine.unselectNetInterface(SURFACE, "${side}")
             pygame.display.flip()
         `);
     }
@@ -172,10 +172,10 @@ class EngineAdapter{
         
         const side = sideHandler.currentSide();
         pyodide.runPython(`
-            isPrefixExist = engine.checkIfPrefixExists('${prefix}')
+            isPrefixExist = engine.checkIfPrefixExists("${prefix}")
 
             if isPrefixExist:
-                engine.showCommonTypeComponentsInterface(SURFACE, '${prefix}', '${side}')
+                engine.showCommonTypeComponentsInterface(SURFACE, "${prefix}", "${side}")
                 pygame.display.flip()
         `);
         return pyodide.globals.get("isPrefixExist");
@@ -186,7 +186,7 @@ class EngineAdapter{
 
         const side = sideHandler.currentSide();
         pyodide.runPython(`
-            engine.clearCommonTypeComponentsInterface(SURFACE, '${side}')
+            engine.clearCommonTypeComponentsInterface(SURFACE, "${side}")
             pygame.display.flip()
         `);
     }
@@ -201,10 +201,10 @@ class EngineAdapter{
         
         const side = sideHandler.setComponentSideAsCurrentSide(componentName);
         pyodide.runPython(`
-            if '${isSelectionModeSingle}' == 'true':
-                engine.clearFindComponentByNameInterface(SURFACE, '${side}')
+            if "${isSelectionModeSingle}" == "true":
+                engine.clearFindComponentByNameInterface(SURFACE, "${side}")
                 
-            engine.findComponentByNameInterface(SURFACE, '${componentName}', '${side}')
+            engine.findComponentByNameInterface(SURFACE, "${componentName}", "${side}")
             pygame.display.flip()
         `);
         return true;

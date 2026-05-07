@@ -4,7 +4,7 @@ class EventHandler{
         const dynamicVH = dpr * 100;
 
         document.body.style.zoom = `${Math.floor(1 / dpr * 100)}%`;
-        document.documentElement.style.setProperty('--GRID-CONTAINER-HEIGHT', dynamicVH + 'vh');
+        document.documentElement.style.setProperty("--GRID-CONTAINER-HEIGHT", dynamicVH + "vh");
     }
 
     static keyDown(event, isTextModalInputFocused){
@@ -232,7 +232,7 @@ class EventHandler{
 
                 const historyIframe = globalInstancesMap.boardHistoryIframe;
                 historyIframe.contentWindow.postMessage({ 
-                        type: 'MOCK_HISTORY',
+                        type: "MOCK_HISTORY",
                         payload: historyDict 
                     }, 
                 targetOrigin);

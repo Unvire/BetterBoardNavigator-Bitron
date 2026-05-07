@@ -42,7 +42,7 @@ class WidgetAdapter{
         const selectedComponentSpan = globalInstancesMap.selectedComponentSpan;
         const sideHandler = globalInstancesMap.sideHandler;
 
-        commonPrefixSpan.innerText = '';
+        commonPrefixSpan.innerText = "";
         currentSideSpan.innerText = sideHandler.currentSide();
 
         selectedComponentSpan.innerText = "";
@@ -149,7 +149,7 @@ class PinoutTableAdapter{
 
     static generatePinoutTable(componentName){
         pyodide.runPython(`
-            pinoutDict = engine.getComponentPinout('${componentName}')
+            pinoutDict = engine.getComponentPinout("${componentName}")
         `);
         let pinoutMap = pyodide.globals.get("pinoutDict").toJs();
         
@@ -316,7 +316,7 @@ class BoardHistoryAdapter{
         const targetOrigin = window.location.origin; 
 
         globalInstancesMap.boardHistoryIframe.contentWindow.postMessage({
-            type: 'SET_API_ROOT',
+            type: "SET_API_ROOT",
             payload: tracebilityRootUrl
         }, targetOrigin);
     }
@@ -325,7 +325,7 @@ class BoardHistoryAdapter{
         const targetOrigin = window.location.origin;
 
         globalInstancesMap.boardHistoryIframe.contentWindow.postMessage({ 
-            type: 'GET_DATA_REQUEST' 
+            type: "GET_DATA_REQUEST" 
         }, targetOrigin);
     }
 
