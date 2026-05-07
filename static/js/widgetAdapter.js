@@ -37,14 +37,17 @@ class WidgetAdapter{
     }
 
     static resetSpans(){
-        const commonPrefixSpan = globalInstancesMap.commonPrefixSpan;
-        const currentSideSpan = globalInstancesMap.currentSideSpan;
-        const selectedComponentSpan = globalInstancesMap.selectedComponentSpan;
         const sideHandler = globalInstancesMap.sideHandler;
+        const currentSideSpan = globalInstancesMap.currentSideSpan;
+        const commonPrefixSpan = globalInstancesMap.commonPrefixSpan;
+        const partNumberSpan = globalInstancesMap.partNumberSpan;
 
-        commonPrefixSpan.innerText = "";
         currentSideSpan.innerText = sideHandler.currentSide();
+        commonPrefixSpan.innerText = "";
+        partNumberSpan.innerText = ""
 
+
+        const selectedComponentSpan = globalInstancesMap.selectedComponentSpan;
         selectedComponentSpan.innerText = "";
     }
 }
@@ -105,6 +108,7 @@ class DynamicSelectableListAdapter{
         EngineAdapter.findComponentByName(itemName);
         EngineAdapter.componentInScreenCenter(itemName);
         DynamicSelectableListAdapter.generateMarkedComponentsList();
+        PartNumberSpanAdapter.displayPartNumberOfComponent(itemName);
     }
 
     static onClickItemEvent(itemElement){
@@ -198,7 +202,7 @@ class TreeViewAdapter{
 
         netsTreeview.eventBeforeSelection = EngineAdapter.unselectNet;
         netsTreeview.netEvent = TreeViewAdapter.selectNetFromTreeviewEvent;
-        netsTreeview.componentEvent = EngineAdapter.selectNetComponentByName;
+        netsTreeview.componentEvent = TreeViewAdapter.selectNetComponentByName;
         netsTreeview.addBranches(netsMap);
         netsTreeview.generate();
     }

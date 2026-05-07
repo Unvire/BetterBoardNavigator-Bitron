@@ -320,7 +320,7 @@ function _bindOnClickEvents(){
     });
 
     globalInstancesMap.languagePickerButton.addEventListener("click", (e) => {
-        e.stopPropagation();
+        //e.stopPropagation();
         globalInstancesMap.languagePickerMenu.classList.toggle("show");
     });
 }
