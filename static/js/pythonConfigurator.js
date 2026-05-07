@@ -41,6 +41,6 @@ class PythonConfigurator{
         const lang = document.documentElement.lang;
         const loadingSuccessMessage = translationsDict[lang]?.["js-loading-screen-success"] || "Aplikacja załadowana. Wczytaj schemat!"
         LoadingScreen.hideLoadingDots();
-        LoadingScreen.setLoadingScreenMessage();
+        LoadingScreen.setLoadingScreenMessage(loadingSuccessMessage);
     }
 }

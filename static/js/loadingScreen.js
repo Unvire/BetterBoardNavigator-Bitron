@@ -3,8 +3,7 @@ class LoadingScreen{
         if (loadingScreenInterval !== null) {
             return;
         }
-        
-        const loadingScreenDots = document.getElementById("loading-dots");
+        const loadingScreenDots = globalInstancesMap.loadingScreenDots
         loadingScreenDots.style.display = ""; // reverts back to value from css
 
         let count = 0;
@@ -19,8 +18,7 @@ class LoadingScreen{
             return;
         }
 
-        const loadingScreenDots = document.getElementById("loading-dots");
-        loadingScreenDots.style.display = "none";
+        globalInstancesMap.loadingScreenDots.style.display = "none";
 
         clearInterval(loadingScreenInterval);
         loadingScreenInterval = null;
@@ -28,19 +26,16 @@ class LoadingScreen{
 
 
     static setLoadingScreenMessage(message) {
-        const loadingScreenText = document.getElementById("loading-text");
-        loadingScreenText.textContent = message;
+        globalInstancesMap.loadingScreenText.textContent = message;
 
         LoadingScreen.showLoadingScreen();
     }
 
     static showLoadingScreen() {
-        const loadingScreenDiv = document.getElementById("loading-screen");
-        loadingScreenDiv.style.display = ""; // reverts back to value from css
+        globalInstancesMap.loadingScreenContainer.style.display = ""; // reverts back to value from css
     }
 
     static hideLoadingScreen() {
-        const loadingScreenDiv = document.getElementById("loading-screen");
-        loadingScreenDiv.style.display = "none";
+        globalInstancesMap.loadingScreenContainer.style.display = "none";
     }
 }

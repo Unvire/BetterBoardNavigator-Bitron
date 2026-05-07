@@ -1,4 +1,6 @@
 async function main(){    
+    _bindHtmlElements();
+    
     LoadingScreen.showLoadingScreen();
     LoadingScreen.showLoadingDots();
 
@@ -6,7 +8,6 @@ async function main(){
 
 
     document.addEventListener("DOMContentLoaded", async () => {
-        _bindHtmlElements();
         await _loadTranslations();
         
         const TRACEBILITY_URL = await loadServerIP();
@@ -123,6 +124,11 @@ function _bindHtmlElements(){
     globalInstancesMap.languagePickerBadgeSpan = document.getElementById("language-picker-badge-span");
     globalInstancesMap.languagePickerCurrentLanguageSpan = document.getElementById("language-picker-current-language-span");
     globalInstancesMap.languagePickerMenu = document.getElementById("language-picker-menu");
+
+    // loading screen
+    globalInstancesMap.loadingScreenContainer = document.getElementById("loading-screen");
+    globalInstancesMap.loadingScreenDots = document.getElementById("loading-dots");
+    globalInstancesMap.loadingScreenText = document.getElementById("loading-text");
 }
 
 function _bindBoardHistoryOnLoadEvent(tracebilityRootUrl){

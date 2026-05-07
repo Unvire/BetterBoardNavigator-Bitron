@@ -68,14 +68,14 @@
                     const lang = payload;
                     document.documentElement.lang = lang;
 
-                    document.querySelectorAll('[data-i18n]').forEach(el => {
-                        const key = el.getAttribute('data-i18n');
+                    document.querySelectorAll("[data-i18n]").forEach(el => {
+                        const key = el.getAttribute("data-i18n");
                         if (translationsDict[lang]?.[key]) {
                             el.innerText = translationsDict[lang][key];
                         }
                     });
 
-                    const serialInput = document.getElementById('user-input');
+                    const serialInput = document.getElementById("user-input");
                     serialInput.placeholder = translationsDict[lang]?.["js-serial-number-input-placeholder"] || "Wpisz numer seryjny...";
                 break;
             }

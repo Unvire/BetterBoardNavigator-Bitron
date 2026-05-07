@@ -254,12 +254,17 @@ class EventHandler{
     static changeLanguage(selectedLanguage){
         document.documentElement.lang = selectedLanguage;
 
-        document.querySelectorAll('[data-i18n]').forEach(el => {
-            const key = el.getAttribute('data-i18n');
+        document.querySelectorAll("[data-i18n]").forEach(el => {
+            const key = el.getAttribute("data-i18n");
             if (translationsDict[selectedLanguage]?.[key]) {
                 el.innerText = translationsDict[selectedLanguage][key];
             }
         });
+
+        if (typeof pyodide !== "undefined") {
+            const loadingSuccessMessage = translationsDict[selectedLanguage]["js-loading-screen-success"]
+            globalInstancesMap.loadingScreenText.textContent = loadingSuccessMessage;
+        }
 
 
         const targetOrigin = window.location.origin;
