@@ -58,9 +58,13 @@ class ModalSubmit extends ModalBox{
 class ModalHelp extends ModalBox{
     constructor(parentContainer, closeSpan, header, button){
         super(parentContainer, closeSpan, header);
+
+        const lang = document.documentElement.lang;
+        const modalHeaderText = translationsDict[lang]?.["js-help-modal-title"] || "Better Board Navigator - pomoc";
+
         this.button = button;
         this.parameterConstant = null;
-        this.header.innerText = "Better Board Navigator - pomoc";
+        this.header.innerText = modalHeaderText;
     }
 
     set eventParameter(parameter){
@@ -79,15 +83,23 @@ class ModalHelp extends ModalBox{
 class ModalPartNumberSearcher extends ModalBox{
     constructor(parentContainer, closeSpan, header){
         super(parentContainer, closeSpan, header);
-        this.header.innerText = "Wyszukiwarka part number";
+
+        const lang = document.documentElement.lang;
+        const modalHeaderText = translationsDict[lang]?.["js-part-number-searcher-modal-title"] || "Wyszukiwarka part number";
+
+        this.header.innerText = modalHeaderText;
     }
 }
 
 class ModalBoardHistory extends ModalBox{
     constructor(parentContainer, closeSpan, header, button){
         super(parentContainer, closeSpan, header);
+        
+        const lang = document.documentElement.lang;
+        const modalHeaderText = translationsDict[lang]?.["js-board-history-modal-title"] || "Historia płytki";
+
         this.button = button;
-        this.header.innerText = "Historia płytki";
+        this.header.innerText = modalHeaderText;
     }
 
     setButtonEvent(eventFunction){

@@ -3,7 +3,9 @@ class CadFileLoader{
         const fileName = `/${file.name}`;
         const reader = new FileReader();
 
-        LoadingScreen.setLoadingScreenMessage("Przetwarzanie schematu");
+        const lang = document.documentElement.lang;
+        const loadingMessage = translationsDict[lang]?.["js-loading-screen-in-progress"] || "Przetwarzanie schematu";
+        LoadingScreen.setLoadingScreenMessage(loadingMessage);
         LoadingScreen.showLoadingDots();
 
         reader.onload = (event) => {

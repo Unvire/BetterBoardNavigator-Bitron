@@ -31,7 +31,10 @@ async function loadServerIP() {
         return ip;
 
     } catch (error) {
-        console.error("Błąd wczytywania IP:", error);
+        const lang = document.documentElement.lang;
+        const alertMessage = translationsDict[lang]?.["js-no-ip-adress-alert"] || "Błąd wczytywania IP:";
+
+        console.error(alertMessage, error);
         return "";
     }
 }
@@ -281,7 +284,10 @@ function _bindLoadFilesEvents(){
 
 
         if (!cadFile) {
-            alert("Musisz wybrać plik ze schematem płytki");
+            const lang = document.documentElement.lang;
+            const noCadFileMessage = translationsDict[lang]?.["js-no-cad-file-selected-alert"] || "Musisz wybrać plik ze schematem płytki";
+
+            alert(noCadFileMessage);
             return;
         }
 

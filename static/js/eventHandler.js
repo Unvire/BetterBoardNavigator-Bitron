@@ -66,9 +66,12 @@ class EventHandler{
         const targetOrigin = window.location.origin;
 
         if (Object.keys(pnDict).length === 0) {
+            const lang = document.documentElement.lang;
+            const noPNsInFileMessage = translationsDict[lang]?.["js-no-part-numbers-in-pdf-alert"] || "W pliku PDF nie ma tabel z part numberami!";
+
             partNumberSearcherButton.disabled = true;
             isPdfFileLoaded = false;
-            alert("W pliku PDF nie ma tabel z part numberami!");
+            alert(noPNsInFileMessage);
         } else {
             partNumberSearcherButton.disabled = false;
             isPdfFileLoaded = true;
@@ -113,12 +116,18 @@ class EventHandler{
 
     static findComponentUsingName(){
         const modalSubmit = globalInstancesMap.modalSubmit;
-        InputModalBoxAdapter.generateModalBox(modalSubmit, "Nazwa komponentu", InputModalBoxAdapter.getComponentNameFromInput);
+        const lang = document.documentElement.lang;
+        const componentNameText = translationsDict[lang]?.["js-find-component-by-name-modal-title"] || "Nazwa komponentu";
+
+        InputModalBoxAdapter.generateModalBox(modalSubmit, componentNameText, InputModalBoxAdapter.getComponentNameFromInput);
     }
     
     static showCommonPrefixComponents(){
         const modalSubmit = globalInstancesMap.modalSubmit;
-        InputModalBoxAdapter.generateModalBox(modalSubmit, "Prefix", InputModalBoxAdapter.getCommonPrefixFromInput);
+        const lang = document.documentElement.lang;
+        const componentNameText = translationsDict[lang]?.["js-find-prefix-modal-title"] || "Wspólny prefix";
+
+        InputModalBoxAdapter.generateModalBox(modalSubmit, componentNameText, InputModalBoxAdapter.getCommonPrefixFromInput);
     }
     
     static hideCommonPrefixComponents(){
@@ -243,6 +252,15 @@ class EventHandler{
     }
 
     static changeLanguage(selectedLanguage){
-        console.log(selectedLanguage)
+        document.documentElement.lang = selectedLanguage;
+
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (translationsDict[selectedLanguage]?.[key]) {
+                el.innerText = translationsDict[selectedLanguage][key];
+            }
+        });
+
+        console.log(document.documentElement.lang)
     }
 }

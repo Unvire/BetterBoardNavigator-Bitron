@@ -299,7 +299,10 @@ class PartNumberSpanAdapter{
 
         const partNumber = partNumberExtractor.getPartNumberOfComponent(componentName);
         if (partNumber == ""){
-            partNumberComponentNameSpan.innerText = "Kod";
+            const lang = document.documentElement.lang;
+            const partNumberSpanText = translationsDict[lang]?.["current-code-text"] || "Kod";
+
+            partNumberComponentNameSpan.innerText = partNumberSpanText;
             partNumberSpan.innerText = "";
         } else {
             partNumberComponentNameSpan.innerText = componentName;
