@@ -135,7 +135,11 @@ class DynamicSelectableListAdapter{
     }
 
     static unselectComponentAndRemoveItemFromList(componentName){
-        EngineAdapter.findComponentByName(componentName);
+        if (isSelectionModeSingle) {
+            EngineAdapter.clearMarkers();
+        } else {
+            EngineAdapter.findComponentByName(componentName);
+        }        
         DynamicSelectableListAdapter.generateMarkedComponentsList();
 
         const allComponentsList = globalInstancesMap.allComponentsList;
