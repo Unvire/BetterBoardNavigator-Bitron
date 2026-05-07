@@ -168,7 +168,7 @@ class PinoutTableAdapter{
         pinoutTable.selectRowByName(netTreeSelectedNetName);
         
         const selectedComponentSpan = globalInstancesMap.selectedComponentSpan;
-        selectedComponentSpan.innerText = componentName;
+        selectedComponentSpan.innerText = `${componentName}\n`;
     }
 
     static selectNetFromTableEvent(netName){
