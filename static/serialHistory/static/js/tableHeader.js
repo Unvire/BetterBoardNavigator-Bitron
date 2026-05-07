@@ -14,6 +14,7 @@ class AbstractTableHeader {
         this.headerLabelsList.forEach(header => {
             const cell = document.createElement("div");
             cell.className = `table-cell header-cell cell-${header.key} unselectable`;
+            cell.setAttribute('data-i18n', header.i18n);
 
             const span = document.createElement("span");
             span.textContent = header.value;
@@ -56,11 +57,11 @@ class HistoryTableHeader extends AbstractTableHeader {
         const internalCode = translationsDict[lang]?.["js-history-table-header-internal-code"] || "Kod";
 
         const headerLabels = [
-            { key: "result", value: "Status" },
-            { key: "date", value: "Data testu" },
-            { key: "phase", value: "Faza" },
-            { key: "sn", value: "Numer seryjny" },
-            { key: "internal-code", value: "Kod" }
+            { key: "result", value: status, i18n: "js-history-table-header-row-status"},
+            { key: "date", value: testDate, i18n: "js-history-table-header-test-date" },
+            { key: "phase", value: phase, i18n: "js-history-table-header-phase" },
+            { key: "sn", value: msn, i18n: "js-history-table-header-serial-number" },
+            { key: "internal-code", value: internalCode, i18n: "js-history-table-header-internal-code" }
         ];
 
         super(sortMethodHandle, headerLabels);
@@ -77,10 +78,10 @@ class MeasurementsTableHeader extends AbstractTableHeader {
         const unit = translationsDict[lang]?.["js-history-table-header-test-unit"] || "Jednostka";
 
         const headerLabels = [
-            { key: "measurement-result", value: status },
-            { key: "measurement-name", value: testname },
-            { key: "measurement-value", value: value },
-            { key: "measurement-unit", value: unit }
+            { key: "measurement-result", value: status, i18n: "js-history-table-header-row-status" },
+            { key: "measurement-name", value: testname, i18n: "js-history-table-header-test-name" },
+            { key: "measurement-value", value: value, i18n: "js-history-table-header-test-value" },
+            { key: "measurement-unit", value: unit, i18n: "js-history-table-header-test-unit" }
         ];
 
         super(sortMethodHandle, headerLabels);

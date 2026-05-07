@@ -1,18 +1,20 @@
-async function main(){    
-    _bindHtmlElements();
+async function main(){   
     
-    LoadingScreen.showLoadingScreen();
-    LoadingScreen.showLoadingDots();
+    
 
     EventHandler.compensateUserDevicePixelRatio();
 
 
-    document.addEventListener("DOMContentLoaded", async () => {
-        await _loadTranslations();
-        
+    document.addEventListener("DOMContentLoaded", async () => { 
+        _bindHtmlElements();
+
+        LoadingScreen.showLoadingScreen();
+        LoadingScreen.showLoadingDots();
+
         const TRACEBILITY_URL = await loadServerIP();
         _bindBoardHistoryOnLoadEvent(TRACEBILITY_URL);
 
+        await _loadTranslations();
         await _initPyodide();
             
         _initWidgetClasses();

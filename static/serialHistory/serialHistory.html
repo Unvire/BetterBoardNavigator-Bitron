@@ -30,12 +30,23 @@
 
     <script>
         const targetOrigin = window.location.origin;
-
         let historyAppInstance = null;
-        let translationsDict = HistoryApp.loadTranslations();
+        let pendingApiRoot = null;
+
+        let translationsDict = null;
+        (async () => {
+            translationsDict = await HistoryApp.loadTranslations();
+        })();
+        
 
         document.addEventListener("DOMContentLoaded", () => {
             historyAppInstance = new HistoryApp();
+
+            /* workaround for the fact that URL event can be faster than DOMContentLoaded */
+            if (pendingApiRoot) {
+                historyAppInstance.tracebilityRootUrl = pendingApiRoot;
+                pendingApiRoot = null;
+            }
         });
 
 
@@ -45,7 +56,11 @@
             const { type, payload } = event.data;
             switch (type) {
                 case "SET_API_ROOT":
-                    historyAppInstance.tracebilityRootUrl = payload;
+                    if (historyAppInstance) {
+                        historyAppInstance.tracebilityRootUrl = payload;
+                    } else {
+                        pendingApiRoot = payload;
+                    }
                 break;
 
                 case "GET_DATA_REQUEST":
