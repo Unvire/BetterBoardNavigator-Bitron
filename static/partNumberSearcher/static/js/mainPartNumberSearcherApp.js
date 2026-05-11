@@ -105,7 +105,7 @@ class PartNumberSearcherApp {
     }
 
     static async loadTranslations(){
-        const response = await fetch("/config/lang.json");
+        const response = await fetch("../../../../config/lang.json");
         return await response.json();
     }
 }
