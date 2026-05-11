@@ -105,29 +105,21 @@ class PartNumberSearcherApp {
     }
 
     static async loadTranslations() {
-        // 1. window.location.origin to dokładnie "http://<Twój_IP_serwera>"
-        // 2. Dodajemy ?t=Data, żeby wymusić świeże pobranie z NSSM
-        const url = `${window.location.origin}/config/lang.json?t=${Date.now()}`;
-        
-        console.log("🛠️ Skrypt próbuje pobrać JSON dokładnie z:", url);
-
-        const response = await fetch(url);
-        
-        if (!response.ok) {
-            throw new Error(`Błąd HTTP: ${response.status}`);
-        }
-        
-        // Pobieramy jako zwykły tekst, żeby najpierw sprawdzić, co tam przyszło
-        const textData = await response.text(); 
-        
         try {
-            // Próbujemy to zamienić na obiekt JSON
-            return JSON.parse(textData);
-        } catch (e) {
-            // Jeśli znowu wywali błąd '<', wypisze Ci w konsoli pierwsze 150 znaków tego, co przyszło.
-            // Od razu zobaczysz, jaką stronę serwuje Ci serwer!
-            console.error("❌ Znowu dostałem HTML! Oto co serwer wysłał zamiast JSON-a:\n", textData.substring(0, 150));
-            throw e;
+            const response = await fetch("/bbn/config/lang.json");
+            if (!response.ok) {
+                throw new Error(`HTTP Error: ${response.status}`);
+            }
+            return await response.json();
+        
+        } catch (error) {
+            console.warn("lang.json not found in /bbn/config/lang.json. Attempting to localhost load...");
+
+            const fallbackResponse = await fetch("/config/lang.json");
+            if (!fallbackResponse.ok) {
+                throw new Error("lang.json: Not found netither in /bbn/, nor in /");
+            }
+            return await fallbackResponse.json();
         }
     }
 }
