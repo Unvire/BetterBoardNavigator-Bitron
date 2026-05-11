@@ -104,8 +104,30 @@ class PartNumberSearcherApp {
         return resultWeight + (Number.isFinite(numPart) ? numPart : 0);
     }
 
-    static async loadTranslations(){
-        const response = await fetch("../../../../config/lang.json");
-        return await response.json();
+    static async loadTranslations() {
+        // 1. window.location.origin to dokładnie "http://<Twój_IP_serwera>"
+        // 2. Dodajemy ?t=Data, żeby wymusić świeże pobranie z NSSM
+        const url = `${window.location.origin}/config/lang.json?t=${Date.now()}`;
+        
+        console.log("🛠️ Skrypt próbuje pobrać JSON dokładnie z:", url);
+
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error(`Błąd HTTP: ${response.status}`);
+        }
+        
+        // Pobieramy jako zwykły tekst, żeby najpierw sprawdzić, co tam przyszło
+        const textData = await response.text(); 
+        
+        try {
+            // Próbujemy to zamienić na obiekt JSON
+            return JSON.parse(textData);
+        } catch (e) {
+            // Jeśli znowu wywali błąd '<', wypisze Ci w konsoli pierwsze 150 znaków tego, co przyszło.
+            // Od razu zobaczysz, jaką stronę serwuje Ci serwer!
+            console.error("❌ Znowu dostałem HTML! Oto co serwer wysłał zamiast JSON-a:\n", textData.substring(0, 150));
+            throw e;
+        }
     }
 }
