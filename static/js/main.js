@@ -155,24 +155,22 @@ function _initWidgetClasses(){
     );
     globalInstancesMap.modalSubmit = modalSubmit;
     
-    const modalHelp = new ModalHelp(
+    const modalHelp = new ButtonModal(
         globalInstancesMap.helpModalContainer, 
         globalInstancesMap.helpModalCloseSpan, 
         globalInstancesMap.helpModalHeader, 
         globalInstancesMap.showDemoBoardButton
     );
-    modalHelp.eventParameter = loadedFileName;
-    modalHelp.setButtonEvent(EventHandler.loadDemoFile);
     globalInstancesMap.modalHelp = modalHelp;
 
-    const modalPartNumberSearcher = new ModalPartNumberSearcher(
+    const modalPartNumberSearcher = new ModalBox(
         globalInstancesMap.partNumberModalContainer, 
         globalInstancesMap.partNumberModalCloseSpan, 
         globalInstancesMap.partNumberModalHeader
     );
     globalInstancesMap.modalPartNumberSearcher = modalPartNumberSearcher;
 
-    const modalBoardHistory = new ModalBoardHistory(
+    const modalBoardHistory = new ButtonModal(
         globalInstancesMap.boardHistoryModalContainer,
         globalInstancesMap.boardHistoryCloseSpan,
         globalInstancesMap.boardHistoryModalHeader,
@@ -325,6 +323,10 @@ function _bindOnClickEvents(){
     globalInstancesMap.boardHistoryButton.addEventListener("click", BoardHistoryAdapter.showModalBox);
     globalInstancesMap.boardHistoryShowFailsButton.addEventListener("click", BoardHistoryAdapter.getMeasurementsJsonRequest);
     globalInstancesMap.unselectAllComponentsButton.addEventListener("click", WidgetAdapter.resetSelectedComponentsWidgets);
+
+    globalInstancesMap.showDemoBoardButton.addEventListener("click", () => {
+        EventHandler.loadDemoFile(loadedFileName);
+    });
     
     globalInstancesMap.textModalInput.addEventListener("focus", () => {
         isTextModalInputFocused = true;

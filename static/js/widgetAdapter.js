@@ -319,7 +319,11 @@ class PartNumberSpanAdapter{
 
 class BoardHistoryAdapter{
     static showModalBox(){
+        const lang = document.documentElement.lang;
         const boardHistoryInstance = globalInstancesMap.modalBoardHistory;
+        const modalHeaderText = translationsDict[lang]?.["js-board-history-modal-title"] || "Historia płytki";
+
+        boardHistoryInstance.setHeader(modalHeaderText);
         boardHistoryInstance.show();        
     }
 

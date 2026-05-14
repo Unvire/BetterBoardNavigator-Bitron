@@ -162,13 +162,21 @@ class EventHandler{
         button.classList.remove("button-selected");
     }
 
-    static showHelpModalBox(){
+    static showHelpModalBox(){        
+        const lang = document.documentElement.lang;
         const modalHelp = globalInstancesMap.modalHelp;
-        SimpleModalAdapter.generateModalBox(modalHelp)
+        const modalHeaderText = translationsDict[lang]?.["js-help-modal-title"] || "Better Board Navigator - pomoc";
+        
+        modalHelp.setHeader(modalHeaderText);
+        SimpleModalAdapter.generateModalBox(modalHelp);
     }
 
     static showPartNumberSearcherModalBox(){
+        const lang = document.documentElement.lang;
         const modalPartNumberSearcher = globalInstancesMap.modalPartNumberSearcher;
+        const modalHeaderText = translationsDict[lang]?.["js-part-number-searcher-modal-title"] || "Wyszukiwarka part number";
+
+        modalPartNumberSearcher.setHeader(modalHeaderText);
         SimpleModalAdapter.generateModalBox(modalPartNumberSearcher);
     }
 

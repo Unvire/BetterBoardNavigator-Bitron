@@ -55,57 +55,12 @@ class ModalSubmit extends ModalBox{
     }
 }
 
-class ModalHelp extends ModalBox{
+class ButtonModal extends ModalBox{
     constructor(parentContainer, closeSpan, header, button){
         super(parentContainer, closeSpan, header);
-
-        const lang = document.documentElement.lang;
-        const modalHeaderText = translationsDict[lang]?.["js-help-modal-title"] || "Better Board Navigator - pomoc";
-
         this.button = button;
-        this.parameterConstant = null;
-        this.header.innerText = modalHeaderText;
-    }
 
-    set eventParameter(parameter){
-        this.parameterConstant = parameter;
-    }
-
-    setButtonEvent(eventFunction){
-        this.buttonEvent = eventFunction;
-        this.button.addEventListener("click", () => {
-            this.buttonEvent(this.parameterConstant);
-            this.close();
-        });
-    }
-}
-
-class ModalPartNumberSearcher extends ModalBox{
-    constructor(parentContainer, closeSpan, header){
-        super(parentContainer, closeSpan, header);
-
-        const lang = document.documentElement.lang;
-        const modalHeaderText = translationsDict[lang]?.["js-part-number-searcher-modal-title"] || "Wyszukiwarka part number";
-
-        this.header.innerText = modalHeaderText;
-    }
-}
-
-class ModalBoardHistory extends ModalBox{
-    constructor(parentContainer, closeSpan, header, button){
-        super(parentContainer, closeSpan, header);
-        
-        const lang = document.documentElement.lang;
-        const modalHeaderText = translationsDict[lang]?.["js-board-history-modal-title"] || "Historia płytki";
-
-        this.button = button;
-        this.header.innerText = modalHeaderText;
-    }
-
-    setButtonEvent(eventFunction){
-        this.buttonEvent = eventFunction;
-        this.button.addEventListener("click", () => {
-            this.buttonEvent(this.parameterConstant);
+        this.button.addEventListener("click",() => {
             this.close();
         });
     }
