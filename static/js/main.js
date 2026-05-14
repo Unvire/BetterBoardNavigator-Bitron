@@ -1,9 +1,5 @@
 async function main(){   
-    
-    
-
     EventHandler.compensateUserDevicePixelRatio();
-
 
     document.addEventListener("DOMContentLoaded", async () => { 
         _bindHtmlElements();

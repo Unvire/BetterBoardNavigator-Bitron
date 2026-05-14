@@ -268,6 +268,7 @@ class InputModalBoxAdapter{
         EngineAdapter.componentInScreenCenter(modalBoxComponentName);
         PinoutTableAdapter.generatePinoutTable(modalBoxComponentName);
         DynamicSelectableListAdapter.generateMarkedComponentsList();
+        PartNumberSpanAdapter.displayPartNumberOfComponent(modalBoxComponentName);
     }
 
     static getCommonPrefixFromInput(commonPrefix){
