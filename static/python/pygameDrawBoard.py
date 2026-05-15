@@ -13,8 +13,10 @@ class DrawBoardEngine:
     def __init__(self, width:int, height:int):
         self.boardData = None
         self.boardDataBackup = None
-        self.drawHandler = {'Line': self._drawLine,
-                            'Arc': self._drawArc}
+        self.drawHandler = {
+            'Line': self._drawLine,
+            'Arc': self._drawArc
+        }
         
         self.colorsDict = {           
             'background': (0, 0, 0), 
@@ -27,31 +29,26 @@ class DrawBoardEngine:
             'selection rectangle': (158, 158, 158)
         }
         
-        self.surfaceDimensions = [width, height]
+        self.surfaceDimensions = []
+        self.surfaceBaseDimensions = []
         self.screenDimensions = [width, height]
 
-        self.boardLayer = self._getEmptySurfce()
-        self.commonTypeComponentsSurface = self._getEmptySurfce()
-        self.selectedComponentsSurface = self._getEmptySurfce()
-        self.selectedNetSurface = self._getEmptySurfce()
-        self.rectangularSelectionSurface = self._getEmptySurfce()
-        self.targetSurfaceCopy = self._getEmptySurfce()
+        self.boardLayer = None
+        self.commonTypeComponentsSurface = None
+        self.selectedComponentsSurface = None
+        self.selectedNetSurface = None
 
         self.selectedComponentsSet = set()
         self.allSelectedNetComponentsSet = set()
         self.selectedNetComponentSet = set()
         self.selectedCommonTypePrefix = ''
         self.selectedNet = dict()
-        self.isHideSelectedNetComponents = False
         self.rectangularAreaXYList = []
 
         self.scale = 1
         self.offsetVector = []
         self.sidesForFlipX = {}
         self.isShowOutlines = True
-    
-    def getColor(self, key:str) -> tuple[int, int, int]:
-        return self.colorsDict.get(key, None)
 
     def getComponents(self) -> list[str]:
         componentsList = list(self.boardData.getComponents().keys())
@@ -91,54 +88,34 @@ class DrawBoardEngine:
 
     def checkIfPrefixExists(self, prefix:str) -> bool:
         return prefix in self.boardData.getCommonTypeGroupedComponents()['T'] or prefix in self.boardData.getCommonTypeGroupedComponents()['B']
-    
-    def copyTargetSurface(self, targetSurface:pygame.Surface):
-        self.targetSurfaceCopy = targetSurface.copy()
-
-    def getRectangularAreaXYListLength(self) -> int:
-        return len(self.rectangularAreaXYList)
-
-    def changeColor(self, key:str, RGB:tuple[int, int, int]):
-        if key in self.colorsDict:
-            self.colorsDict[key] = RGB
 
     def setBoardData(self, boardData:board.Board, isMakeBackup:bool=True):
-        def resetVariablesAndSurfaces():
-            self._resetSelectionCollections()
-            self._resetSurfaceVariables()
-            self._resetSurfaceDimensions()
-            self.selectedComponentsSurface = self._getEmptySurfce()
-            self.selectedNetSurface = self._getEmptySurfce()
-            self.selectedNetSurface = self._getEmptySurfce()
+        self._resetSelectionCollections()
+        self._resetSurfaceVariables()
         
-        resetVariablesAndSurfaces()
         self.boardData = boardData
         if isMakeBackup:
             self.boardDataBackup = copy.deepcopy(boardData)
         self._adjustBoardDimensionsForRotating()
-    
-    def appendXYToRectangularAreaXYList(self, coords:tuple[int, int]):
-        self.rectangularAreaXYList.append(coords)
-    
-    def _diableAreaRectangularSelection(self):
-        self.rectangularAreaXYList = []
+
+        self.boardLayer = self._getEmptySurfce()
+        self.selectedComponentsSurface = self._getEmptySurfce()
+        self.selectedNetSurface = self._getEmptySurfce()
+        self.selectedNetSurface = self._getEmptySurfce()
     
     def _resetSelectionCollections(self):
         self.selectedComponentsSet = set()
         self.allSelectedNetComponentsSet = set()
         self.selectedCommonTypePrefix = ''
         self.selectedNet = dict()
-        self.isHideSelectedNetComponents = False
         self.selectedNetComponentSet = set()
     
     def _resetSurfaceVariables(self):
         self.scale = 1
         self.offsetVector = [0, 0]
         self.sidesForFlipX = {'T'}
-    
-    def _resetSurfaceDimensions(self):
-        screenWidth, screenHeight = self.screenDimensions
-        self.surfaceDimensions = [screenWidth, screenHeight]
+        self.surfaceDimensions = []
+        self.surfaceBaseDimensions = []
     
     def getMostCommonPrefixInterface(self) -> str:
         return self.boardData.getMostCommonPrefix()
@@ -193,10 +170,6 @@ class DrawBoardEngine:
         self._unselectNet()
         return self.drawAndBlitInterface(targetSurface, side)
     
-    def showHideMarkersForSelectedNetByNameInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
-        self._showHideNetComponents()
-        return self.drawAndBlitInterface(targetSurface, side)
-    
     def showCommonTypeComponentsInterface(self, targetSurface:pygame.Surface, prefix:str, side:str) -> pygame.Surface:
         self._selectCommonTypeComponents(side, prefix)
         return self.drawAndBlitInterface(targetSurface, side)
@@ -229,51 +202,8 @@ class DrawBoardEngine:
         boardDataNormalized = self._getNormalizedBoard(dimensions, self.boardData)
         self.setBoardData(boardDataNormalized, isMakeBackup=True)
         return self.drawAndBlitInterface(targetSurface, side)
-    
-    def drawSelectionRectangleInterface(self, targetSurface:pygame.Surface, secondPoint:tuple[int, int]) -> pygame.Surface:
-        def resetRectangularSelectionSurface() -> pygame.Surface:
-            backgroundColor = self.colorsDict['background']
-            self.rectangularSelectionSurface = self._getEmptySurfce()
-            self.rectangularSelectionSurface.set_colorkey(backgroundColor)
-            return self.rectangularSelectionSurface
-        
-        def calculateSelectionRectangle(secondPoint:tuple[int, int]) -> tuple[int, int, int, int]:
-            x0, y0 = self.rectangularAreaXYList[0]
-            x1, y1 = secondPoint
-            width = x1 - x0
-            height = y1 - y0
-            xBL = x0 if width > 0 else x1
-            yBL = y0 if height > 0 else y1
-            return xBL, yBL, abs(width), abs(height)
-
-        def drawRectangleOnCopiedTargetSurface(rectangularSelectionSurface:pygame.Surface, xBL:int, yBL:int, width:int, height:int):
-            color = self.colorsDict['selection rectangle']
-            targetSurfaceCopied = self.targetSurfaceCopy.copy()
-            pygame.draw.rect(rectangularSelectionSurface, color, (xBL, yBL, width, height), width=2)
-            targetSurfaceCopied.blit(rectangularSelectionSurface, [0, 0])
-            targetSurface.blit(targetSurfaceCopied, [0, 0])
-
-        rectangularSelectionSurface = resetRectangularSelectionSurface()
-        xBL, yBL, width, height = calculateSelectionRectangle(secondPoint)
-        drawRectangleOnCopiedTargetSurface(rectangularSelectionSurface, xBL, yBL, width, height)       
-        return targetSurface
-    
-    def setAreaManuallyInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
-        def getBottomLeftAndTopRightPoints() -> tuple[gobj.Point, gobj.Point]:
-            x0, y0 = self.rectangularAreaXYList[0]
-            x1, y1 = self.rectangularAreaXYList[1]
-            bottomLeftPoint = gobj.Point(min(x0, x1), min(y0, y1))
-            topRightPoint = gobj.Point(max(x0, x1), max(y0, y1))
-            return bottomLeftPoint, topRightPoint
-        
-        bottomLeftPoint, topRightPoint = getBottomLeftAndTopRightPoints()
-        BoardWrapper.setAreaManually(self.boardData, bottomLeftPoint, topRightPoint)
-        boardDataNormalized = self._getNormalizedBoard(self.screenDimensions, self.boardData, isCheckingForPositiveCoordsActive=False)
-        self.setBoardData(boardDataNormalized, isMakeBackup=False)  
-        return self.drawAndBlitInterface(targetSurface, side)
 
     def drawAndBlitInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
-        self._diableAreaRectangularSelection()
         self._drawBoard(side)
         return self._blitBoardSurfacesIntoTarget(targetSurface)
 
@@ -299,7 +229,8 @@ class DrawBoardEngine:
         
         def setInitialSurfaceDimensions(dimensions:list[int|float], factor:float):
             width, height = dimensions
-            self.surfaceDimensions = [int(width * factor), int(height * factor)]
+            self.surfaceBaseDimensions = [int(width * factor), int(height * factor)]
+            self.surfaceDimensions = [val for val in self.surfaceBaseDimensions]
         
         boardAreaDiagonal = calculateDiagonal(self.boardData.getWidthHeight())
         scaleFactor = calculateScalingFactor(boardAreaDiagonal)
@@ -324,10 +255,10 @@ class DrawBoardEngine:
     
     def _scaleUp(self, zoomingPoint:tuple[int, int]):
         surfaceWidth, surfaceHeight = self.surfaceDimensions
-        isWidthTooBig = surfaceWidth > DrawBoardEngine.MAX_SURFACE_DIMENSION
-        isHeightTooBig = surfaceHeight > DrawBoardEngine.MAX_SURFACE_DIMENSION
-        if isWidthTooBig or isHeightTooBig:
-            return
+        #isWidthTooBig = surfaceWidth > DrawBoardEngine.MAX_SURFACE_DIMENSION
+        #isHeightTooBig = surfaceHeight > DrawBoardEngine.MAX_SURFACE_DIMENSION
+        #if isWidthTooBig or isHeightTooBig:
+        #    return
         
         previousScaleFactor = self._getScaleFactorFromSurfaceDimensions()
         if self.scale < 1:
@@ -389,9 +320,9 @@ class DrawBoardEngine:
     def _selectNetComponentByName(self, componentName:str):
         if componentName in self.selectedNetComponentSet:
             self.selectedNetComponentSet = set()
+
         elif componentName in self.allSelectedNetComponentsSet:
-            self.selectedNetComponentSet = set()
-            self.selectedNetComponentSet.add(componentName)
+            self.selectedNetComponentSet = {componentName}
     
     def _setComponentInScreenCenter(self, componentInstance:comp.Component, side:str):
         coords = componentInstance.getCoords()
@@ -407,10 +338,12 @@ class DrawBoardEngine:
     
     def _selectNet(self, netName:str):
         net = self.boardData.getElementByName('nets', netName)
+        if not net:
+            return
+        
         self.allSelectedNetComponentsSet = set(net)
         for componentName, parameters in net.items():
             self.selectedNet[componentName] = parameters['pins']
-        self.isHideSelectedNetComponents = False
     
     def _unselectComponents(self):
         self.selectedComponentsSet = set()
@@ -419,9 +352,6 @@ class DrawBoardEngine:
         self.allSelectedNetComponentsSet = set()
         self.selectedNetComponentSet = set()
         self.selectedNet = dict()
-    
-    def _showHideNetComponents(self):
-        self.isHideSelectedNetComponents = not self.isHideSelectedNetComponents
     
     def _selectCommonTypeComponents(self, side:str, prefix:str):
         prefix = prefix.upper()
@@ -519,9 +449,8 @@ class DrawBoardEngine:
         def drawSelectedNets(side:str):
             componentNames = list(self.selectedNetComponentSet)
             color = self.colorsDict['selected net marker']
-            if not self.isHideSelectedNetComponents:
-                self._drawMarkers(surface=self.selectedNetSurface, componentNamesList=componentNames, color=color, side=side)
             self._drawSelectedPins(surface=self.selectedNetSurface, color=color, side=side)
+            self._drawMarkers(surface=self.selectedNetSurface, componentNamesList=componentNames, color=color, side=side)
         
         resetSurfaces()
         drawBoardLayer(side)
@@ -669,6 +598,9 @@ class DrawBoardEngine:
             componentNumber = 0
         return stringValue(componentType) + int(componentNumber)
 
+
+
+
 if __name__ == '__main__':
     def openSchematicFile() -> str:        
         from tkinter import filedialog
@@ -683,7 +615,6 @@ if __name__ == '__main__':
     isMousePressed = False
     isMovingCalledFirstTime = True
     isFindComponentByClickActive = False
-    isSelectAreaActive = False
 
     filePath = openSchematicFile()
     wrapper = BoardWrapper(WIDTH, HEIGHT)
@@ -716,13 +647,11 @@ if __name__ == '__main__':
     print('Clear arrow markers - c')
     print('Find net by name - v')
     print('Clear selected net - b')
-    print('Show/hide selected net components - n')
     print('Highlight common type components - a')
     print('Clear common type components - s')
     print('Change screen surface dimensions - g')
     print('Set component in screen center - h')
     print('Select component on net (net must be drawn before) - j')
-    print('Set area with rectangular selection - k')
     print('====================================')
 
     run = True
@@ -740,12 +669,6 @@ if __name__ == '__main__':
                     if isFindComponentByClickActive:
                         foundComponents = engine.findComponentByClick(pygame.mouse.get_pos(), side)
                         print(f'clicked component: {foundComponents}')
-                    elif isSelectAreaActive:
-                        pointXY = pygame.mouse.get_pos()
-                        engine.appendXYToRectangularAreaXYList(pointXY)
-                        if engine.getRectangularAreaXYListLength() == 2:
-                            engine.setAreaManuallyInterface(WIN, side)
-                            isSelectAreaActive = False
 
             elif event.type == pygame.MOUSEBUTTONUP:
                 isMousePressed = False
@@ -757,11 +680,6 @@ if __name__ == '__main__':
                         engine.moveBoardInterface(WIN, [dx, dy])
                     else:
                         isMovingCalledFirstTime = False
-                elif isSelectAreaActive:
-                    isSelectAreaActive = engine.getRectangularAreaXYListLength() < 2
-                    if engine.getRectangularAreaXYListLength() == 1:
-                        posXY = pygame.mouse.get_pos()
-                        engine.drawSelectionRectangleInterface(WIN, posXY)
             
             elif event.type == pygame.MOUSEWHEEL:
                 pointXY = pygame.mouse.get_pos()
@@ -801,9 +719,6 @@ if __name__ == '__main__':
                 elif event.key == pygame.K_b:
                     engine.unselectNetInterface(WIN, side)
                 
-                elif event.key == pygame.K_n:
-                    engine.showHideMarkersForSelectedNetByNameInterface(WIN, side)
-                
                 elif event.key == pygame.K_a:
                     prefix = input('Common type prefix: ')
                     engine.showCommonTypeComponentsInterface(WIN, prefix, side)
@@ -836,11 +751,6 @@ if __name__ == '__main__':
                 elif event.key == pygame.K_j:
                     componentName = input('Net component name: ')
                     engine.selectNetComponentByNameInterface(WIN, componentName, side)
-                
-                elif event.key == pygame.K_k and not isSelectAreaActive:
-                    print('Rectangular area selection activated')
-                    engine.copyTargetSurface(WIN)
-                    isSelectAreaActive = True
 
         
         ## display image
