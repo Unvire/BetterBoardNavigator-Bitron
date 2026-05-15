@@ -297,9 +297,13 @@ class DrawBoardEngine:
                     scaleFactor = max(scaleFactor, boardAreaDiagonal / dimension * SCALE_FACTOR)
             return scaleFactor
         
+        def setInitialSurfaceDimensions(dimensions:list[int|float], factor:float):
+            width, height = dimensions
+            self.surfaceDimensions = [int(width * factor), int(height * factor)]
+        
         boardAreaDiagonal = calculateDiagonal(self.boardData.getWidthHeight())
         scaleFactor = calculateScalingFactor(boardAreaDiagonal)
-        self._scaleSurfaceDimensionsByFactor(scaleFactor)
+        setInitialSurfaceDimensions(self.boardData.getWidthHeight(), scaleFactor)
         self._centerBoardInAdjustedSurface()
     
     def _setOffsetVector(self, vector:tuple[int, int]):
