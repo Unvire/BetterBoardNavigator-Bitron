@@ -222,12 +222,11 @@ class DrawBoardEngine:
             SCALE_FACTOR = 1.03
 
             width, height = boardInstanceWidthHeight
+            biggerDimension = max(width, height)
 
             diagonal = calculateDiagonal(width, height)
-            diagToWidthProportion = diagonal / width
-            diagToHeightProportion = diagonal / height
-
-            return max(diagToWidthProportion, diagToHeightProportion) * SCALE_FACTOR
+            diagToBiggerDimension = diagonal / biggerDimension
+            return diagToBiggerDimension * SCALE_FACTOR
         
         def setInitialSurfaceDimensions(dimensions:list[int|float], factor:float):
             width, height = dimensions
