@@ -6,7 +6,7 @@ import component as comp
 
 class DrawBoardEngine:
     MIN_SURFACE_DIMENSION = 100
-    STEP_FACTOR = 0.05
+    STEP_FACTOR = 0.1
     MAX_SURFACE_DIMENSION = 8800
     DELTA_ROTATION_ANGLE_DEG = 5
 
@@ -215,26 +215,30 @@ class DrawBoardEngine:
         return wrapper.normalizeBoard()
 
     def _adjustBoardDimensionsForRotating(self):
-        def calculateDiagonal(dimensions:list[int|float]) -> float:
-            width, height = dimensions
+        def calculateDiagonal(width:int|float, height:int|float) -> float:
             return math.sqrt(width ** 2 + height ** 2)
         
-        def calculateScalingFactor(boardAreaDiagonal:float) -> float:
-            SCALE_FACTOR = 1.05
-            scaleFactor = 1
-            for dimension in self.surfaceDimensions:
-                if boardAreaDiagonal / dimension > 1:
-                    scaleFactor = max(scaleFactor, boardAreaDiagonal / dimension * SCALE_FACTOR)
-            return scaleFactor
+        def calculateScalingFactor(boardInstanceWidthHeight:list[int|float, int|float]) -> float:
+            SCALE_FACTOR = 1.03
+
+            width, height = boardInstanceWidthHeight
+
+            diagonal = calculateDiagonal(width, height)
+            diagToWidthProportion = diagonal / width
+            diagToHeightProportion = diagonal / height
+
+            return max(diagToWidthProportion, diagToHeightProportion) * SCALE_FACTOR
         
         def setInitialSurfaceDimensions(dimensions:list[int|float], factor:float):
             width, height = dimensions
             self.surfaceBaseDimensions = [int(width * factor), int(height * factor)]
             self.surfaceDimensions = [val for val in self.surfaceBaseDimensions]
+        #####################################
+
+        boardInstanceWidthHeight = self.boardData.getWidthHeight()
         
-        boardAreaDiagonal = calculateDiagonal(self.boardData.getWidthHeight())
-        scaleFactor = calculateScalingFactor(boardAreaDiagonal)
-        setInitialSurfaceDimensions(self.boardData.getWidthHeight(), scaleFactor)
+        scaleFactor = calculateScalingFactor(boardInstanceWidthHeight)
+        setInitialSurfaceDimensions(boardInstanceWidthHeight, scaleFactor)
         self._centerBoardInAdjustedSurface()
     
     def _setOffsetVector(self, vector:tuple[int, int]):
@@ -259,19 +263,16 @@ class DrawBoardEngine:
         #isHeightTooBig = surfaceHeight > DrawBoardEngine.MAX_SURFACE_DIMENSION
         #if isWidthTooBig or isHeightTooBig:
         #    return
-        
-        previousScaleFactor = self._getScaleFactorFromSurfaceDimensions()
-        if self.scale < 1:
-            scaleFactor = 1 / self.scale
-            self.scale += DrawBoardEngine.STEP_FACTOR
-        else:
-            self.scale += DrawBoardEngine.STEP_FACTOR
-            scaleFactor = self.scale
-        
-        self._scaleSurfaceDimensionsByFactor(scaleFactor)
+
+        previousScaleFactor = self.scale
+        self.scale += DrawBoardEngine.STEP_FACTOR
+
+        self._scaleSurfaceDimensionsByFactor(self.scale)
         newOffset = self._calculateOffsetVectorForScaledSurface(zoomingPoint, previousScaleFactor)
         self._setOffsetVector(newOffset)
-        BoardWrapper.scaleBoardInPlace(self.boardData, scaleFactor)
+
+        boardInstanceScaleFactor = self.scale / previousScaleFactor
+        BoardWrapper.scaleBoardInPlace(self.boardData, boardInstanceScaleFactor)
 
     def _scaleDown(self, zoomingPoint:tuple[int, int]):        
         surfaceWidth, surfaceHeight = self.surfaceDimensions
@@ -280,18 +281,15 @@ class DrawBoardEngine:
         if isWidthTooSmall or isHeightTooSmall:
             return
 
-        previousScaleFactor = self._getScaleFactorFromSurfaceDimensions()
-        if self.scale > 1:
-            scaleFactor = 1 / self.scale
-            self.scale -= DrawBoardEngine.STEP_FACTOR
-        else:
-            self.scale -= DrawBoardEngine.STEP_FACTOR
-            scaleFactor = self.scale
+        previousScaleFactor = self.scale
+        self.scale -= DrawBoardEngine.STEP_FACTOR
         
-        self._scaleSurfaceDimensionsByFactor(scaleFactor)
+        self._scaleSurfaceDimensionsByFactor(self.scale)
         newOffset = self._calculateOffsetVectorForScaledSurface(zoomingPoint, previousScaleFactor)
         self._setOffsetVector(newOffset)
-        BoardWrapper.scaleBoardInPlace(self.boardData, scaleFactor)
+
+        boardInstanceScaleFactor = self.scale / previousScaleFactor
+        BoardWrapper.scaleBoardInPlace(self.boardData, boardInstanceScaleFactor)
     
     def findComponentByClick(self, cursorXY:list[int, int], side:str) -> list[str]:
         x, y = cursorXY
@@ -362,7 +360,7 @@ class DrawBoardEngine:
         self.selectedCommonTypePrefix = ''
     
     def _scaleSurfaceDimensionsByFactor(self, factor:int|float):
-        self.surfaceDimensions = [val * factor for val in self.surfaceDimensions]
+        self.surfaceDimensions = [val * factor for val in self.surfaceBaseDimensions]
     
     def _flipUnflipCurrentSide(self, side:str):
         if side in self.sidesForFlipX:
@@ -402,8 +400,9 @@ class DrawBoardEngine:
             x, y = point
             xCursor, yCursor = cursorPosition
             return xCursor - x, yCursor - y
+        #####################################
 
-        originSurfaceDimensions = [val * previousScaleFactor for val in self.screenDimensions]
+        originSurfaceDimensions = [val * previousScaleFactor for val in self.surfaceBaseDimensions]
 
         pointMoveReversed = reverseSurfaceLinearTranslation(zoomingPoint, self.offsetVector)
         pointRelativeToSurface = calculatePointCoordsRelativeToSurfaceDimensions(pointMoveReversed, originSurfaceDimensions)
