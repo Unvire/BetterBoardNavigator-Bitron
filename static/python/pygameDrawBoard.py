@@ -281,13 +281,7 @@ class DrawBoardEngine:
 
         previousScaleFactor = self.scale
         self.scale += self.STEP_FACTOR
-
-        self._updateSurfaceDimensions()
-        newOffset = self._calculateOffsetVectorForScaledSurface(zoomingPoint, previousScaleFactor)
-        self._setOffsetVector(newOffset)
-
-        boardInstanceScaleFactor = self.scale / previousScaleFactor
-        BoardWrapper.scaleBoardInPlace(self.boardData, boardInstanceScaleFactor)
+        self._commonScalingOperations(zoomingPoint, previousScaleFactor)
 
     def _scaleDown(self, zoomingPoint:tuple[int, int]):
         if self.scale - self.STEP_FACTOR < self.MIN_SCALE_FACTOR:
@@ -295,7 +289,9 @@ class DrawBoardEngine:
 
         previousScaleFactor = self.scale
         self.scale -= self.STEP_FACTOR
-        
+        self._commonScalingOperations(zoomingPoint, previousScaleFactor)
+    
+    def _commonScalingOperations(self, zoomingPoint:tuple[int, int], previousScaleFactor:float):
         self._updateSurfaceDimensions()
         newOffset = self._calculateOffsetVectorForScaledSurface(zoomingPoint, previousScaleFactor)
         self._setOffsetVector(newOffset)
