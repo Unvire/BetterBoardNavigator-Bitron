@@ -5,9 +5,10 @@ import geometryObjects as gobj
 import component as comp
 
 class DrawBoardEngine:
-    MIN_SURFACE_DIMENSION = 100
-    STEP_FACTOR = 0.1
-    MAX_SURFACE_DIMENSION = 8800
+    BONUS_SCALE_FACTOR = 1.03
+    STEP_FACTOR = 0.2
+    MIN_SCALE_FACTOR = 0.2
+    MAX_SCALE_FACTOR = 7
     DELTA_ROTATION_ANGLE_DEG = 5
 
     def __init__(self, width:int, height:int):
@@ -30,7 +31,7 @@ class DrawBoardEngine:
         }
         
         self.surfaceDimensions = []
-        self.surfaceBaseDimensions = []
+        self.boardBaseRectangle = None
         self.screenDimensions = [width, height]
 
         self.boardLayer = None
@@ -115,7 +116,7 @@ class DrawBoardEngine:
         self.offsetVector = [0, 0]
         self.sidesForFlipX = {'T'}
         self.surfaceDimensions = []
-        self.surfaceBaseDimensions = []
+        self.boardBaseRectangle = None
     
     def getMostCommonPrefixInterface(self) -> str:
         return self.boardData.getMostCommonPrefix()
@@ -137,6 +138,7 @@ class DrawBoardEngine:
     def rotateBoardInterface(self, targetSurface:pygame.Surface,  isClockwise:bool, side:str, angleDeg:float=None) -> pygame.Surface:
         rotationXY = [val / 2 for val in self.surfaceDimensions]
         self._rotate(rotationXY, isClockwise, angleDeg)     
+        print(self.surfaceBaseDimensions, self.surfaceDimensions)
         return self.drawAndBlitInterface(targetSurface, side)
     
     def findComponentByNameInterface(self, targetSurface:pygame.Surface, componentName:str, side:str) -> pygame.Surface:
@@ -214,31 +216,39 @@ class DrawBoardEngine:
         wrapper.setIsCheckForPositiveCoordsActive(isCheckingForPositiveCoordsActive)
         return wrapper.normalizeBoard()
 
-    def _adjustBoardDimensionsForRotating(self):
-        def calculateDiagonal(width:int|float, height:int|float) -> float:
-            return math.sqrt(width ** 2 + height ** 2)
-        
-        def calculateScalingFactor(boardInstanceWidthHeight:list[int|float, int|float]) -> float:
-            SCALE_FACTOR = 1.03
-
-            width, height = boardInstanceWidthHeight
+    def _adjustBoardDimensionsForRotating(self):                
+        def calculateScalingFactor(width:float|int, height:float|int) -> float:
             biggerDimension = max(width, height)
 
-            diagonal = calculateDiagonal(width, height)
+            diagonal = math.sqrt(width ** 2 + height ** 2)
             diagToBiggerDimension = diagonal / biggerDimension
-            return diagToBiggerDimension * SCALE_FACTOR
-        
-        def setInitialSurfaceDimensions(dimensions:list[int|float], factor:float):
-            width, height = dimensions
-            self.surfaceBaseDimensions = [int(width * factor), int(height * factor)]
-            self.surfaceDimensions = [val for val in self.surfaceBaseDimensions]
+            return diagToBiggerDimension * self.BONUS_SCALE_FACTOR
         #####################################
 
-        boardInstanceWidthHeight = self.boardData.getWidthHeight()
-        
-        scaleFactor = calculateScalingFactor(boardInstanceWidthHeight)
-        setInitialSurfaceDimensions(boardInstanceWidthHeight, scaleFactor)
+        width, height = self.boardData.getWidthHeight()        
+        scaleFactor = calculateScalingFactor(width, height)
+
+        self._setBaseRectangle(width * scaleFactor, height * scaleFactor)
+        self._updateSurfaceDimensions()
         self._centerBoardInAdjustedSurface()
+    
+    def _setBaseRectangle(self, baseWidth:float|int, baseHeight:float|int):
+        bottomLeftPoint = gobj.Point(0, 0)
+        topRightPoint = gobj.Point(baseWidth, baseHeight)
+        self.boardBaseRectangle = gobj.Rectangle(bottomLeftPoint, topRightPoint)
+    
+    def _updateSurfaceDimensions(self):
+        baseWidth, baseHeight = self._calculateBaseRectangleWidthHeight()
+        self.surfaceDimensions = [baseWidth * self.scale, baseHeight * self.scale]
+    
+    def _calculateBaseRectangleWidthHeight(self) -> list[float|int, float|int]:
+        bottomLeftPoint, topRightPoint = gobj.getDefaultBottomLeftTopRightPoints()
+        basePoints = self.boardBaseRectangle.getPoints()
+
+        bottomLeftPoint, topRightPoint = gobj.updateBottomLeftTopRightPoints([bottomLeftPoint, topRightPoint], basePoints)
+        xBL, yBL = bottomLeftPoint.getXY()
+        xTR, yTR = topRightPoint.getXY()
+        return [abs(xTR - xBL), abs(yTR - yBL)]
     
     def _setOffsetVector(self, vector:tuple[int, int]):
         self.offsetVector = vector
@@ -250,40 +260,43 @@ class DrawBoardEngine:
     
     def _rotate(self, rotationXY:tuple[int, int], isClockwise:bool, angleDeg:float=None):
         if not angleDeg:
-            angleDeg = DrawBoardEngine.DELTA_ROTATION_ANGLE_DEG
-        angleDeg *= (-1) ** int(isClockwise) 
+            angleDeg = self.DELTA_ROTATION_ANGLE_DEG
+        angleDeg *= (-1) ** int(isClockwise)  # overengineered +1 or -1 multilpication
+        
         xRot, yRot = rotationXY
         rotationPoint = gobj.Point(xRot, yRot)
+        relativeScaleFactor = self.surfaceDimensions[0] / self.surfaceBaseDimensions[0]
         BoardWrapper.rotateBoardInPlace(self.boardData, rotationPoint, angleDeg)
+        
+        dimensionsAfterRotation = self.boardData.getWidthHeight()
+        self.surfaceBaseDimensions = [val for val in dimensionsAfterRotation]
+        self.surfaceDimensions = [val * relativeScaleFactor for val in self.surfaceBaseDimensions]
+        ## przeliczyć base dimensions jako base dimensions * angle
+        ## na ich podstawie doskalować surface dimensions
+        ## mam nadzieje że środek się nie przemieszcza na skutek rotacji
     
     def _scaleUp(self, zoomingPoint:tuple[int, int]):
-        surfaceWidth, surfaceHeight = self.surfaceDimensions
-        #isWidthTooBig = surfaceWidth > DrawBoardEngine.MAX_SURFACE_DIMENSION
-        #isHeightTooBig = surfaceHeight > DrawBoardEngine.MAX_SURFACE_DIMENSION
-        #if isWidthTooBig or isHeightTooBig:
-        #    return
+        if self.scale + self.STEP_FACTOR > self.MAX_SCALE_FACTOR:
+            return
 
         previousScaleFactor = self.scale
-        self.scale += DrawBoardEngine.STEP_FACTOR
+        self.scale += self.STEP_FACTOR
 
-        self._scaleSurfaceDimensionsByFactor(self.scale)
+        self._updateSurfaceDimensions()
         newOffset = self._calculateOffsetVectorForScaledSurface(zoomingPoint, previousScaleFactor)
         self._setOffsetVector(newOffset)
 
         boardInstanceScaleFactor = self.scale / previousScaleFactor
         BoardWrapper.scaleBoardInPlace(self.boardData, boardInstanceScaleFactor)
 
-    def _scaleDown(self, zoomingPoint:tuple[int, int]):        
-        surfaceWidth, surfaceHeight = self.surfaceDimensions
-        isWidthTooSmall = surfaceWidth < DrawBoardEngine.MIN_SURFACE_DIMENSION
-        isHeightTooSmall = surfaceHeight < DrawBoardEngine.MIN_SURFACE_DIMENSION
-        if isWidthTooSmall or isHeightTooSmall:
+    def _scaleDown(self, zoomingPoint:tuple[int, int]):
+        if self.scale - self.STEP_FACTOR < self.MIN_SCALE_FACTOR:
             return
 
         previousScaleFactor = self.scale
-        self.scale -= DrawBoardEngine.STEP_FACTOR
+        self.scale -= self.STEP_FACTOR
         
-        self._scaleSurfaceDimensionsByFactor(self.scale)
+        self._updateSurfaceDimensions()
         newOffset = self._calculateOffsetVectorForScaledSurface(zoomingPoint, previousScaleFactor)
         self._setOffsetVector(newOffset)
 
@@ -400,8 +413,9 @@ class DrawBoardEngine:
             xCursor, yCursor = cursorPosition
             return xCursor - x, yCursor - y
         #####################################
-
-        originSurfaceDimensions = [val * previousScaleFactor for val in self.surfaceBaseDimensions]
+        
+        surfaceBaseDimensions = self._calculateBaseRectangleWidthHeight()
+        originSurfaceDimensions = [val * previousScaleFactor for val in surfaceBaseDimensions]
 
         pointMoveReversed = reverseSurfaceLinearTranslation(zoomingPoint, self.offsetVector)
         pointRelativeToSurface = calculatePointCoordsRelativeToSurfaceDimensions(pointMoveReversed, originSurfaceDimensions)
@@ -529,6 +543,9 @@ class DrawBoardEngine:
 
         self.selectedNetSurface.set_colorkey(color)
         targetSurface.blit(self.selectedNetSurface, self.offsetVector)
+
+        obrys = self.selectedNetSurface.get_rect()
+        pygame.draw.rect(targetSurface, (255, 0, 0), obrys, width=2)
         return targetSurface
 
     def _drawLine(self, surface:pygame.Surface, color:tuple[int, int, int], lineInstance:gobj.Line, width:int=1):
