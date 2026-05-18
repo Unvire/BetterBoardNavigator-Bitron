@@ -99,9 +99,10 @@ class DrawBoardEngine:
         if isMakeBackup:
             self.boardDataBackup = copy.deepcopy(boardData)
 
-        width, height = self.boardData.getWidthHeight()   
+        width, height = self.boardData.getWidthHeight()
         self._setBaseRectangle(width * self.BONUS_SCALE_FACTOR, height * self.BONUS_SCALE_FACTOR)
         self._updateSurfaceDimensions()
+        self._centerSurfaceInScreen()
         self._centerBoardInAdjustedSurface()
 
         self.boardLayer = self._getEmptySurfce()
@@ -357,14 +358,21 @@ class DrawBoardEngine:
     def _showHideOutlines(self):
         self.isShowOutlines = not self.isShowOutlines
     
+    def _centerSurfaceInScreen(self):
+        surfaceWidth, surfaceHeight = self.surfaceDimensions
+        screenWidth, screenHeight = self.screenDimensions        
+
+        xSurfaceOffset = (screenWidth - surfaceWidth) / 2
+        ySurfaceOffset = (screenHeight - surfaceHeight) / 2
+        self.offsetVector = [xSurfaceOffset, ySurfaceOffset]
+    
     def _centerBoardInAdjustedSurface(self):
         surfaceWidth, surfaceHeight = self.surfaceDimensions
-        screenWidth, screenHeight = self.screenDimensions
+        boardWidth, boardHeight = self.boardData.getWidthHeight()
 
-        xOffset = (screenWidth - surfaceWidth) / 2
-        yOffset = (screenHeight - surfaceHeight) / 2
-        self.offsetVector = [xOffset, yOffset]
-        BoardWrapper.translateBoardInPlace(self.boardData, [-xOffset, -yOffset]) #'-' because board must be moved away from its center 
+        xBoardOffset = (surfaceWidth - boardWidth) / 2
+        yBoardOffset = (surfaceHeight - boardHeight) / 2
+        BoardWrapper.translateBoardInPlace(self.boardData, [xBoardOffset, yBoardOffset]) #'-' because board must be moved away from its center 
     
     def _calculateOffsetVectorForScaledSurface(self, zoomingPoint:tuple[int, int], previousScaleFactor:float):
         def reverseSurfaceLinearTranslation(screenCoords:list[int, int], offset:list[int, int]) -> tuple[int, int]:

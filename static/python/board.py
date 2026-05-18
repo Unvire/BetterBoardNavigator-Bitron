@@ -73,14 +73,10 @@ class Board:
     
     def calculateAreaFromComponents(self) -> tuple[gobj.Point, gobj.Point]:
         bottomLeftPoint, topRightPoint = gobj.getDefaultBottomLeftTopRightPoints()
-        for _, componentInstance in self.components.items():
+        for componentInstance in self.components.values():
             for point in componentInstance.getArea():
                 bottomLeftPoint, topRightPoint = gobj.Point.minXY_maxXYCoords(bottomLeftPoint, topRightPoint, point)
         
-        SCALE_DOWN_FACTOR = 0.97
-        SCALE_UP_FACTOR = 1.03
-        bottomLeftPoint.scaleInPlace(SCALE_DOWN_FACTOR)
-        topRightPoint.scaleInPlace(SCALE_UP_FACTOR)
         return bottomLeftPoint, topRightPoint
     
     def calculateAreaFromOutlines(self) -> tuple[gobj.Point, gobj.Point]:
