@@ -157,6 +157,18 @@ class BoardWrapper():
         board.translateRotateScaleBoard('rotateInPlace', rotationPoint, angle)
     
     @staticmethod
+    def rotateBoardInPlaceAroundAreaCenter(board:board.Board, angle:float):
+        boardArea = board.getArea()
+        xRot, yRot = Shape.calculateAreaCenterXY(boardArea)
+        
+        rotationPoint = gobj.Point(xRot, yRot)
+        board.translateRotateScaleBoard('rotateInPlace', rotationPoint, angle)
+
+        normalizedBottomLeftPoint, _ = board.getArea()
+        x, y = normalizedBottomLeftPoint.getXY()
+        board.translateRotateScaleBoard('translateInPlace', [-x, -y])        
+    
+    @staticmethod
     def translateBoardInPlace(board:board.Board, moveVector:list[float|int, float|int]):
         board.translateRotateScaleBoard('translateInPlace', moveVector)
     

@@ -94,7 +94,7 @@ class Board:
             rotateInPlace -> rotationPoint:geometryObjects.Point, angleDeg:int|float
             scaleInPlace -> factor:int|float
         '''
-        components = [componentInstance for _, componentInstance in self.components.items()]
+        components = [componentInstance for componentInstance in self.components.values()]
         objList = self.area + self.outlines + components
         for obj in objList:
             func = getattr(obj, functionName)

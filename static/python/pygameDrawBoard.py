@@ -246,16 +246,18 @@ class DrawBoardEngine:
             angleDeg = self.DELTA_ROTATION_ANGLE_DEG
         angleDeg *= (-1) ** int(isClockwise)  # overengineered +1 or -1 multilpication
         
-        boardArea = self.boardData.getArea()
-        xRot, yRot = Shape.calculateAreaCenterXY(boardArea)
-        rotationPoint  =gobj.Point(xRot, yRot)
-        BoardWrapper.rotateBoardInPlace(self.boardData, rotationPoint, angleDeg)
+        print(self.boardData.getArea())
+        BoardWrapper.rotateBoardInPlaceAroundAreaCenter(self.boardData, angleDeg)
 
+        print(self.boardData.getArea())
         
         baseWidth, baseHeight = self._calculateBaseRectangleAreaWidthHeight()
         baseRotationPoint = gobj.Point(baseWidth / 2, baseHeight / 2)
         self.boardBaseRectangle.rotateInPlace(baseRotationPoint, angleDeg)
         self._updateSurfaceDimensions()
+        
+        self._centerBoardInAdjustedSurface()
+        print(self.boardBaseRectangle)
     
     def _scaleUp(self, zoomingPoint:tuple[int, int]):
         if self.scale + self.STEP_FACTOR > self.MAX_SCALE_FACTOR:
@@ -530,16 +532,10 @@ class DrawBoardEngine:
         surfaceRect = self.selectedNetSurface.get_rect()
         w, h = surfaceRect.width, surfaceRect.height
         x, y = self.offsetVector
-        pygame.draw.rect(targetSurface, (255, 0, 0), (x, y, w, h), width=2)
 
         
         ## DEBUG
-        instanceArea = self.boardData.getArea()
-        w0, h0 = Shape.getAreaWidthHeight(instanceArea)
-        pygame.draw.circle(targetSurface, (255, 0, 0), (w0//2 + x, h0//2 +  y), radius=20)
-
-        w1, h1 = self.surfaceDimensions
-        pygame.draw.circle(targetSurface, (255, 0, 255), (w1//2 + x, h1//2 + y), radius=20)
+        pygame.draw.rect(targetSurface, (255, 0, 0), (x, y, w, h), width=2)
         return targetSurface
 
     def _drawLine(self, surface:pygame.Surface, color:tuple[int, int, int], lineInstance:gobj.Line, width:int=1):
