@@ -164,6 +164,7 @@ class BoardWrapper():
         rotationPoint = gobj.Point(xRot, yRot)
         board.translateRotateScaleBoard('rotateInPlace', rotationPoint, angle)
 
+        # move bottom left corner back to (0,0)
         normalizedBottomLeftPoint, _ = board.getArea()
         x, y = normalizedBottomLeftPoint.getXY()
         board.translateRotateScaleBoard('translateInPlace', [-x, -y])        

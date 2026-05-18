@@ -245,19 +245,22 @@ class DrawBoardEngine:
         if not angleDeg:
             angleDeg = self.DELTA_ROTATION_ANGLE_DEG
         angleDeg *= (-1) ** int(isClockwise)  # overengineered +1 or -1 multilpication
-        
-        print(self.boardData.getArea())
-        BoardWrapper.rotateBoardInPlaceAroundAreaCenter(self.boardData, angleDeg)
 
-        print(self.boardData.getArea())
+        xTarget, yTarget = Shape.calculateAreaCenterXY(self.boardData.getArea())
+        BoardWrapper.rotateBoardInPlaceAroundAreaCenter(self.boardData, angleDeg)
+        self._rotateBaseRectangleAroundItsCenter(angleDeg)
         
+        self._updateSurfaceDimensions()        
+        self._centerBoardInAdjustedSurface()
+        x, y = Shape.calculateAreaCenterXY(self.boardData.getArea())
+
+        deltaVector = xTarget - x, yTarget - y
+        self._updateOffsetVector(deltaVector)
+    
+    def _rotateBaseRectangleAroundItsCenter(self, angleDeg:float):
         baseWidth, baseHeight = self._calculateBaseRectangleAreaWidthHeight()
         baseRotationPoint = gobj.Point(baseWidth / 2, baseHeight / 2)
         self.boardBaseRectangle.rotateInPlace(baseRotationPoint, angleDeg)
-        self._updateSurfaceDimensions()
-        
-        self._centerBoardInAdjustedSurface()
-        print(self.boardBaseRectangle)
     
     def _scaleUp(self, zoomingPoint:tuple[int, int]):
         if self.scale + self.STEP_FACTOR > self.MAX_SCALE_FACTOR:
