@@ -17,11 +17,7 @@ class BoardWrapper():
         self.baseMoveOffsetXY = [0.0, 0.0]
         self.sideComponents = {}
         self.commonTypeComponents = {}
-        self.isCheckForPositiveCoordsActive = True
         self._resetGroupsToDefault()
-
-    def setIsCheckForPositiveCoordsActive(self, state:bool):
-        self.isCheckForPositiveCoordsActive = state
 
     def loadAndSetBoardFromFilePath(self, filePath:str):
         boardInstance = self._loadBaseBoard(filePath)
@@ -81,24 +77,15 @@ class BoardWrapper():
         scaleX = self.width / areaWidth
         scaleY = self.height / areaHeight
         baseScale = min(scaleX, scaleY) * FITNESS_SCALE_FACTOR 
-        self._setBaseScale(baseScale)
-    
-    def _setBaseScale(self, baseScale:float):
+        
         self.baseScale = baseScale
         
     def _calculateAndSetBaseOffsetXY(self, boardArea:tuple[gobj.Point, gobj.Point]):
-        x0, y0, x1, y1 = Shape.getAreaAsXYXY(boardArea)
-        
-        xMidScaled = (x1 + x0) / 2 * self.baseScale
-        yMidScaled = (y1 + y0) / 2 * self.baseScale
-        xTarget = self.width // 2
-        yTarget = self.height // 2
+        x0, y0, *_ = Shape.getAreaAsXYXY(boardArea)
 
-        xMove, yMove = xTarget - xMidScaled, yTarget - yMidScaled
-        self._setBaseMoveOffsetXY(xMove, yMove)
-
-    def _setBaseMoveOffsetXY(self, x:float, y:float):
-        self.baseMoveOffsetXY = [x, y]    
+        xMove = x0 * self.baseScale
+        yMove = y0 * self.baseScale
+        self.baseMoveOffsetXY = [-xMove, -yMove]
     
     def _scaleAndMoveAreaPoints(self, pointList:list[gobj.Point]):
         for point in pointList:
@@ -111,10 +98,9 @@ class BoardWrapper():
             shape.translateInPlace(self.baseMoveOffsetXY)
     
     def _recalculateAndGroupComponents(self, componentsDict:dict):
-        for _, componentInstance in componentsDict.items():
+        for componentInstance in componentsDict.values():
             self._recalculateComponent(componentInstance)
-            if self.isCheckForPositiveCoordsActive:
-                self._checkIfComponentCoordsArePositive(componentInstance)
+            self._checkIfComponentCoordsArePositive(componentInstance)
             self._addComponentToSideComponents(componentInstance)
             self._addComponentToCommonTypeComponents(componentInstance)
 
@@ -184,7 +170,15 @@ class BoardWrapper():
         board.setArea(bottomLeftPoint, topRightPoint)
     
 
-if __name__ == '__main__':
+if __name__ == '__main__':    
+    def openSchematicFile() -> str:        
+        from tkinter import filedialog
+        filePath = filedialog.askopenfile(mode='r', filetypes=[('*', '*')])
+        return filePath.name
+    
+    filePath = openSchematicFile()
     normalizedBoard = BoardWrapper(1200, 700)
-    normalizedBoard.loadAndSetBoardFromFilePath(r'C:\python programy\2024_05_20 Schematic yoinker\Schematic\Fisker_Bumper_ECE_MB_RH.gcd')
+
+    normalizedBoard.loadAndSetBoardFromFilePath(filePath)
     normalizedBoard.normalizeBoard()
+    print(normalizedBoard.board.getArea())

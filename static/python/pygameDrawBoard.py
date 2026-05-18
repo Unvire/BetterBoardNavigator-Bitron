@@ -212,11 +212,10 @@ class DrawBoardEngine:
         self._drawBoard(side)
         return self._blitBoardSurfacesIntoTarget(targetSurface)
 
-    def _getNormalizedBoard(self, surfaceDimensions:tuple[int, int], boardInstance:board.Board, isCheckingForPositiveCoordsActive:bool=True) -> board.Board:
+    def _getNormalizedBoard(self, surfaceDimensions:tuple[int, int], boardInstance:board.Board) -> board.Board:
         width, height = surfaceDimensions
         wrapper = BoardWrapper(width, height)
         wrapper.setBoard(boardInstance)
-        wrapper.setIsCheckForPositiveCoordsActive(isCheckingForPositiveCoordsActive)
         return wrapper.normalizeBoard()
     
     def _setBaseRectangle(self, baseWidth:float|int, baseHeight:float|int):
