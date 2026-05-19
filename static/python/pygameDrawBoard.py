@@ -258,7 +258,8 @@ class DrawBoardEngine:
         BoardWrapper.rotateBoardInPlaceAroundAreaCenter(self.boardData, angleDeg)
         self._rotateBaseRectangleAroundItsCenter(angleDeg)
         
-        self._updateSurfaceDimensions()        
+        currentScaleFactor = self.SCALE_BASE ** self.scaleStep
+        self._updateSurfaceDimensions(currentScaleFactor)        
         self._centerBoardInAdjustedSurface()
         x, y = Shape.calculateAreaCenterXY(self.boardData.getArea())
 
@@ -598,10 +599,10 @@ class DrawBoardEngine:
         #targetSurface.blit(self.fontSurface, self.offsetVector)
 
         ## DEBUG
-        surfaceRect = self.selectedNetSurface.get_rect()
-        w, h = surfaceRect.width, surfaceRect.height
-        x, y = self.offsetVector
-        pygame.draw.rect(targetSurface, (255, 0, 0), (x, y, w, h), width=2)
+        #surfaceRect = self.selectedNetSurface.get_rect()
+        #w, h = surfaceRect.width, surfaceRect.height
+        #x, y = self.offsetVector
+        #pygame.draw.rect(targetSurface, (255, 0, 0), (x, y, w, h), width=2)
         return targetSurface
 
     def _drawLine(self, surface:pygame.Surface, color:tuple[int, int, int], lineInstance:gobj.Line, width:int=1):

@@ -163,11 +163,7 @@ class BoardWrapper():
         
         rotationPoint = gobj.Point(xRot, yRot)
         board.translateRotateScaleBoard('rotateInPlace', rotationPoint, angle)
-
-        # move bottom left corner back to (0,0)
-        normalizedBottomLeftPoint, _ = board.getArea()
-        x, y = normalizedBottomLeftPoint.getXY()
-        board.translateRotateScaleBoard('translateInPlace', [-x, -y])        
+        BoardWrapper.translateBoardBottomLeftAreaPointTo00(board)
     
     @staticmethod
     def translateBoardInPlace(board:board.Board, moveVector:list[float|int, float|int]):
@@ -181,6 +177,12 @@ class BoardWrapper():
     @staticmethod
     def setAreaManually(board:board.Board, bottomLeftPoint:gobj.Point, topRightPoint:gobj.Point):
         board.setArea(bottomLeftPoint, topRightPoint)
+    
+    @staticmethod
+    def translateBoardBottomLeftAreaPointTo00(board:board.Board):
+        bottomLeftPoint = board.getArea()[0]
+        x, y = bottomLeftPoint.getXY()
+        board.translateRotateScaleBoard('translateInPlace', [-x, -y])  
     
 
 if __name__ == '__main__':    
