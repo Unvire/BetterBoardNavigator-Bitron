@@ -13,6 +13,8 @@ class DrawBoardEngine:
     DELTA_ROTATION_ANGLE_DEG = 5
 
     def __init__(self, width:int, height:int):
+        pygame.font.init()
+
         self.boardData = None
         self.boardDataBackup = None
         self.drawHandler = {
@@ -39,13 +41,14 @@ class DrawBoardEngine:
         self.commonTypeComponentsSurface = None
         self.selectedComponentsSurface = None
         self.selectedNetSurface = None
+        self.fontSurface = None
 
         self.selectedComponentsSet = set()
         self.allSelectedNetComponentsSet = set()
         self.selectedNetComponentSet = set()
         self.selectedCommonTypePrefix = ''
         self.selectedNet = dict()
-        self.rectangularAreaXYList = []
+        self.fontCache = {}
 
         self.scaleStep = 0
         self.offsetVector = []
@@ -106,9 +109,10 @@ class DrawBoardEngine:
         self._centerBoardInAdjustedSurface()
 
         self.boardLayer = self._getEmptySurfce()
+        self.commonTypeComponentsSurface = self._getEmptySurfce()
         self.selectedComponentsSurface = self._getEmptySurfce()
         self.selectedNetSurface = self._getEmptySurfce()
-        self.selectedNetSurface = self._getEmptySurfce()
+        self.fontSurface = self._getEmptySurfce()
     
     def _resetSelectionCollections(self):
         self.selectedComponentsSet = set()
@@ -123,6 +127,7 @@ class DrawBoardEngine:
         self.sidesForFlipX = {'T'}
         self.surfaceDimensions = []
         self.boardBaseRectangle = None
+        self.fontCache = {}
     
     def getMostCommonPrefixInterface(self) -> str:
         return self.boardData.getMostCommonPrefix()
@@ -428,6 +433,7 @@ class DrawBoardEngine:
             self.commonTypeComponentsSurface = self._getEmptySurfce()
             self.selectedComponentsSurface = self._getEmptySurfce()
             self.selectedNetSurface = self._getEmptySurfce()
+            self.fontSurface = self._getEmptySurfce()
 
         def drawBoardLayer(side:str):
             componentNames = self.boardData.getSideGroupedComponents()[side]
@@ -463,11 +469,17 @@ class DrawBoardEngine:
             self._drawSelectedPins(surface=self.selectedNetSurface, color=color, side=side)
             self._drawMarkers(surface=self.selectedNetSurface, componentNamesList=componentNames, color=color, side=side)
         
+        def renderText(side:str):
+            color = self.colorsDict['outlines']
+            sideComponents = self.boardData.getSideGroupedComponents()[side]
+            self._renderComponentNames(surface=self.fontSurface, sideComponents=sideComponents, color=color)
+        
         resetSurfaces()
         drawBoardLayer(side)
         drawCommonTypeComponents(side)
         drawSelectedComponents(side)
         drawSelectedNets(side)
+        #renderText(side)
         self._flipSurfaceXAxis(side)     
     
     def _drawOutlines(self, surface:pygame.Surface, color:tuple[int, int, int], width:int=1):
@@ -514,6 +526,45 @@ class DrawBoardEngine:
         for _, pinInstance in pinsDict.items():
             self._drawInstanceAsCirlceOrPolygon(surface, pinInstance, color, width)
     
+    def _renderComponentNames(self, surface:pygame.Surface, sideComponents:list[str], color:tuple[int, int, int]):
+        MIN_WIDTH_HEIGHT = 20
+        EXAMPLE_FONT_SIZE = 10
+        MIN_FONT_SIZE = 8
+        MAX_FONT_SIZE = 40
+
+        for componentName in sideComponents:
+            componentInstance = self.boardData.getElementByName('components', componentName)
+            area = componentInstance.getArea()
+            width, height = Shape.getAreaWidthHeight(area)
+
+            if width < MIN_WIDTH_HEIGHT or height < MIN_WIDTH_HEIGHT:
+                continue
+            
+            exampleFont = self._getFont(EXAMPLE_FONT_SIZE)
+            textWidth, textHeight = exampleFont.size(componentName)
+
+            maxAllowedWidth, maxAllowedHeight = width * 0.9, height * 0.9            
+            sizeByWidth = (maxAllowedWidth / textWidth) * EXAMPLE_FONT_SIZE
+            sizeByHeight = (maxAllowedHeight / textHeight) * EXAMPLE_FONT_SIZE
+            fontSize = int(min(sizeByWidth, sizeByHeight))
+            fontSize = max(MIN_FONT_SIZE, min(fontSize, MAX_FONT_SIZE))
+
+
+            font = self._getFont(fontSize)
+            renderedText = font.render(componentName, True, color)
+
+            centerPoint = componentInstance.getCoords()
+            x, y = centerPoint.getXY()
+            textRect = renderedText.get_rect(center=(x, y))
+            surface.blit(renderedText, textRect)
+    
+    def _getFont(self, fontSize:int) -> pygame.font.Font:
+        size = max(1, int(fontSize))
+        if size not in self.fontCache:
+            self.fontCache[size] = pygame.font.SysFont('Arial', size)
+        return self.fontCache[size]
+
+    
     def _flipSurfaceXAxis(self, side:str):   
         if side in self.sidesForFlipX:  
             self.boardLayer = pygame.transform.flip(self.boardLayer, True, False)
@@ -543,11 +594,14 @@ class DrawBoardEngine:
         self.selectedNetSurface.set_colorkey(color)
         targetSurface.blit(self.selectedNetSurface, self.offsetVector)
 
+        #self.fontSurface.set_colorkey(color)
+        #targetSurface.blit(self.fontSurface, self.offsetVector)
+
         ## DEBUG
-        #surfaceRect = self.selectedNetSurface.get_rect()
-        #w, h = surfaceRect.width, surfaceRect.height
-        #x, y = self.offsetVector
-        #pygame.draw.rect(targetSurface, (255, 0, 0), (x, y, w, h), width=2)
+        surfaceRect = self.selectedNetSurface.get_rect()
+        w, h = surfaceRect.width, surfaceRect.height
+        x, y = self.offsetVector
+        pygame.draw.rect(targetSurface, (255, 0, 0), (x, y, w, h), width=2)
         return targetSurface
 
     def _drawLine(self, surface:pygame.Surface, color:tuple[int, int, int], lineInstance:gobj.Line, width:int=1):
