@@ -7,10 +7,12 @@ import component as comp
 
 class DrawBoardEngine:
     BONUS_SCALE_FACTOR = 1.05
-    SCALE_BASE = 1.26
+    SCALE_BASE = 1.23
     STEP_MAX = 10
     STEP_MIN = -5
     DELTA_ROTATION_ANGLE_DEG = 5
+    MIN_FONT_SIZE = 10
+    MAX_FONT_SIZE = 26
 
     def __init__(self, width:int, height:int):
         pygame.font.init()
@@ -223,8 +225,12 @@ class DrawBoardEngine:
         return self.drawAndBlitInterface(targetSurface, side)
 
     def drawAndBlitInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
+        print('a')
         self._drawBoard(side)
-        return self._blitBoardSurfacesIntoTarget(targetSurface)
+        print('b')
+        self._blitBoardSurfacesIntoTarget(targetSurface)
+        print('c')
+        return 
 
     def _getNormalizedBoard(self, surfaceDimensions:tuple[int, int], boardInstance:board.Board) -> board.Board:
         width, height = surfaceDimensions
@@ -538,46 +544,29 @@ class DrawBoardEngine:
             self._drawInstanceAsCirlceOrPolygon(surface, pinInstance, color, width)
     
     def _renderComponentNames(self, surface:pygame.Surface, sideComponents:list[str], color:tuple[int, int, int], isFlipX:bool):
-        MIN_WIDTH_HEIGHT = 20
+        MIN_COMPONENT_SIZE_PX = 10
         EXAMPLE_FONT_SIZE = 10
-        MIN_FONT_SIZE = 8
-        MAX_FONT_SIZE = 40
 
         for componentName in sideComponents:
             componentInstance = self.boardData.getElementByName('components', componentName)
             area = componentInstance.getArea()
             width, height = Shape.getAreaWidthHeight(area)
 
-            if width < MIN_WIDTH_HEIGHT or height < MIN_WIDTH_HEIGHT:
+            if max(width, height) < MIN_COMPONENT_SIZE_PX:
                 continue
-            
-            exampleFont = self._getFont(EXAMPLE_FONT_SIZE)
-            textWidth, textHeight = exampleFont.size(componentName)
 
-            maxAllowedWidth, maxAllowedHeight = width * 0.9, height * 0.9            
-            sizeByWidth = (maxAllowedWidth / textWidth) * EXAMPLE_FONT_SIZE
-            sizeByHeight = (maxAllowedHeight / textHeight) * EXAMPLE_FONT_SIZE
-            fontSize = int(min(sizeByWidth, sizeByHeight))
-            fontSize = max(MIN_FONT_SIZE, min(fontSize, MAX_FONT_SIZE))
+            textWidth, textHeight = self._getFontWidthHeight(EXAMPLE_FONT_SIZE, componentName)
+            targetFontSize = self._calculateFontSize(width, height, textWidth, textHeight, EXAMPLE_FONT_SIZE)
 
-
-            font = self._getFont(fontSize)
+            font = self._getFont(targetFontSize)
             renderedText = font.render(componentName, True, color)
 
             centerPoint = componentInstance.getCoords()
             x, y = centerPoint.getXY()
             if isFlipX:
                 x = self._xForMirroredSurface(x)
-
             textRect = renderedText.get_rect(center=(x, y))
             surface.blit(renderedText, textRect)
-    
-    def _getFont(self, fontSize:int) -> pygame.font.Font:
-        size = max(1, int(fontSize))
-        if size not in self.fontCache:
-            self.fontCache[size] = pygame.font.SysFont('Arial', size)
-        return self.fontCache[size]
-
     
     def _flipSurfaceXAxis(self, side:str):   
         if side in self.sidesForFlipX:  
@@ -661,6 +650,25 @@ class DrawBoardEngine:
         surface = pygame.Surface(self.surfaceDimensions)
         surface.fill(color)
         return surface
+    
+    def _getFontWidthHeight(self, fontSize:int, textToRender:str) -> tuple[int, int]:
+        font = self._getFont(fontSize)
+        textWidth, textHeight = font.size(textToRender)
+        return textWidth, textHeight
+    
+    def _calculateFontSize(self, width:int, height:int, exampleTextWidth:int, exampleTextHeight:int, exampleFontSize:int) -> int:
+        sizeByWidth = (width / exampleTextWidth) * exampleFontSize
+        sizeByHeight = (height / exampleTextHeight) * exampleFontSize
+
+        fontSize = int(min(sizeByWidth, sizeByHeight))
+        fontSize = max(self.MIN_FONT_SIZE, min(fontSize, self.MAX_FONT_SIZE))
+        return fontSize
+    
+    def _getFont(self, fontSize:int) -> pygame.font.Font:
+        size = max(1, int(fontSize))
+        if size not in self.fontCache:
+            self.fontCache[size] = pygame.font.SysFont('Arial', size)
+        return self.fontCache[size]
     
     def _xForMirroredSurface(self, x:float) -> float:
         surfaceWidth, _ = self.surfaceDimensions
