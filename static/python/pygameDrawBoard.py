@@ -577,8 +577,15 @@ class DrawBoardEngine:
     def _drawMarkerArrow(self, surface:pygame.Surface, coordsXY:list[int, int], color:tuple[int, int, int]):
         x, y = coordsXY
         k = self._getScaleFactorFromSurfaceDimensions()
-        markerCoords = [(x, y), (x - (4 * k), y - (6 * k)), (x - (2 * k), y - (6 * k)), (x - (2 * k), y - (40 * k)), 
-                        (x + (2 * k), y - (40 * k)), (x + (2 * k), y - (6 * k)), (x + (4 * k), y - (6 * k))]
+        markerCoords = [
+            (x, y), 
+            (x - (8 * k), y - (12 * k)), 
+            (x - (4 * k), y - (12 * k)), 
+            (x - (4 * k), y - (80 * k)), 
+            (x + (4 * k), y - (80 * k)), 
+            (x + (4 * k), y - (12 * k)), 
+            (x + (8 * k), y - (12 * k))
+        ]
         pygame.draw.polygon(surface, color, markerCoords, width=0)
     
     def _getEmptySurfce(self) -> pygame.Surface:
