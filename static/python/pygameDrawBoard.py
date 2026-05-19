@@ -54,6 +54,7 @@ class DrawBoardEngine:
         self.offsetVector = []
         self.sidesForFlipX = {}
         self.isShowOutlines = True
+        self.isShowComponentNames = True
 
     def getComponents(self) -> list[str]:
         componentsList = list(self.boardData.getComponents().keys())
@@ -209,6 +210,10 @@ class DrawBoardEngine:
 
     def showHideOutlinesInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
         self._showHideOutlines()
+        return self.drawAndBlitInterface(targetSurface, side)
+
+    def showHideComponentNamesInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
+        self._showHideComponentNames()
         return self.drawAndBlitInterface(targetSurface, side)
 
     def changeScreenDimensionsInterface(self, targetSurface:pygame.Surface, dimensions:tuple[int, int], side:str) -> pygame.Surface:
@@ -380,6 +385,9 @@ class DrawBoardEngine:
     def _showHideOutlines(self):
         self.isShowOutlines = not self.isShowOutlines
     
+    def _showHideComponentNames(self):
+        self.isShowComponentNames = not self.isShowComponentNames
+    
     def _centerSurfaceInScreen(self):
         surfaceWidth, surfaceHeight = self.surfaceDimensions
         screenWidth, screenHeight = self.screenDimensions        
@@ -471,16 +479,18 @@ class DrawBoardEngine:
             self._drawMarkers(surface=self.selectedNetSurface, componentNamesList=componentNames, color=color, side=side)
         
         def renderText(side:str):
-            color = self.colorsDict['outlines']
-            sideComponents = self.boardData.getSideGroupedComponents()[side]
-            self._renderComponentNames(surface=self.fontSurface, sideComponents=sideComponents, color=color)
+            if self.isShowComponentNames:
+                color = self.colorsDict['outlines']
+                sideComponents = self.boardData.getSideGroupedComponents()[side]
+                isFlipX = side in self.sidesForFlipX
+                self._renderComponentNames(surface=self.fontSurface, sideComponents=sideComponents, color=color, isFlipX=isFlipX)
         
         resetSurfaces()
         drawBoardLayer(side)
         drawCommonTypeComponents(side)
         drawSelectedComponents(side)
         drawSelectedNets(side)
-        #renderText(side)
+        renderText(side)
         self._flipSurfaceXAxis(side)     
     
     def _drawOutlines(self, surface:pygame.Surface, color:tuple[int, int, int], width:int=1):
@@ -527,7 +537,7 @@ class DrawBoardEngine:
         for _, pinInstance in pinsDict.items():
             self._drawInstanceAsCirlceOrPolygon(surface, pinInstance, color, width)
     
-    def _renderComponentNames(self, surface:pygame.Surface, sideComponents:list[str], color:tuple[int, int, int]):
+    def _renderComponentNames(self, surface:pygame.Surface, sideComponents:list[str], color:tuple[int, int, int], isFlipX:bool):
         MIN_WIDTH_HEIGHT = 20
         EXAMPLE_FONT_SIZE = 10
         MIN_FONT_SIZE = 8
@@ -556,6 +566,9 @@ class DrawBoardEngine:
 
             centerPoint = componentInstance.getCoords()
             x, y = centerPoint.getXY()
+            if isFlipX:
+                x = self._xForMirroredSurface(x)
+
             textRect = renderedText.get_rect(center=(x, y))
             surface.blit(renderedText, textRect)
     
@@ -595,8 +608,8 @@ class DrawBoardEngine:
         self.selectedNetSurface.set_colorkey(color)
         targetSurface.blit(self.selectedNetSurface, self.offsetVector)
 
-        #self.fontSurface.set_colorkey(color)
-        #targetSurface.blit(self.fontSurface, self.offsetVector)
+        self.fontSurface.set_colorkey(color)
+        targetSurface.blit(self.fontSurface, self.offsetVector)
 
         ## DEBUG
         #surfaceRect = self.selectedNetSurface.get_rect()
@@ -726,6 +739,7 @@ if __name__ == '__main__':
     print('Change screen surface dimensions - g')
     print('Set component in screen center - h')
     print('Select component on net (net must be drawn before) - j')
+    print('Show/hide component names - k')
     print('====================================')
 
     run = True
@@ -825,6 +839,9 @@ if __name__ == '__main__':
                 elif event.key == pygame.K_j:
                     componentName = input('Net component name: ')
                     engine.selectNetComponentByNameInterface(WIN, componentName, side)
+                
+                elif event.key == pygame.K_k:
+                    engine.showHideComponentNamesInterface(WIN, side)
 
         
         ## display image
