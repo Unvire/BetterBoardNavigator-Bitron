@@ -7,9 +7,9 @@ import component as comp
 
 class DrawBoardEngine:
     BONUS_SCALE_FACTOR = 1.05
-    STEP_FACTOR = 0.2
-    MIN_SCALE_FACTOR = 0.2
-    MAX_SCALE_FACTOR = 7
+    SCALE_BASE = 1.26
+    STEP_MAX = 10
+    STEP_MIN = -5
     DELTA_ROTATION_ANGLE_DEG = 5
 
     def __init__(self, width:int, height:int):
@@ -47,7 +47,7 @@ class DrawBoardEngine:
         self.selectedNet = dict()
         self.rectangularAreaXYList = []
 
-        self.scale = 1
+        self.scaleStep = 1
         self.offsetVector = []
         self.sidesForFlipX = {}
         self.isShowOutlines = True
@@ -101,7 +101,7 @@ class DrawBoardEngine:
 
         width, height = self.boardData.getWidthHeight()
         self._setBaseRectangle(width * self.BONUS_SCALE_FACTOR, height * self.BONUS_SCALE_FACTOR)
-        self._updateSurfaceDimensions()
+        self._updateSurfaceDimensions(1)
         self._centerSurfaceInScreen()
         self._centerBoardInAdjustedSurface()
 
@@ -118,7 +118,7 @@ class DrawBoardEngine:
         self.selectedNetComponentSet = set()
     
     def _resetSurfaceVariables(self):
-        self.scale = 1
+        self.scaleStep = 1
         self.offsetVector = [0, 0]
         self.sidesForFlipX = {'T'}
         self.surfaceDimensions = []
@@ -133,10 +133,13 @@ class DrawBoardEngine:
     
     def scaleUpDownInterface(self, targetSurface:pygame.Surface, isScaleUp:bool, pointXY:list[int, int], side:str) -> pygame.Surface:
         if isScaleUp:
-            self._scaleUp(pointXY)
+            isBlit = self._scaleUp(pointXY)
         else:
-            self._scaleDown(pointXY)
-        return self.drawAndBlitInterface(targetSurface, side)
+            isBlit = self._scaleDown(pointXY)
+
+        if isBlit:
+            targetSurface = self.drawAndBlitInterface(targetSurface, side)
+        return targetSurface
     
     def changeSideInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
         return self.drawAndBlitInterface(targetSurface, side)
@@ -224,9 +227,9 @@ class DrawBoardEngine:
         topRightPoint = gobj.Point(baseWidth, baseHeight)
         self.boardBaseRectangle = gobj.Rectangle(bottomLeftPoint, topRightPoint)
     
-    def _updateSurfaceDimensions(self):
+    def _updateSurfaceDimensions(self, factor:float=1):
         baseWidth, baseHeight = self._calculateBaseRectangleAreaWidthHeight()
-        self.surfaceDimensions = [baseWidth * self.scale, baseHeight * self.scale]
+        self.surfaceDimensions = [baseWidth * factor, baseHeight * factor]
     
     def _calculateBaseRectangleAreaWidthHeight(self) -> tuple[float|int, float|int]:
         areaPoints = self.boardBaseRectangle.calculateArea()
@@ -262,29 +265,38 @@ class DrawBoardEngine:
         baseRotationPoint = gobj.Point(baseWidth / 2, baseHeight / 2)
         self.boardBaseRectangle.rotateInPlace(baseRotationPoint, angleDeg)
     
-    def _scaleUp(self, zoomingPoint:tuple[int, int]):
-        if self.scale + self.STEP_FACTOR > self.MAX_SCALE_FACTOR:
-            return
+    def _scaleUp(self, zoomingPoint:tuple[int, int]) -> bool:
+        if self.scaleStep + 1 > self.STEP_MAX:
+            return False
 
-        previousScaleFactor = self.scale
-        self.scale += self.STEP_FACTOR
-        self._commonScalingOperations(zoomingPoint, previousScaleFactor)
+        previousStep = self.scaleStep
+        self.scaleStep += 1
+        self._commonScalingOperations(zoomingPoint, previousStep)
+        return True
 
     def _scaleDown(self, zoomingPoint:tuple[int, int]):
-        if self.scale - self.STEP_FACTOR < self.MIN_SCALE_FACTOR:
-            return
-
-        previousScaleFactor = self.scale
-        self.scale -= self.STEP_FACTOR
-        self._commonScalingOperations(zoomingPoint, previousScaleFactor)
+        if self.scaleStep - 1 < self.STEP_MIN:
+            return False
+        
+        previousStep = self.scaleStep
+        self.scaleStep -= 1
+        self._commonScalingOperations(zoomingPoint, previousStep)
+        return True
     
-    def _commonScalingOperations(self, zoomingPoint:tuple[int, int], previousScaleFactor:float):
-        self._updateSurfaceDimensions()
+    def _commonScalingOperations(self, zoomingPoint:tuple[int, int], previousStepValue:int):
+        # surface dimensions must be updated as a value from expotential formula
+        scaleFactor = self.SCALE_BASE ** self.scaleStep
+        self._updateSurfaceDimensions(scaleFactor)
+
+        # offset for zooming in place must be calculated based on current scale and previous scale
+        previousScaleFactor = self.SCALE_BASE ** previousStepValue
         newOffset = self._calculateOffsetVectorForScaledSurface(zoomingPoint, previousScaleFactor)
         self._setOffsetVector(newOffset)
 
-        boardInstanceScaleFactor = self.scale / previousScaleFactor
-        BoardWrapper.scaleBoardInPlace(self.boardData, boardInstanceScaleFactor)
+        # board is scaled by multiplication by a factor
+        relativeScaleFactor = self.SCALE_BASE if (self.scaleStep - previousStepValue) > 0 else 1 / self.SCALE_BASE
+        BoardWrapper.scaleBoardInPlace(self.boardData, relativeScaleFactor)
+        print(self.surfaceDimensions, scaleFactor, previousScaleFactor, relativeScaleFactor)
     
     def findComponentByClick(self, cursorXY:list[int, int], side:str) -> list[str]:
         x, y = cursorXY
