@@ -47,7 +47,7 @@ class DrawBoardEngine:
         self.selectedNet = dict()
         self.rectangularAreaXYList = []
 
-        self.scaleStep = 1
+        self.scaleStep = 0
         self.offsetVector = []
         self.sidesForFlipX = {}
         self.isShowOutlines = True
@@ -118,7 +118,7 @@ class DrawBoardEngine:
         self.selectedNetComponentSet = set()
     
     def _resetSurfaceVariables(self):
-        self.scaleStep = 1
+        self.scaleStep = 0
         self.offsetVector = [0, 0]
         self.sidesForFlipX = {'T'}
         self.surfaceDimensions = []
@@ -288,15 +288,14 @@ class DrawBoardEngine:
         scaleFactor = self.SCALE_BASE ** self.scaleStep
         self._updateSurfaceDimensions(scaleFactor)
 
-        # offset for zooming in place must be calculated based on current scale and previous scale
+        # offset for zooming in place must be calculated based on current scale and previous scaling factor
         previousScaleFactor = self.SCALE_BASE ** previousStepValue
         newOffset = self._calculateOffsetVectorForScaledSurface(zoomingPoint, previousScaleFactor)
         self._setOffsetVector(newOffset)
 
-        # board is scaled by multiplication by a factor
+        # board is scaled by multiplication by a relative factor (self.SCALE_BASE or 1/self.SCALE_BASE)
         relativeScaleFactor = self.SCALE_BASE if (self.scaleStep - previousStepValue) > 0 else 1 / self.SCALE_BASE
         BoardWrapper.scaleBoardInPlace(self.boardData, relativeScaleFactor)
-        print(self.surfaceDimensions, scaleFactor, previousScaleFactor, relativeScaleFactor)
     
     def findComponentByClick(self, cursorXY:list[int, int], side:str) -> list[str]:
         x, y = cursorXY
@@ -544,13 +543,11 @@ class DrawBoardEngine:
         self.selectedNetSurface.set_colorkey(color)
         targetSurface.blit(self.selectedNetSurface, self.offsetVector)
 
-        surfaceRect = self.selectedNetSurface.get_rect()
-        w, h = surfaceRect.width, surfaceRect.height
-        x, y = self.offsetVector
-
-        
         ## DEBUG
-        pygame.draw.rect(targetSurface, (255, 0, 0), (x, y, w, h), width=2)
+        #surfaceRect = self.selectedNetSurface.get_rect()
+        #w, h = surfaceRect.width, surfaceRect.height
+        #x, y = self.offsetVector
+        #pygame.draw.rect(targetSurface, (255, 0, 0), (x, y, w, h), width=2)
         return targetSurface
 
     def _drawLine(self, surface:pygame.Surface, color:tuple[int, int, int], lineInstance:gobj.Line, width:int=1):
