@@ -576,15 +576,15 @@ class DrawBoardEngine:
     
     def _drawMarkerArrow(self, surface:pygame.Surface, coordsXY:list[int, int], color:tuple[int, int, int]):
         x, y = coordsXY
-        k = self._getScaleFactorFromSurfaceDimensions()
+        k = self.SCALE_BASE ** self.scaleStep
         markerCoords = [
             (x, y), 
-            (x - (8 * k), y - (12 * k)), 
-            (x - (4 * k), y - (12 * k)), 
-            (x - (4 * k), y - (80 * k)), 
-            (x + (4 * k), y - (80 * k)), 
-            (x + (4 * k), y - (12 * k)), 
-            (x + (8 * k), y - (12 * k))
+            (x - (5 * k), y - (12 * k)), 
+            (x - (2 * k), y - (12 * k)), 
+            (x - (2 * k), y - (60 * k)), 
+            (x + (2 * k), y - (60 * k)), 
+            (x + (2 * k), y - (12 * k)), 
+            (x + (5 * k), y - (12 * k))
         ]
         pygame.draw.polygon(surface, color, markerCoords, width=0)
     
@@ -593,11 +593,6 @@ class DrawBoardEngine:
         surface = pygame.Surface(self.surfaceDimensions)
         surface.fill(color)
         return surface
-    
-    def _getScaleFactorFromSurfaceDimensions(self) -> float:
-        screenWidth, _ = self.screenDimensions
-        surfaceWidth, _ = self.surfaceDimensions
-        return surfaceWidth / screenWidth
     
     def _xForMirroredSurface(self, x:float) -> float:
         surfaceWidth, _ = self.surfaceDimensions
