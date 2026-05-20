@@ -107,10 +107,6 @@ class DrawBoardEngine:
             self.boardDataBackup = copy.deepcopy(boardData)
 
         self._buildAreaCache()
-        width, height = self.boardData.getWidthHeight()
-        self._setBaseRectangle(width * self.BONUS_SCALE_FACTOR, height * self.BONUS_SCALE_FACTOR)
-        self._updateSurfaceDimensions(1)
-        self._centerSurfaceInScreen()
         self._centerBoardInAdjustedSurface()
 
         self.boardLayer = self._getEmptySurfce()
@@ -130,8 +126,6 @@ class DrawBoardEngine:
         self.scaleStep = 0
         self.offsetVector = [0, 0]
         self.sidesForFlipX = {'T'}
-        self.surfaceDimensions = []
-        self.boardBaseRectangle = None
         self.fontCache = {}
     
     def getMostCommonPrefixInterface(self) -> str:
@@ -151,7 +145,9 @@ class DrawBoardEngine:
             targetSurface = self.drawAndBlitInterface(targetSurface, side)
         return targetSurface
     
-    def changeSideInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
+    def changeSideInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:    
+        x, y = self.offsetVector
+        self.offsetVector = [-x, y]
         return self.drawAndBlitInterface(targetSurface, side)
     
     def rotateBoardInterface(self, targetSurface:pygame.Surface,  isClockwise:bool, side:str, angleDeg:float=None) -> pygame.Surface:
@@ -237,23 +233,6 @@ class DrawBoardEngine:
         wrapper.setBoard(boardInstance)
         return wrapper.normalizeBoard()
     
-    def _setBaseRectangle(self, baseWidth:float|int, baseHeight:float|int):
-        bottomLeftPoint = gobj.Point(0, 0)
-        topRightPoint = gobj.Point(baseWidth, baseHeight)
-        self.boardBaseRectangle = gobj.Rectangle(bottomLeftPoint, topRightPoint)
-    
-    def _updateSurfaceDimensions(self, factor:float=1):
-        baseWidth, baseHeight = self._calculateBaseRectangleAreaWidthHeight()
-        self.surfaceDimensions = [baseWidth * factor, baseHeight * factor]
-    
-    def _calculateBaseRectangleAreaWidthHeight(self) -> tuple[float|int, float|int]:
-        areaPoints = self.boardBaseRectangle.calculateArea()
-        baseWidth, baseHeight = Shape.getAreaWidthHeight(areaPoints)
-        return baseWidth, baseHeight
-    
-    def _setOffsetVector(self, vector:tuple[int, int]):
-        self.offsetVector = vector
-    
     def _updateOffsetVector(self, relativeVector:tuple[int, int]):
         xMove, yMove = self.offsetVector
         dx, dy = relativeVector
@@ -276,11 +255,6 @@ class DrawBoardEngine:
         deltaVector = xTarget - x, yTarget - y
         self._updateOffsetVector(deltaVector)
     
-    def _rotateBaseRectangleAroundItsCenter(self, angleDeg:float):
-        baseWidth, baseHeight = self._calculateBaseRectangleAreaWidthHeight()
-        baseRotationPoint = gobj.Point(baseWidth / 2, baseHeight / 2)
-        self.boardBaseRectangle.rotateInPlace(baseRotationPoint, angleDeg)
-    
     def _scaleUp(self, zoomingPoint:tuple[int, int]) -> bool:
         if self.scaleStep + 1 > self.STEP_MAX:
             return False
@@ -299,19 +273,15 @@ class DrawBoardEngine:
         self._commonScalingOperations(zoomingPoint, previousStep)
         return True
     
-    def _commonScalingOperations(self, zoomingPoint:tuple[int, int], previousStepValue:int):
-        # surface dimensions must be updated as a value from expotential formula
-        scaleFactor = self.SCALE_BASE ** self.scaleStep
-        self._updateSurfaceDimensions(scaleFactor)
-
-        # offset for zooming in place must be calculated based on current scale and previous scaling factor
-        previousScaleFactor = self.SCALE_BASE ** previousStepValue
-        newOffset = self._calculateOffsetVectorForScaledSurface(zoomingPoint, previousScaleFactor)
-        self._setOffsetVector(newOffset)
-
-        # board is scaled by multiplication by a relative factor (self.SCALE_BASE or 1/self.SCALE_BASE)
+    def _commonScalingOperations(self, zoomingPoint:tuple[int, int], previousStepValue:int):        
         relativeScaleFactor = self.SCALE_BASE if (self.scaleStep - previousStepValue) > 0 else 1 / self.SCALE_BASE
+
+        w0, h0 = self.boardData.getWidthHeight()
         BoardWrapper.scaleBoardInPlace(self.boardData, relativeScaleFactor)
+        w1, h1 = self.boardData.getWidthHeight()
+
+        x, y = self._calculateOffsetVectorForScaledSurface(zoomingPoint, (w0, h0), (w1, h1))
+        self.offsetVector = [x, y]
     
     def findComponentByClick(self, cursorXY:list[int, int], side:str) -> list[str]:
         x, y = cursorXY
@@ -354,7 +324,7 @@ class DrawBoardEngine:
         x = xScreen / 2 - xComp
         y = yScreen / 2 - yComp
 
-        self._setOffsetVector([x, y])
+        self.offsetVector = [x, y]
     
     def _selectNet(self, netName:str):
         net = self.boardData.getElementByName('nets', netName)
@@ -407,9 +377,10 @@ class DrawBoardEngine:
 
         xBoardOffset = (surfaceWidth - boardWidth) / 2
         yBoardOffset = (surfaceHeight - boardHeight) / 2
-        BoardWrapper.translateBoardInPlace(self.boardData, [xBoardOffset, yBoardOffset]) #'-' because board must be moved away from its center 
+
+        self.offsetVector = [-xBoardOffset, yBoardOffset] # initial side is flipped in x-Axis, so there must be -x in vector
     
-    def _calculateOffsetVectorForScaledSurface(self, zoomingPoint:tuple[int, int], previousScaleFactor:float):
+    def _calculateOffsetVectorForScaledSurface(self, zoomingPoint:tuple[int, int], oldWidthHeight:tuple[float, float], newWidthHeight:tuple[float, float]) -> tuple[float, float]:
         def reverseSurfaceLinearTranslation(screenCoords:list[int, int], offset:list[int, int]) -> tuple[int, int]:
             xScreen, yScreen = screenCoords
             xMove, yMove = offset
@@ -430,14 +401,10 @@ class DrawBoardEngine:
             xCursor, yCursor = cursorPosition
             return xCursor - x, yCursor - y
         #####################################
-        
-        areaPoints = self.boardBaseRectangle.calculateArea()
-        surfaceBaseDimensions = Shape.getAreaWidthHeight(areaPoints)
-        originSurfaceDimensions = [val * previousScaleFactor for val in surfaceBaseDimensions]
 
         pointMoveReversed = reverseSurfaceLinearTranslation(zoomingPoint, self.offsetVector)
-        pointRelativeToSurface = calculatePointCoordsRelativeToSurfaceDimensions(pointMoveReversed, originSurfaceDimensions)
-        pointInScaledSurface = calcluatePointInScaledSurface(self.surfaceDimensions, pointRelativeToSurface)
+        pointRelativeToSurface = calculatePointCoordsRelativeToSurfaceDimensions(pointMoveReversed, oldWidthHeight)
+        pointInScaledSurface = calcluatePointInScaledSurface(newWidthHeight, pointRelativeToSurface)
         resultOffset = translateScaledPointToCursorPosition(pointInScaledSurface, zoomingPoint)
         return resultOffset
     
@@ -585,25 +552,24 @@ class DrawBoardEngine:
     def _blitBoardSurfacesIntoTarget(self, targetSurface:pygame.Surface) -> pygame.Surface:    
         color = self.colorsDict['background']
         targetSurface.fill(color)
-        targetSurface.blit(self.boardLayer, self.offsetVector)
+        targetSurface.blit(self.boardLayer, [0, 0])
 
         self.commonTypeComponentsSurface.set_colorkey(color)
-        targetSurface.blit(self.commonTypeComponentsSurface, self.offsetVector)
+        targetSurface.blit(self.commonTypeComponentsSurface, [0, 0])
 
         self.selectedComponentsSurface.set_colorkey(color)
-        targetSurface.blit(self.selectedComponentsSurface, self.offsetVector)
+        targetSurface.blit(self.selectedComponentsSurface, [0, 0])
 
         self.selectedNetSurface.set_colorkey(color)
-        targetSurface.blit(self.selectedNetSurface, self.offsetVector)
+        targetSurface.blit(self.selectedNetSurface, [0, 0])
 
         self.fontSurface.set_colorkey(color)
-        targetSurface.blit(self.fontSurface, self.offsetVector)
+        targetSurface.blit(self.fontSurface, [0, 0])
 
         ## DEBUG
-        #surfaceRect = self.selectedNetSurface.get_rect()
-        #w, h = surfaceRect.width, surfaceRect.height
-        #x, y = self.offsetVector
-        #pygame.draw.rect(targetSurface, (255, 0, 0), (x, y, w, h), width=2)
+        surfaceRect = self.selectedNetSurface.get_rect()
+        w, h = surfaceRect.width, surfaceRect.height
+        pygame.draw.rect(targetSurface, (255, 0, 0), (0, 0, w, h), width=2)
         return targetSurface
 
     def _drawLine(self, surface:pygame.Surface, color:tuple[int, int, int], lineInstance:gobj.Line, width:int=1):

@@ -44,6 +44,7 @@ class BoardWrapper():
             self._normalizeAreaComponentsShapes()
         
         self.board.setGroups(self.sideComponents, self.commonTypeComponents)
+        BoardWrapper.translateBoardBottomLeftAreaPointTo00(self.board)
         return self.board
 
     def _normalizeAreaComponentsShapes(self):
@@ -151,6 +152,7 @@ class BoardWrapper():
     @staticmethod
     def scaleBoardInPlace(board:board.Board, scaleFactor:float):
         board.translateRotateScaleBoard('scaleInPlace', scaleFactor)
+        #BoardWrapper.translateBoardBottomLeftAreaPointTo00(board)
     
     @staticmethod
     def rotateBoardInPlace(board:board.Board, rotationPoint:gobj.Point, angle:float):
