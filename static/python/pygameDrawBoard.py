@@ -56,7 +56,7 @@ class DrawBoardEngine:
         self.offsetVector = []
         self.sidesForFlipX = {}
         self.isShowOutlines = True
-        self.isShowComponentNames = True
+        self.isShowComponentNames = False
 
     def getComponents(self) -> list[str]:
         componentsList = list(self.boardData.getComponents().keys())
@@ -225,11 +225,8 @@ class DrawBoardEngine:
         return self.drawAndBlitInterface(targetSurface, side)
 
     def drawAndBlitInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
-        print('a')
         self._drawBoard(side)
-        print('b')
         self._blitBoardSurfacesIntoTarget(targetSurface)
-        print('c')
         return 
 
     def _getNormalizedBoard(self, surfaceDimensions:tuple[int, int], boardInstance:board.Board) -> board.Board:

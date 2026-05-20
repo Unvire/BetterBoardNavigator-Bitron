@@ -94,6 +94,16 @@ class EngineAdapter{
         `);
     }
 
+    static toggleComponentNames(){
+        const sideHandler = globalInstancesMap.sideHandler;
+
+        const side = sideHandler.currentSide();
+        pyodide.runPythonAsync(`
+            engine.showHideComponentNamesInterface(SURFACE, "${side}")
+            pygame.display.flip()
+        `);
+    }
+
     static resetView(){
         const sideHandler = globalInstancesMap.sideHandler;
 

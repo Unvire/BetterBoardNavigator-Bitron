@@ -93,6 +93,7 @@ class EventHandler{
         globalInstancesMap.rotateButton.disabled = false;
         globalInstancesMap.mirrorSideButton.disabled = false;
         globalInstancesMap.toggleOutlinesButton.disabled = false;
+        globalInstancesMap.toggleCompponentNamesButton.disabled = false;
         globalInstancesMap.resetViewButton.disabled = false;
         globalInstancesMap.areaFromComponentsButton.disabled = false;
         globalInstancesMap.preserveComponentMarkersButton.disabled = false;
@@ -113,6 +114,13 @@ class EventHandler{
         allComponentsList.selectionMode = selectionModesMap[isSelectionModeSingle];
         EventHandler.toggleButton(preserveComponentMarkersButton);
         return isSelectionModeSingle;
+    }
+
+    static toggleComponentNames(){
+        const toggleComponentNamesButton = globalInstancesMap.toggleCompponentNamesButton;
+
+        EngineAdapter.toggleComponentNames();
+        EventHandler.toggleButton(toggleComponentNamesButton);
     }
 
     static unselectNet(){

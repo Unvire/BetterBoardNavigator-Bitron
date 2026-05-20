@@ -47,6 +47,7 @@ function _bindHtmlElements(){
     globalInstancesMap.changeSideButton = document.getElementById("change-side-button");
     globalInstancesMap.mirrorSideButton = document.getElementById("mirror-side-button");
     globalInstancesMap.toggleOutlinesButton = document.getElementById("toggle-outlines-button");
+    globalInstancesMap.toggleCompponentNamesButton = document.getElementById("toggle-component-names-button");
 
     globalInstancesMap.resetViewButton = document.getElementById("default-view-button");    
     globalInstancesMap.areaFromComponentsButton = document.getElementById("components-area-button");
@@ -310,6 +311,7 @@ function _bindOnClickEvents(){
     globalInstancesMap.preserveComponentMarkersButton.addEventListener("click", () => {
         isSelectionModeSingle = EventHandler.preserveComponentMarkers(isSelectionModeSingle);
     });
+    globalInstancesMap.toggleCompponentNamesButton.addEventListener("click", EventHandler.toggleComponentNames);
     globalInstancesMap.unselectNetButton.addEventListener("click", EventHandler.unselectNet);            
     globalInstancesMap.findComponentUsingNameButton.addEventListener("click", EventHandler.findComponentUsingName);
     globalInstancesMap.prefixComponentsButton.addEventListener("click", EventHandler.showCommonPrefixComponents);
