@@ -35,8 +35,7 @@ class DrawBoardEngine:
             'selection rectangle': (158, 158, 158)
         }
         
-        self.surfaceDimensions = []
-        self.boardBaseRectangle = None
+        self.surfaceDimensions = [width, height]
         self.screenDimensions = [width, height]
 
         self.boardLayer = None
@@ -50,7 +49,9 @@ class DrawBoardEngine:
         self.selectedNetComponentSet = set()
         self.selectedCommonTypePrefix = ''
         self.selectedNet = dict()
+
         self.fontCache = {}
+        self.areaCache = {}
 
         self.scaleStep = 0
         self.offsetVector = []
@@ -105,6 +106,7 @@ class DrawBoardEngine:
         if isMakeBackup:
             self.boardDataBackup = copy.deepcopy(boardData)
 
+        self._buildAreaCache()
         width, height = self.boardData.getWidthHeight()
         self._setBaseRectangle(width * self.BONUS_SCALE_FACTOR, height * self.BONUS_SCALE_FACTOR)
         self._updateSurfaceDimensions(1)
@@ -647,6 +649,14 @@ class DrawBoardEngine:
         surface = pygame.Surface(self.surfaceDimensions)
         surface.fill(color)
         return surface
+
+    def _buildAreaCache(self):
+        self.areaCache = {}
+
+        componentsDict = self.boardData.getComponents()
+        for componentName, componentInstance in componentsDict.items():
+            area = componentInstance.getArea()
+            self.areaCache[componentName] = area
     
     def _getFontWidthHeight(self, fontSize:int, textToRender:str) -> tuple[int, int]:
         font = self._getFont(fontSize)
