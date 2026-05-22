@@ -111,12 +111,7 @@ class DrawBoardEngine:
             self.boardDataBackup = copy.deepcopy(boardData)
 
         self._buildAreaCache()
-        #self._chunkifyBoard()
-
-        #self._setBaseRectangle(width * self.BONUS_SCALE_FACTOR, height * self.BONUS_SCALE_FACTOR)
-        #self._updateSurfaceDimensions(1)
-        #self._centerSurfaceInScreen()
-        #self._centerBoardInAdjustedSurface()
+        self._centerBoard()
         
     
     def _resetSelectionCollections(self):
@@ -228,8 +223,7 @@ class DrawBoardEngine:
 
     def drawAndBlitInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
         self._chunkifyBoard(side)
-        self._blitBoardSurfacesIntoTarget(targetSurface)
-        return 
+        return self._blitVisibleChunksIntoScreen(targetSurface)
 
     def _getNormalizedBoard(self, surfaceDimensions:tuple[int, int], boardInstance:board.Board) -> board.Board:
         width, height = surfaceDimensions
@@ -401,13 +395,13 @@ class DrawBoardEngine:
         ySurfaceOffset = (screenHeight - surfaceHeight) / 2
         self.offsetVector = [xSurfaceOffset, ySurfaceOffset]
     
-    def _centerBoardInAdjustedSurface(self):
+    def _centerBoard(self):
         surfaceWidth, surfaceHeight = self.surfaceDimensions
         boardWidth, boardHeight = self.boardData.getWidthHeight()
 
         xBoardOffset = (surfaceWidth - boardWidth) / 2
         yBoardOffset = (surfaceHeight - boardHeight) / 2
-        BoardWrapper.translateBoardInPlace(self.boardData, [xBoardOffset, yBoardOffset]) #'-' because board must be moved away from its center 
+        self.offsetVector = [xBoardOffset, yBoardOffset]
     
     def _calculateOffsetVectorForScaledSurface(self, zoomingPoint:tuple[int, int], previousScaleFactor:float):
         def reverseSurfaceLinearTranslation(screenCoords:list[int, int], offset:list[int, int]) -> tuple[int, int]:
@@ -451,7 +445,7 @@ class DrawBoardEngine:
         for i, j in itertools.product(iRange, jRange):
             coords = i * self.CHUNK_SIZE_PX, j * self.CHUNK_SIZE_PX
             chunkSurface = self._drawChunk(side, coords)
-            self.surfaceChunks[coords] = chunkSurface
+            self.surfaceChunks[(i, j)] = chunkSurface
 
 
     def _drawBoard(self, side:str):         
@@ -485,7 +479,10 @@ class DrawBoardEngine:
         chunkSurface = self._drawMarkersInChunk(chunkSurface, chunkRect, side)
         chunkSurface = self._drawSelectedNetPadsInChunk(chunkSurface, chunkRect, side)
         chunkSurface = self._drawSelectedNetComponentsInChunk(chunkSurface, chunkRect, side)
-        # rendering add rendering text when above will work
+        # add rendering text when above will work
+
+        ## DEBUG
+        #pygame.draw.rect(chunkSurface, (255, 0, 0), (0, 0, self.CHUNK_SIZE_PX, self.CHUNK_SIZE_PX), width=2)
         return chunkSurface
     
     def _drawOutlinesInChunk(self, chunkSurface:pygame.Surface, chunkRect:pygame.Rect) -> pygame.Surface:
@@ -513,6 +510,7 @@ class DrawBoardEngine:
             if chunkRect.colliderect(areaRect):
                 componentsToDraw.append(componentName)
 
+        print(componentsToDraw)
         self._drawComponents(surface=chunkSurface, componentNamesList=componentsToDraw, side=side, width=1)
         return chunkSurface        
         
@@ -676,6 +674,42 @@ class DrawBoardEngine:
         else:
             pointsList = instance.getShapePoints()
             self._drawPolygon(surface, color, pointsList, width)
+    
+    def _blitVisibleChunksIntoScreen(self, targetSurface:pygame.Surface) -> pygame.Surface:
+        color = self.colorsDict['background']
+        targetSurface.fill(color)
+
+        screenWidth, screenHeight = self.screenDimensions
+        xOffset, yOffset = self.offsetVector
+
+        screenLeft = -xOffset
+        screenTop = -yOffset
+        screenRight = screenLeft + screenWidth
+        screenBottom = screenRight + screenHeight
+        print(screenLeft, screenRight, '|', screenTop, screenBottom)
+
+        iStart = int(screenLeft // self.CHUNK_SIZE_PX)
+        jStart = int(screenTop // self.CHUNK_SIZE_PX)
+        iEnd = int(screenRight // self.CHUNK_SIZE_PX)
+        jEnd = int(screenBottom // self.CHUNK_SIZE_PX)
+
+        rowRange = range(iStart, iEnd)
+        colRange = range(jStart, jEnd)
+        for i, j in itertools.product(rowRange, colRange):
+            chunkKey = i, j
+            if chunkKey not in self.surfaceChunks:
+                print(i, j)
+                continue
+
+            chunkSurface = self.surfaceChunks[chunkKey]
+            pygame.image.save(chunkSurface, f"debug_chunk_{i}x{j}.png")
+            xDraw = (i * self.CHUNK_SIZE_PX) + xOffset
+            yDraw = (j * self.CHUNK_SIZE_PX) + yOffset
+            
+            chunkSurface.set_colorkey(color)
+            targetSurface.blit(targetSurface, [xDraw, yDraw])
+            
+        return targetSurface
         
     def _blitBoardSurfacesIntoTarget(self, targetSurface:pygame.Surface) -> pygame.Surface:    
         color = self.colorsDict['background']
@@ -694,11 +728,7 @@ class DrawBoardEngine:
         self.fontSurface.set_colorkey(color)
         targetSurface.blit(self.fontSurface, self.offsetVector)
 
-        ## DEBUG
-        #surfaceRect = self.selectedNetSurface.get_rect()
-        #w, h = surfaceRect.width, surfaceRect.height
-        #x, y = self.offsetVector
-        #pygame.draw.rect(targetSurface, (255, 0, 0), (x, y, w, h), width=2)
+
         return targetSurface
 
     def _drawLine(self, surface:pygame.Surface, color:tuple[int, int, int], lineInstance:gobj.Line, width:int=1):
