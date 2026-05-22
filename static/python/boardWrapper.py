@@ -151,6 +151,7 @@ class BoardWrapper():
     @staticmethod
     def scaleBoardInPlace(board:board.Board, scaleFactor:float):
         board.translateRotateScaleBoard('scaleInPlace', scaleFactor)
+        BoardWrapper.translateBoardBottomLeftAreaPointTo00(board)
     
     @staticmethod
     def rotateBoardInPlace(board:board.Board, rotationPoint:gobj.Point, angle:float):

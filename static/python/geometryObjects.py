@@ -98,6 +98,12 @@ class AbstractBaseShape(ABC):
     @abstractmethod
     def getPoints(self):
         pass
+
+    def getArea(self) -> tuple[Point, Point]:
+        points = self.getPoints()
+        bottomLeftPoint, topRightPoint = getDefaultBottomLeftTopRightPoints()
+        bottomLeftPoint, topRightPoint = updateBottomLeftTopRightPoints((bottomLeftPoint, topRightPoint), points)
+        return bottomLeftPoint, topRightPoint
     
     def scaleInPlace(self, factor:float|int):
         for point in self.getPoints():

@@ -1,7 +1,7 @@
 import geometryObjects as gobj
 import copy
 
-class Shape():
+class Shape:
     def __init__(self, name:str):
         self.name = name
         self.shape = 'RECT'
@@ -155,3 +155,10 @@ class Shape():
         xBL, yBL = bottomLeftPoint.getXY()
         xTR, yTR = topRightPoint.getXY()
         return xBL, yBL, xTR, yTR
+    
+    @staticmethod
+    def getAreaAsXYWH(area:tuple[gobj.Point, gobj.Point]) -> tuple[float, float, float, float]:
+        bottomLeftPoint, topRightPoint = area
+        xBL, yBL = bottomLeftPoint.getXY()
+        xTR, yTR = topRightPoint.getXY()
+        return xBL, yBL, xTR - xBL, yTR - yBL
