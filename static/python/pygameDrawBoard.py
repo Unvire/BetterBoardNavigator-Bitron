@@ -471,50 +471,46 @@ class DrawBoardEngine:
     def _drawChunk(self, side:str, coords:tuple[int, int]) -> pygame.surface:
         chunkSurface = self._getEmptySurfce()
 
-        x, y, width, height =  self._calculateChunkBoundariesXYWH(coords)
-        chunkRect = pygame.Rect(x, y, width, height)
-        chunkSurface = self._drawOutlinesInChunk(chunkSurface, chunkRect)
-        chunkSurface = self._drawComponentsInChunk(chunkSurface, chunkRect, side)
-        chunkSurface = self._drawCommonTypeComponentsInChunk(chunkSurface, chunkRect, side)
-        chunkSurface = self._drawMarkersInChunk(chunkSurface, chunkRect, side)
-        chunkSurface = self._drawSelectedNetPadsInChunk(chunkSurface, chunkRect, side)
-        chunkSurface = self._drawSelectedNetComponentsInChunk(chunkSurface, chunkRect, side)
+        chunkCornersXY =  self._calculateChunkBoundariesXYXY(coords)
+        chunkSurface = self._drawOutlinesInChunk(chunkSurface, chunkCornersXY)
+        chunkSurface = self._drawComponentsInChunk(chunkSurface, chunkCornersXY, side)
+        chunkSurface = self._drawCommonTypeComponentsInChunk(chunkSurface, chunkCornersXY, side)
+        chunkSurface = self._drawMarkersInChunk(chunkSurface, chunkCornersXY, side)
+        chunkSurface = self._drawSelectedNetPadsInChunk(chunkSurface, chunkCornersXY, side)
+        chunkSurface = self._drawSelectedNetComponentsInChunk(chunkSurface, chunkCornersXY, side)
         # add rendering text when above will work
 
         ## DEBUG
         #pygame.draw.rect(chunkSurface, (255, 0, 0), (0, 0, self.CHUNK_SIZE_PX, self.CHUNK_SIZE_PX), width=2)
+        pygame.image.save(chunkSurface, f"debug_chunk_{coords}.png")
         return chunkSurface
     
-    def _drawOutlinesInChunk(self, chunkSurface:pygame.Surface, chunkRect:pygame.Rect) -> pygame.Surface:
+    def _drawOutlinesInChunk(self, chunkSurface:pygame.Surface, chunkCornersXYXY:tuple[int, int, int, int]) -> pygame.Surface:
         if not self.isShowOutlines:
             return chunkSurface
 
         for shape in self.areaCache['outlines']:
-            x, y, width, height = Shape.getAreaAsXYWH(shape.getArea())
-            areaRect = pygame.Rect(x, y, width, height)
-
-            if not chunkRect.colliderect(areaRect):
+            areaCornersXYXY = Shape.getAreaAsXYXY(shape.getArea())
+            if not self._is2AreasOverlap(chunkCornersXYXY, areaCornersXYXY):
                 continue
-
+            
             shapeType = shape.getType()
             color = self.colorsDict['outlines']
             self.drawHandler[shapeType](chunkSurface, color, shape, width=1)
         return chunkSurface
     
-    def _drawComponentsInChunk(self, chunkSurface:pygame.Surface, chunkRect:pygame.Rect, side:str) -> pygame.Surface:
+    def _drawComponentsInChunk(self, chunkSurface:pygame.Surface, chunkCornersXYXY:tuple[int, int, int, int], side:str) -> pygame.Surface:
         componentsToDraw = []
         for componentName, componentArea in self.areaCache[side].items():
-            x, y, width, height = Shape.getAreaAsXYWH(componentArea)
-            areaRect = pygame.Rect(x, y, width, height)
+            areaCornersXYXY = Shape.getAreaAsXYXY(componentArea)
 
-            if chunkRect.colliderect(areaRect):
+            if self._is2AreasOverlap(chunkCornersXYXY, areaCornersXYXY):
                 componentsToDraw.append(componentName)
 
-        print(componentsToDraw)
         self._drawComponents(surface=chunkSurface, componentNamesList=componentsToDraw, side=side, width=1)
         return chunkSurface        
         
-    def _drawCommonTypeComponentsInChunk(self, chunkSurface:pygame.Surface, chunkRect:pygame.Rect, side:str) -> pygame.Surface:
+    def _drawCommonTypeComponentsInChunk(self, chunkSurface:pygame.Surface, chunkCornersXYXY:tuple[int, int, int, int], side:str) -> pygame.Surface:
         commonTypeComponents = self.boardData.getCommonTypeGroupedComponents()[side]
         if not self.selectedCommonTypePrefix in commonTypeComponents:
             return chunkSurface     
@@ -523,58 +519,54 @@ class DrawBoardEngine:
         componentNames = commonTypeComponents[prefix]
         for componentName in componentNames:
             componentArea = self.areaCache[side][componentName]
-            x, y, width, height = Shape.getAreaAsXYWH(componentArea)
-            areaRect = pygame.Rect(x, y, width, height)
+            areaCornersXYXY = Shape.getAreaAsXYXY(componentArea)
 
-            if chunkRect.colliderect(areaRect):
+            if self._is2AreasOverlap(chunkCornersXYXY, areaCornersXYXY):
                 componentsToDraw.append(componentName)
 
         self._drawComponents(surface=chunkSurface, componentNamesList=componentsToDraw, side=side, width=0)
         return chunkSurface
     
-    def _drawMarkersInChunk(self, chunkSurface:pygame.Surface, chunkRect:pygame.Rect, side:str) -> pygame.Surface:
+    def _drawMarkersInChunk(self, chunkSurface:pygame.Surface, chunkCornersXYXY:tuple[int, int, int, int], side:str) -> pygame.Surface:
         componentNames = list(self.selectedComponentsSet)
         componentsToDraw = []
         for componentName in componentNames:
             componentArea = self.areaCache[side][componentName]
-            x, y, width, height = Shape.getAreaAsXYWH(componentArea)
-            areaRect = pygame.Rect(x, y, width, height)
+            areaCornersXYXY = Shape.getAreaAsXYXY(componentArea)
 
-            if chunkRect.colliderect(areaRect):
+            if self._is2AreasOverlap(chunkCornersXYXY, areaCornersXYXY):
                 componentsToDraw.append(componentName)
         
         color = self.colorsDict['selected component marker']
         self._drawMarkers(surface=chunkSurface, componentNamesList=componentNames, color=color, side=side)
         return chunkSurface    
              
-    def _drawSelectedNetPadsInChunk(self, chunkSurface:pygame.Surface, chunkRect:pygame.Rect, side:str) -> pygame.Surface:
+    def _drawSelectedNetPadsInChunk(self, chunkSurface:pygame.Surface, chunkCornersXYXY:tuple[int, int, int, int], side:str) -> pygame.Surface:
         if not self.selectedNet:
             return chunkSurface
         
         componentsToDraw = []
         for componentName in self.selectedNet:
             componentArea = self.areaCache[side][componentName]
-            x, y, width, height = Shape.getAreaAsXYWH(componentArea)
-            areaRect = pygame.Rect(x, y, width, height)
+            areaCornersXYXY = Shape.getAreaAsXYXY(componentArea)
 
-            if chunkRect.colliderect(areaRect):
+            if self._is2AreasOverlap(chunkCornersXYXY, areaCornersXYXY):
                 componentsToDraw.append(componentName)
 
         netComponentsInChunk = set(componentsToDraw)
         self._drawSelectedPins(surface=chunkSurface, componentNamesSet=netComponentsInChunk, side=side)
         return chunkSurface
     
-    def _drawSelectedNetComponentsInChunk(self, chunkSurface:pygame.Surface, chunkRect:pygame.Rect, side:str) -> pygame.Surface:
+    def _drawSelectedNetComponentsInChunk(self, chunkSurface:pygame.Surface, chunkCornersXYXY:tuple[int, int, int, int], side:str) -> pygame.Surface:
         if not self.selectedNet:
             return chunkSurface
         
         componentsToDraw = []
         for componentName in list(self.selectedNetComponentSet):
             componentArea = self.areaCache[side][componentName]
-            x, y, width, height = Shape.getAreaAsXYWH(componentArea)
-            areaRect = pygame.Rect(x, y, width, height)
+            areaCornersXYXY = Shape.getAreaAsXYXY(componentArea)
 
-            if chunkRect.colliderect(areaRect):
+            if self._is2AreasOverlap(chunkCornersXYXY, areaCornersXYXY):
                 componentsToDraw.append(componentName)
 
         color = self.colorsDict['selected net marker']
@@ -582,9 +574,17 @@ class DrawBoardEngine:
         return chunkSurface
 
 
-    def _calculateChunkBoundariesXYWH(self, chunkCoords:tuple[int, int]) -> tuple[int, int, int, int]:
+    def _calculateChunkBoundariesXYXY(self, chunkCoords:tuple[int, int]) -> tuple[int, int, int, int]:
         x0, y0 = chunkCoords
         return x0, y0, x0 + self.CHUNK_SIZE_PX, y0 + self.CHUNK_SIZE_PX
+
+    def _is2AreasOverlap(self, chunkCorners:tuple[int, int, int, int], areaCorners:tuple[int, int, int, int]) -> bool:
+        xC_Min, yC_Min, xC_Max, yC_Max = chunkCorners
+        xA_Min, yA_Min, xA_Max, yA_Max = areaCorners
+
+        overlapX = (xA_Min <= xC_Max) and (xA_Max >= xC_Min)
+        overlapY = (yA_Min <= yC_Max) and (yA_Max >= yC_Min)
+        return overlapX and overlapY
     
     def _drawComponents(self, surface:pygame.Surface, componentNamesList:list[str], side:str, width:int=1):
         componentColor = self.colorsDict['components']
@@ -686,7 +686,6 @@ class DrawBoardEngine:
         screenTop = -yOffset
         screenRight = screenLeft + screenWidth
         screenBottom = screenRight + screenHeight
-        print(screenLeft, screenRight, '|', screenTop, screenBottom)
 
         iStart = int(screenLeft // self.CHUNK_SIZE_PX)
         jStart = int(screenTop // self.CHUNK_SIZE_PX)
@@ -698,38 +697,19 @@ class DrawBoardEngine:
         for i, j in itertools.product(rowRange, colRange):
             chunkKey = i, j
             if chunkKey not in self.surfaceChunks:
-                print(i, j)
                 continue
 
             chunkSurface = self.surfaceChunks[chunkKey]
-            pygame.image.save(chunkSurface, f"debug_chunk_{i}x{j}.png")
             xDraw = (i * self.CHUNK_SIZE_PX) + xOffset
             yDraw = (j * self.CHUNK_SIZE_PX) + yOffset
             
             chunkSurface.set_colorkey(color)
-            targetSurface.blit(targetSurface, [xDraw, yDraw])
+            targetSurface.blit(chunkSurface, [xDraw, yDraw])
             
         return targetSurface
         
-    def _blitBoardSurfacesIntoTarget(self, targetSurface:pygame.Surface) -> pygame.Surface:    
-        color = self.colorsDict['background']
-        targetSurface.fill(color)
-        targetSurface.blit(self.boardLayer, self.offsetVector)
-
-        self.commonTypeComponentsSurface.set_colorkey(color)
-        targetSurface.blit(self.commonTypeComponentsSurface, self.offsetVector)
-
-        self.selectedComponentsSurface.set_colorkey(color)
-        targetSurface.blit(self.selectedComponentsSurface, self.offsetVector)
-
-        self.selectedNetSurface.set_colorkey(color)
-        targetSurface.blit(self.selectedNetSurface, self.offsetVector)
-
-        self.fontSurface.set_colorkey(color)
-        targetSurface.blit(self.fontSurface, self.offsetVector)
-
-
-        return targetSurface
+    def _blitBoardSurfacesIntoTarget(self, targetSurface:pygame.Surface) -> pygame.Surface:
+        raise ValueError
 
     def _drawLine(self, surface:pygame.Surface, color:tuple[int, int, int], lineInstance:gobj.Line, width:int=1):
         startPoint, endPoint = lineInstance.getPoints()
@@ -857,11 +837,11 @@ if __name__ == '__main__':
     pygame.display.set_caption(filePath)
 
     engine = DrawBoardEngine(WIDTH, HEIGHT)
-    engine.setBoardData(boardInstance)
-    engine.drawAndBlitInterface(WIN, side)    
+    engine.setBoardData(boardInstance)    
     print('Components: ', engine.getComponents())
     print('Nets: ', engine.getNets())
 
+    engine.drawAndBlitInterface(WIN, side)
     print('====================================')
     print('Pygame draw PCB engine')
     print('Move - mouse dragging')
