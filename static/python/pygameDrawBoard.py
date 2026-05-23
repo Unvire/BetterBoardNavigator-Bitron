@@ -482,13 +482,15 @@ class DrawBoardEngine:
 
         ## DEBUG
         #pygame.draw.rect(chunkSurface, (255, 0, 0), (0, 0, self.CHUNK_SIZE_PX, self.CHUNK_SIZE_PX), width=2)
-        pygame.image.save(chunkSurface, f"debug_chunk_{coords}.png")
+        #pygame.image.save(chunkSurface, f"debug_chunk_{coords}.png")
         return chunkSurface
     
     def _drawOutlinesInChunk(self, chunkSurface:pygame.Surface, chunkCornersXYXY:tuple[int, int, int, int]) -> pygame.Surface:
         if not self.isShowOutlines:
             return chunkSurface
 
+        xChunkOffset, yChunkOffset, *_ = chunkCornersXYXY
+        chunkOffsetXY = [xChunkOffset, yChunkOffset]
         for shape in self.areaCache['outlines']:
             areaCornersXYXY = Shape.getAreaAsXYXY(shape.getArea())
             if not self._is2AreasOverlap(chunkCornersXYXY, areaCornersXYXY):
@@ -496,18 +498,20 @@ class DrawBoardEngine:
             
             shapeType = shape.getType()
             color = self.colorsDict['outlines']
-            self.drawHandler[shapeType](chunkSurface, color, shape, width=1)
+            self.drawHandler[shapeType](chunkSurface, color, shape, chunkOffsetXY=chunkOffsetXY, width=1)
         return chunkSurface
     
     def _drawComponentsInChunk(self, chunkSurface:pygame.Surface, chunkCornersXYXY:tuple[int, int, int, int], side:str) -> pygame.Surface:
         componentsToDraw = []
+        xChunkOffset, yChunkOffset, *_ = chunkCornersXYXY
+        chunkOffsetXY = [xChunkOffset, yChunkOffset]
         for componentName, componentArea in self.areaCache[side].items():
             areaCornersXYXY = Shape.getAreaAsXYXY(componentArea)
 
             if self._is2AreasOverlap(chunkCornersXYXY, areaCornersXYXY):
                 componentsToDraw.append(componentName)
 
-        self._drawComponents(surface=chunkSurface, componentNamesList=componentsToDraw, side=side, width=1)
+        self._drawComponents(surface=chunkSurface, componentNamesList=componentsToDraw, side=side, chunkOffsetXY=chunkOffsetXY, width=1)
         return chunkSurface        
         
     def _drawCommonTypeComponentsInChunk(self, chunkSurface:pygame.Surface, chunkCornersXYXY:tuple[int, int, int, int], side:str) -> pygame.Surface:
@@ -516,6 +520,8 @@ class DrawBoardEngine:
             return chunkSurface     
         
         componentsToDraw = []
+        xChunkOffset, yChunkOffset, *_ = chunkCornersXYXY
+        chunkOffsetXY = [xChunkOffset, yChunkOffset]
         componentNames = commonTypeComponents[prefix]
         for componentName in componentNames:
             componentArea = self.areaCache[side][componentName]
@@ -524,12 +530,14 @@ class DrawBoardEngine:
             if self._is2AreasOverlap(chunkCornersXYXY, areaCornersXYXY):
                 componentsToDraw.append(componentName)
 
-        self._drawComponents(surface=chunkSurface, componentNamesList=componentsToDraw, side=side, width=0)
+        self._drawComponents(surface=chunkSurface, componentNamesList=componentsToDraw, side=side, chunkOffsetXY=chunkOffsetXY, width=0)
         return chunkSurface
     
     def _drawMarkersInChunk(self, chunkSurface:pygame.Surface, chunkCornersXYXY:tuple[int, int, int, int], side:str) -> pygame.Surface:
         componentNames = list(self.selectedComponentsSet)
         componentsToDraw = []
+        xChunkOffset, yChunkOffset, *_ = chunkCornersXYXY
+        chunkOffsetXY = [xChunkOffset, yChunkOffset]
         for componentName in componentNames:
             componentArea = self.areaCache[side][componentName]
             areaCornersXYXY = Shape.getAreaAsXYXY(componentArea)
@@ -538,7 +546,7 @@ class DrawBoardEngine:
                 componentsToDraw.append(componentName)
         
         color = self.colorsDict['selected component marker']
-        self._drawMarkers(surface=chunkSurface, componentNamesList=componentNames, color=color, side=side)
+        self._drawMarkers(surface=chunkSurface, componentNamesList=componentNames, color=color, side=side, chunkOffsetXY=chunkOffsetXY)
         return chunkSurface    
              
     def _drawSelectedNetPadsInChunk(self, chunkSurface:pygame.Surface, chunkCornersXYXY:tuple[int, int, int, int], side:str) -> pygame.Surface:
@@ -546,6 +554,8 @@ class DrawBoardEngine:
             return chunkSurface
         
         componentsToDraw = []
+        xChunkOffset, yChunkOffset, *_ = chunkCornersXYXY
+        chunkOffsetXY = [xChunkOffset, yChunkOffset]
         for componentName in self.selectedNet:
             componentArea = self.areaCache[side][componentName]
             areaCornersXYXY = Shape.getAreaAsXYXY(componentArea)
@@ -554,7 +564,7 @@ class DrawBoardEngine:
                 componentsToDraw.append(componentName)
 
         netComponentsInChunk = set(componentsToDraw)
-        self._drawSelectedPins(surface=chunkSurface, componentNamesSet=netComponentsInChunk, side=side)
+        self._drawSelectedPins(surface=chunkSurface, componentNamesSet=netComponentsInChunk, side=side, chunkOffsetXY=chunkOffsetXY)
         return chunkSurface
     
     def _drawSelectedNetComponentsInChunk(self, chunkSurface:pygame.Surface, chunkCornersXYXY:tuple[int, int, int, int], side:str) -> pygame.Surface:
@@ -562,6 +572,8 @@ class DrawBoardEngine:
             return chunkSurface
         
         componentsToDraw = []
+        xChunkOffset, yChunkOffset, *_ = chunkCornersXYXY
+        chunkOffsetXY = [xChunkOffset, yChunkOffset]
         for componentName in list(self.selectedNetComponentSet):
             componentArea = self.areaCache[side][componentName]
             areaCornersXYXY = Shape.getAreaAsXYXY(componentArea)
@@ -570,7 +582,7 @@ class DrawBoardEngine:
                 componentsToDraw.append(componentName)
 
         color = self.colorsDict['selected net marker']
-        self._drawMarkers(surface=self.selectedNetSurface, componentNamesList=componentsToDraw, color=color, side=side)
+        self._drawMarkers(surface=self.selectedNetSurface, componentNamesList=componentsToDraw, color=color, side=side, chunkOffsetXY=chunkOffsetXY)
         return chunkSurface
 
 
@@ -586,7 +598,7 @@ class DrawBoardEngine:
         overlapY = (yA_Min <= yC_Max) and (yA_Max >= yC_Min)
         return overlapX and overlapY
     
-    def _drawComponents(self, surface:pygame.Surface, componentNamesList:list[str], side:str, width:int=1):
+    def _drawComponents(self, surface:pygame.Surface, componentNamesList:list[str], side:str, chunkOffsetXY:tuple[int, int], width:int=1):
         componentColor = self.colorsDict['components']
         pinColorDict = {
             'SMT': self.colorsDict['SMT pins'], 
@@ -606,19 +618,19 @@ class DrawBoardEngine:
             isSkipComponentTH = mountingType == 'TH' and componentSide != side
             isDrawComponent = not (isSkipComponentSMT or isSkipComponentTH)
             if isDrawComponent:
-                self._drawInstanceAsCirlceOrPolygon(surface, componentInstance, componentColor, width)
+                self._drawInstanceAsCirlceOrPolygon(surface, componentInstance, componentColor, chunkOffsetXY, width)
 
             pinsColor = pinColorDict[componentInstance.getMountingType()]
-            self._drawPins(surface, componentInstance, pinsColor, width)
+            self._drawPins(surface, componentInstance, pinsColor, chunkOffsetXY, width)
     
-    def _drawMarkers(self, surface:pygame.Surface, componentNamesList:list[str], color:tuple[int, int, int], side:str):
+    def _drawMarkers(self, surface:pygame.Surface, componentNamesList:list[str], color:tuple[int, int, int], side:str, chunkOffsetXY:tuple[int, int]):
         for componentName in componentNamesList:
             componentInstance = self.boardData.getElementByName('components', componentName)
             if componentInstance.getMountingType() == 'TH' or componentInstance.getSide() == side:
                 centerPoint = componentInstance.getCoords()
-                self._drawMarkerArrow(surface, centerPoint.getXY(), color)
+                self._drawMarkerArrow(surface, centerPoint.getXY(), color, chunkOffsetXY)
     
-    def _drawSelectedPins(self, surface:pygame.Surface, componentNamesSet:set, side:str):
+    def _drawSelectedPins(self, surface:pygame.Surface, componentNamesSet:set, side:str, chunkOffsetXY:tuple[int, int]):
         color = self.colorsDict['selected net marker']
         for componentName, pinsList in self.selectedNet.items():
             if componentName not in componentNamesSet:
@@ -628,12 +640,12 @@ class DrawBoardEngine:
             pinsInstancesList = [componentInstance.getPinByName(pinName) for pinName in pinsList if componentInstance]
             for pinInstance in pinsInstancesList:
                 if componentInstance.getMountingType() == 'TH' or componentInstance.getSide() == side:
-                    self._drawInstanceAsCirlceOrPolygon(surface, pinInstance, color, width=0)
+                    self._drawInstanceAsCirlceOrPolygon(surface, pinInstance, color, chunkOffsetXY, width=0)
 
-    def _drawPins(self, surface:pygame.Surface, componentInstance:comp.Component, color:tuple[int, int, int], width:int=1):
+    def _drawPins(self, surface:pygame.Surface, componentInstance:comp.Component, color:tuple[int, int, int], chunkOffsetXY:tuple[int, int], width:int=1):
         pinsDict = componentInstance.getPins()
         for _, pinInstance in pinsDict.items():
-            self._drawInstanceAsCirlceOrPolygon(surface, pinInstance, color, width)
+            self._drawInstanceAsCirlceOrPolygon(surface, pinInstance, color, chunkOffsetXY, width)
     
     def _renderComponentNames(self, surface:pygame.Surface, sideComponents:list[str], color:tuple[int, int, int], isFlipX:bool):
         MIN_COMPONENT_SIZE_PX = 10
@@ -667,13 +679,14 @@ class DrawBoardEngine:
             self.selectedNetSurface = pygame.transform.flip(self.selectedNetSurface, True, False)
             self.commonTypeComponentsSurface = pygame.transform.flip(self.commonTypeComponentsSurface, True, False)
     
-    def _drawInstanceAsCirlceOrPolygon(self, surface:pygame.Surface, instance: pin.Pin|comp.Component, color:tuple[int, int, int], width:int=1):
+    def _drawInstanceAsCirlceOrPolygon(self, surface:pygame.Surface, instance: pin.Pin|comp.Component, color:tuple[int, int, int], 
+                                            chunkOffsetXY:tuple[int, int], width:int=1):
         if  instance.getShape() == 'CIRCLE':
             shape = instance.getShapeData()
-            self._drawCircle(surface, color, shape, width)
+            self._drawCircle(surface, color, shape, chunkOffsetXY, width)
         else:
             pointsList = instance.getShapePoints()
-            self._drawPolygon(surface, color, pointsList, width)
+            self._drawPolygon(surface, color, pointsList, chunkOffsetXY, width)
     
     def _blitVisibleChunksIntoScreen(self, targetSurface:pygame.Surface) -> pygame.Surface:
         color = self.colorsDict['background']
@@ -710,33 +723,56 @@ class DrawBoardEngine:
         
     def _blitBoardSurfacesIntoTarget(self, targetSurface:pygame.Surface) -> pygame.Surface:
         raise ValueError
+    
 
-    def _drawLine(self, surface:pygame.Surface, color:tuple[int, int, int], lineInstance:gobj.Line, width:int=1):
+    def _drawLine(self, surface:pygame.Surface, color:tuple[int, int, int], lineInstance:gobj.Line, chunkOffsetXY:tuple[int, int], width:int=1):
         startPoint, endPoint = lineInstance.getPoints()
-        pygame.draw.line(surface, color, startPoint.getXY(), endPoint.getXY(), width)
+        xOffset, yOffset = chunkOffsetXY
+        x0, y0 = startPoint.getXY()
+        x1, y1 = endPoint.getXY()
 
-    def _drawArc(self, surface:pygame.Surface, color:tuple[int, int, int], arcInstance:gobj.Arc, width:int=1):
+        startXY = x0 - xOffset, y0 - yOffset
+        endXY = x1 - xOffset, y1 - yOffset
+        pygame.draw.line(surface, color, startXY, endXY, width)
+
+    def _drawArc(self, surface:pygame.Surface, color:tuple[int, int, int], arcInstance:gobj.Arc, chunkOffsetXY:tuple[int, int], width:int=1):
         def inversedAxisAngle(angleRad:float):
             return 2 * math.pi - angleRad
 
         rotationPoint, radius, startAngle, endAngle = arcInstance.getAsCenterRadiusAngles()
         x0, y0 = rotationPoint.getXY()
-        x0 -= radius
-        y0 -= radius
+        xOffset, yOffset = chunkOffsetXY
+
+        xStart = x0 - radius - xOffset
+        yStart = y0 - radius - yOffset
 
         startAngle, endAngle = inversedAxisAngle(endAngle), inversedAxisAngle(startAngle)
-        pygame.draw.arc(surface, color, (x0, y0, 2 * radius, 2 * radius), startAngle, endAngle, width)
+        pygame.draw.arc(surface, color, (xStart, yStart, 2 * radius, 2 * radius), startAngle, endAngle, width)
 
-    def _drawCircle(self, surface:pygame.Surface, color:tuple[int, int, int], circleInstance:gobj.Circle, width:int=1):
+    def _drawCircle(self, surface:pygame.Surface, color:tuple[int, int, int], circleInstance:gobj.Circle, chunkOffsetXY:tuple[int, int], width:int=1):
         centerPoint, radius = circleInstance.getCenterRadius()
-        pygame.draw.circle(surface, color, centerPoint.getXY(), radius, width)
+        x0, y0 = centerPoint.getXY()
+        xOffset, yOffset = chunkOffsetXY
 
-    def _drawPolygon(self, surface:pygame.Surface, color:tuple[int, int, int], pointsList:list[gobj.Point], width:int=1):
-        pointsXYList = [point.getXY() for point in pointsList]
+        xStart = x0 - radius - xOffset
+        yStart = y0 - radius - yOffset
+        pygame.draw.circle(surface, color, (xStart, yStart), radius, width)
+
+    def _drawPolygon(self, surface:pygame.Surface, color:tuple[int, int, int], pointsList:list[gobj.Point], chunkOffsetXY:tuple[int, int], width:int=1):
+        def applyOffset(pointXY:tuple[float, float], offsetXY:tuple[int, int]) -> tuple[float, float]:
+            x0, y0 = pointXY
+            xOffset, yOffset = offsetXY
+            return x0 - xOffset, y0 - yOffset
+            
+        pointsXYList = [applyOffset(point.getXY(), chunkOffsetXY) for point in pointsList]
         pygame.draw.polygon(surface, color, pointsXYList, width)
     
-    def _drawMarkerArrow(self, surface:pygame.Surface, coordsXY:list[int, int], color:tuple[int, int, int]):
+    def _drawMarkerArrow(self, surface:pygame.Surface, coordsXY:list[int, int], color:tuple[int, int, int], chunkOffsetXY:tuple[int, int]):
         x, y = coordsXY
+        xOffset, yOffset = chunkOffsetXY
+
+        x -= xOffset
+        y -= yOffset
         k = self.SCALE_BASE ** self.scaleStep
         markerCoords = [
             (x, y), 
