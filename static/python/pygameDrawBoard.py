@@ -130,9 +130,9 @@ class DrawBoardEngine:
     def getMostCommonPrefixInterface(self) -> str:
         return self.boardData.getMostCommonPrefix()
 
-    def moveBoardInterface(self, targetSurface:pygame.Surface, relativeXY:list[int, int]) -> pygame.Surface:
-        self._updateOffsetVector(relativeXY)                    
-        return self._blitBoardSurfacesIntoTarget(targetSurface)
+    def moveBoardInterface(self, targetSurface:pygame.Surface, relativeXY:list[int, int], side:str) -> pygame.Surface:
+        self._updateOffsetVector(relativeXY, side)                    
+        return self._blitVisibleChunksIntoScreen(targetSurface, side)
     
     def scaleUpDownInterface(self, targetSurface:pygame.Surface, isScaleUp:bool, pointXY:list[int, int], side:str) -> pygame.Surface:
         if isScaleUp:
@@ -242,9 +242,10 @@ class DrawBoardEngine:
     def _setOffsetVector(self, vector:tuple[int, int]):
         self.offsetVector = vector
     
-    def _updateOffsetVector(self, relativeVector:tuple[int, int]):
+    def _updateOffsetVector(self, relativeVector:tuple[int, int], side:str):
         xMove, yMove = self.offsetVector
         dx, dy = relativeVector
+        dx = -dx if side in self.sidesForFlipX else dx
         self.offsetVector = [xMove + dx, yMove + dy]
     
     def _rotate(self, isClockwise:bool, angleDeg:float=None):
@@ -707,7 +708,6 @@ class DrawBoardEngine:
             
             chunkSurface.set_colorkey(color)
             targetSurface.blit(chunkSurface, [xDraw, yDraw])
-            
         return targetSurface
 
     def _calculateVisibleChunkRowAndColRanges(self, screenDimensions:tuple[int, int], currentOffset:tuple[int, int]) -> tuple[range, range]:
@@ -719,10 +719,10 @@ class DrawBoardEngine:
         screenRight = screenLeft + screenWidth
         screenBottom = screenRight + screenHeight
 
-        iStart, iEnd = int(screenLeft // self.CHUNK_SIZE_PX), int(screenRight // self.CHUNK_SIZE_PX)
+        iStart, iEnd = math.floor(screenLeft / self.CHUNK_SIZE_PX), math.ceil(screenRight / self.CHUNK_SIZE_PX)
         rowRange = range(iStart, iEnd)
 
-        jStart, jEnd = int(screenTop // self.CHUNK_SIZE_PX), int(screenBottom // self.CHUNK_SIZE_PX)
+        jStart, jEnd = math.floor(screenTop / self.CHUNK_SIZE_PX), math.ceil(screenBottom / self.CHUNK_SIZE_PX)
         colRange = range(jStart, jEnd)
         return rowRange, colRange
         
@@ -931,7 +931,7 @@ if __name__ == '__main__':
                 if isMousePressed:
                     dx, dy = pygame.mouse.get_rel()
                     if not isMovingCalledFirstTime:
-                        engine.moveBoardInterface(WIN, [dx, dy])
+                        engine.moveBoardInterface(WIN, [dx, dy], side)
                     else:
                         isMovingCalledFirstTime = False
             
