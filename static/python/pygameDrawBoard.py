@@ -261,24 +261,21 @@ class DrawBoardEngine:
     def _rotate(self, isClockwise:bool, angleDeg:float=None):
         if not angleDeg:
             angleDeg = self.DELTA_ROTATION_ANGLE_DEG
-        angleDeg *= (-1) ** int(isClockwise)  # overengineered +1 or -1 multilpication
 
-        xTarget, yTarget = Shape.calculateAreaCenterXY(self.boardData.getArea())
-        BoardWrapper.rotateBoardInPlaceAroundAreaCenter(self.boardData, angleDeg)
-        self._rotateBaseRectangleAroundItsCenter(angleDeg)
+        if isClockwise:
+            angleDeg *= -1
+
+        # board is moved to 0,0 in this operation, width, height can be used to calculated center of rotation
+        originWidth, originHeight = self.boardData.getWidthHeight()
+        BoardWrapper.rotateBoardInPlaceAroundAreaCenter(self.boardData, angleDeg) 
+        rotatedWidth, rotatedHeight = self.boardData.getWidthHeight()
         
-        currentScaleFactor = self.SCALE_BASE ** self.scaleStep
-        self._updateSurfaceDimensions(currentScaleFactor)        
-        self._centerBoardInAdjustedSurface()
-        x, y = Shape.calculateAreaCenterXY(self.boardData.getArea())
+        # we are rotating around center so each point moves exactly 1/2 * (originXY - rotatedXY)
+        xOffset, yOffset = self.offsetVector
+        dx = (originWidth - rotatedWidth) / 2
+        dy = (originHeight - rotatedHeight) / 2
 
-        deltaVector = xTarget - x, yTarget - y
-        self._updateOffsetVector(deltaVector)
-    
-    def _rotateBaseRectangleAroundItsCenter(self, angleDeg:float):
-        baseWidth, baseHeight = self._calculateBaseRectangleAreaWidthHeight()
-        baseRotationPoint = gobj.Point(baseWidth / 2, baseHeight / 2)
-        self.boardBaseRectangle.rotateInPlace(baseRotationPoint, angleDeg)
+        self.offsetVector = [xOffset + dx, yOffset + dy]     
     
     def _scaleUp(self, zoomingPoint:tuple[int, int]) -> bool:
         if self.scaleStep + 1 > self.STEP_MAX:
@@ -483,7 +480,7 @@ class DrawBoardEngine:
         # add rendering text when above will work
 
         ## DEBUG
-        #pygame.draw.rect(chunkSurface, (255, 0, 0), (0, 0, self.CHUNK_SIZE_PX, self.CHUNK_SIZE_PX), width=2)
+        pygame.draw.rect(chunkSurface, (255, 0, 0), (0, 0, self.CHUNK_SIZE_PX, self.CHUNK_SIZE_PX), width=2)
         #pygame.image.save(chunkSurface, f"debug_chunk_{coords}.png")
         return chunkSurface
     
