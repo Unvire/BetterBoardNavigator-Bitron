@@ -306,10 +306,12 @@ class DrawBoardEngine:
         x, y = cursorXY
         xOffset, yOffset = self.offsetVector
 
-        x = x - xOffset
-        y = y - yOffset
         if side in self.sidesForFlipX:
-            x = self._xForMirroredSurface(x)
+            x = self._xForMirroredSurface(x + xOffset)
+        else:
+            x = x - xOffset
+        y = y - yOffset
+        
             
         clickedPoint = gobj.Point(x, y)
         return self.boardData.findComponentByCoords(clickedPoint, side)
@@ -703,8 +705,8 @@ class DrawBoardEngine:
             yDraw = (j * self.CHUNK_SIZE_PX) + yOffset
             
             if side in self.sidesForFlipX:
-                screenWidth = self.screenDimensions[0]
-                xDraw = screenWidth - xDraw - self.CHUNK_SIZE_PX
+                xDraw = self._xForMirroredSurface(xDraw)
+                xDraw -= self.CHUNK_SIZE_PX
             
             chunkSurface.set_colorkey(color)
             targetSurface.blit(chunkSurface, [xDraw, yDraw])
@@ -817,8 +819,7 @@ class DrawBoardEngine:
         return self.fontCache[size]
     
     def _xForMirroredSurface(self, x:float) -> float:
-        raise ValueError
-        surfaceWidth, _ = self.surfaceDimensions
+        surfaceWidth = self.screenDimensions[0]
         return surfaceWidth - x
     
     def _pinStringValue(self, pinName:str) -> int:
