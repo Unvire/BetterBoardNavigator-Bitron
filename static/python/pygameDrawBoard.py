@@ -9,7 +9,7 @@ class DrawBoardEngine:
     CHUNK_SIZE_PX = 512
     BONUS_SCALE_FACTOR = 1.05
     SCALE_BASE = 1.23
-    STEP_MAX = 10
+    STEP_MAX = 30
     STEP_MIN = -5
     DELTA_ROTATION_ANGLE_DEG = 5
     MIN_FONT_SIZE = 10
@@ -135,6 +135,11 @@ class DrawBoardEngine:
         return self._blitVisibleChunksIntoScreen(targetSurface, side)
     
     def scaleUpDownInterface(self, targetSurface:pygame.Surface, isScaleUp:bool, pointXY:list[int, int], side:str) -> pygame.Surface:
+        if side in self.sidesForFlipX:
+            x, y = pointXY
+            x = self._xForMirroredSurface(x)
+            pointXY = x, y
+
         if isScaleUp:
             isBlit = self._scaleUp(pointXY)
         else:
@@ -208,7 +213,7 @@ class DrawBoardEngine:
         return self.drawChunksAndBlitInterface(targetSurface, side)
 
     def showHideOutlinesInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
-        self.isShowOutlines = not self.isShowOutlines
+        self._showHideOutlines()
         return self.drawChunksAndBlitInterface(targetSurface, side)
 
     def showHideComponentNamesInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
@@ -294,18 +299,14 @@ class DrawBoardEngine:
         return True
     
     def _commonScalingOperations(self, zoomingPoint:tuple[int, int], previousStepValue:int):
-        # surface dimensions must be updated as a value from expotential formula
-        scaleFactor = self.SCALE_BASE ** self.scaleStep
-        self._updateSurfaceDimensions(scaleFactor)
-
-        # offset for zooming in place must be calculated based on current scale and previous scaling factor
-        previousScaleFactor = self.SCALE_BASE ** previousStepValue
-        newOffset = self._calculateOffsetVectorForScaledSurface(zoomingPoint, previousScaleFactor)
-        self._setOffsetVector(newOffset)
+        originBoardWidthHeight = self.boardData.getWidthHeight()
 
         # board is scaled by multiplication by a relative factor (self.SCALE_BASE or 1/self.SCALE_BASE)
         relativeScaleFactor = self.SCALE_BASE if (self.scaleStep - previousStepValue) > 0 else 1 / self.SCALE_BASE
         BoardWrapper.scaleBoardInPlace(self.boardData, relativeScaleFactor)
+        scaledBoardWidthHeight = self.boardData.getWidthHeight()
+
+        self._updateOffsetVectorForScaledSurface(zoomingPoint, originBoardWidthHeight, scaledBoardWidthHeight)
     
     def findComponentByClick(self, cursorXY:list[int, int], side:str) -> list[str]:
         x, y = cursorXY
@@ -317,7 +318,6 @@ class DrawBoardEngine:
             x = x - xOffset
         y = y - yOffset
         
-            
         clickedPoint = gobj.Point(x, y)
         return self.boardData.findComponentByCoords(clickedPoint, side)
     
@@ -394,15 +394,6 @@ class DrawBoardEngine:
     def _showHideComponentNames(self):
         self.isShowComponentNames = not self.isShowComponentNames
     
-    def _centerSurfaceInScreen(self):
-        raise ValueError
-        surfaceWidth, surfaceHeight = self.surfaceDimensions
-        screenWidth, screenHeight = self.screenDimensions        
-
-        xSurfaceOffset = (screenWidth - surfaceWidth) / 2
-        ySurfaceOffset = (screenHeight - surfaceHeight) / 2
-        self.offsetVector = [xSurfaceOffset, ySurfaceOffset]
-    
     def _centerBoard(self):
         screenWidth, screenHeight = self.screenDimensions
         boardWidth, boardHeight = self.boardData.getWidthHeight()
@@ -411,7 +402,8 @@ class DrawBoardEngine:
         yBoardOffset = (screenHeight - boardHeight) / 2
         self.offsetVector = [xBoardOffset, yBoardOffset]
     
-    def _calculateOffsetVectorForScaledSurface(self, zoomingPoint:tuple[int, int], previousScaleFactor:float):
+    def _updateOffsetVectorForScaledSurface(self, zoomingPoint:tuple[int, int], originSurfaceDimensions:tuple[int|float, int|float], 
+                                               scaledSurfaceDimensions:tuple[int|float, int|float]):
         def reverseSurfaceLinearTranslation(screenCoords:list[int, int], offset:list[int, int]) -> tuple[int, int]:
             xScreen, yScreen = screenCoords
             xMove, yMove = offset
@@ -431,19 +423,19 @@ class DrawBoardEngine:
             x, y = point
             xCursor, yCursor = cursorPosition
             return xCursor - x, yCursor - y
-        #####################################
-        raise ValueError
-        areaPoints = self.boardBaseRectangle.calculateArea()
-        surfaceBaseDimensions = Shape.getAreaWidthHeight(areaPoints)
-        originSurfaceDimensions = [val * previousScaleFactor for val in surfaceBaseDimensions]
+        ####################################
 
         pointMoveReversed = reverseSurfaceLinearTranslation(zoomingPoint, self.offsetVector)
         pointRelativeToSurface = calculatePointCoordsRelativeToSurfaceDimensions(pointMoveReversed, originSurfaceDimensions)
-        pointInScaledSurface = calcluatePointInScaledSurface(self.surfaceDimensions, pointRelativeToSurface)
-        resultOffset = translateScaledPointToCursorPosition(pointInScaledSurface, zoomingPoint)
-        return resultOffset
+        pointInScaledSurface = calcluatePointInScaledSurface(scaledSurfaceDimensions, pointRelativeToSurface)
+        xOffset, yOffset = translateScaledPointToCursorPosition(pointInScaledSurface, zoomingPoint)
+
+        self.offsetVector = [xOffset, yOffset]
+        
     
-    def _chunkifyBoard(self, side:str):   
+    def _chunkifyBoard(self, side:str):
+        self.surfaceChunks = {}
+
         width, height = self.boardData.getWidthHeight()
         rows = math.ceil(width / self.CHUNK_SIZE_PX)
         cols = math.ceil(height / self.CHUNK_SIZE_PX)
@@ -731,9 +723,6 @@ class DrawBoardEngine:
         jStart, jEnd = math.floor(screenTop / self.CHUNK_SIZE_PX), math.ceil(screenBottom / self.CHUNK_SIZE_PX)
         colRange = range(jStart, jEnd)
         return rowRange, colRange
-        
-    def _blitBoardSurfacesIntoTarget(self, targetSurface:pygame.Surface) -> pygame.Surface:
-        raise ValueError
     
 
     def _drawLine(self, surface:pygame.Surface, color:tuple[int, int, int], lineInstance:gobj.Line, chunkOffsetXY:tuple[int, int], width:int=1):
