@@ -6,6 +6,7 @@ from abstractShape import Shape
 import component as comp
 
 class DrawBoardEngine:
+    IS_DEBUG = False
     CHUNK_SIZE_PX = 768
     BONUS_SCALE_FACTOR = 1.05
     SCALE_BASE = 1.23
@@ -153,7 +154,8 @@ class DrawBoardEngine:
         return self.drawChunksAndBlitInterface(targetSurface, side)
     
     def rotateBoardInterface(self, targetSurface:pygame.Surface,  isClockwise:bool, side:str, angleDeg:float=None) -> pygame.Surface:
-        self._rotate(isClockwise, angleDeg)     
+        self._rotate(isClockwise, angleDeg)   
+        self._buildAreaCache() # area is normalized after rotation, so references must be updated
         return self.drawChunksAndBlitInterface(targetSurface, side)
     
     def findComponentByNameInterface(self, targetSurface:pygame.Surface, componentName:str, side:str) -> pygame.Surface:
@@ -444,6 +446,16 @@ class DrawBoardEngine:
             chunkSurface = self._drawChunk(side, coordsPx)
             self.surfaceChunks[(i, j)] = chunkSurface
 
+            if self.IS_DEBUG:
+                pygame.draw.rect(chunkSurface, (255, 0, 0), (0, 0, self.CHUNK_SIZE_PX, self.CHUNK_SIZE_PX), width=2)
+
+                debug_font = pygame.font.SysFont('Arial', 24)
+                id_text = f"[{i}, {j}]"
+                text_surf = debug_font.render(id_text, True, (255, 0, 0))
+                text_bg = pygame.Surface(text_surf.get_size(), pygame.SRCALPHA)
+                text_bg.fill((0, 0, 0, 150))
+                text_bg.blit(text_surf, (0, 0))
+                chunkSurface.blit(text_bg, (5, 5))
 
     def _drawBoard(self, side:str):         
         def drawSelectedNets(side:str):
@@ -479,9 +491,6 @@ class DrawBoardEngine:
            chunkSurface = pygame.transform.flip(chunkSurface, True, False)
         # add rendering text when above will work
 
-        ## DEBUG
-        pygame.draw.rect(chunkSurface, (255, 0, 0), (0, 0, self.CHUNK_SIZE_PX, self.CHUNK_SIZE_PX), width=2)
-        #pygame.image.save(chunkSurface, f"debug_chunk_{coords}.png")
         return chunkSurface
     
     def _drawOutlinesInChunk(self, chunkSurface:pygame.Surface, chunkCornersXYXY:tuple[int, int, int, int]) -> pygame.Surface:

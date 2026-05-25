@@ -13,13 +13,20 @@ class Board:
         self.mostCommonPrefix = ''
     
     def setArea(self, bottomLeftPoint:gobj.Point, topRightPoint:gobj.Point):
-        self.area = [bottomLeftPoint, topRightPoint]
-    
+        x0, y0 = bottomLeftPoint.getXY()
+        x1, y1 = topRightPoint.getXY()       
+
+        bottomRightPoint = gobj.Point(x1, y0)
+        topLeftPoint = gobj.Point(x0, y1)
+        self.area = [bottomLeftPoint, bottomRightPoint, topRightPoint, topLeftPoint]
+
     def getArea(self) -> list[gobj.Point]:
-        return self.area
+        bottomLeftPoint, topRightPoint = gobj.getDefaultBottomLeftTopRightPoints()
+        bottomLeftPoint, topRightPoint = gobj.updateBottomLeftTopRightPoints([bottomLeftPoint, topRightPoint], self.area)
+        return bottomLeftPoint, topRightPoint
 
     def getWidthHeight(self) -> list[float|int, float|int]:
-        xBL, yBL, xTR, yTR = Shape.getAreaAsXYXY(self.area)
+        xBL, yBL, xTR, yTR = Shape.getAreaAsXYXY(self.getArea())
         return abs(xTR - xBL), abs(yTR - yBL)
     
     def setOutlines(self, outlinesList:list[gobj.Point|gobj.Arc]):
@@ -96,18 +103,10 @@ class Board:
         '''
         components = [componentInstance for componentInstance in self.components.values()]
         objList = self.area + self.outlines + components
+
         for obj in objList:
             func = getattr(obj, functionName)
             func(*args)
-        
-        if functionName == 'rotateInPlace':
-            bottomLeftPoint, topRightPoint = self.normalizeArea(self.area)
-            self.setArea(bottomLeftPoint, topRightPoint)
-    
-    def normalizeArea(self, area:list[gobj.Point, gobj.Point]) -> list[gobj.Point, gobj.Point]:
-        bottomLeftPoint, topRightPoint = gobj.getDefaultBottomLeftTopRightPoints()
-        bottomLeftPoint, topRightPoint = gobj.updateBottomLeftTopRightPoints([bottomLeftPoint, topRightPoint], area)
-        return bottomLeftPoint, topRightPoint
     
     def findComponentByCoords(self, clickedPoint:gobj.Point, side:str) -> list[str]:
         result = []

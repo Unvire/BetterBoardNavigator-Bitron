@@ -92,6 +92,9 @@ class BoardWrapper():
             point.scaleInPlace(self.baseScale)
             point.translateInPlace(self.baseMoveOffsetXY)
 
+        bottomLeftPoint, topRightPoint = pointList
+        self.board.setArea(bottomLeftPoint, topRightPoint)
+
     def _resizeAndMoveShapes(self, shapesList:list):
         for shape in shapesList:
             shape.scaleInPlace(self.baseScale)   
