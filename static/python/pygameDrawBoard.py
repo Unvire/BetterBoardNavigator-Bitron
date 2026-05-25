@@ -976,7 +976,7 @@ if __name__ == '__main__':
                 
                 elif event.key == pygame.K_a:
                     prefix = input('Common type prefix: ')
-                    engine.showCommonTypeComponentsInterface(WIN, prefix, side)
+                    engine.showCommonTypeComponentsInterface(WIN, prefix, side) 
                 
                 elif event.key == pygame.K_s:
                     engine.clearCommonTypeComponentsInterface(WIN, side)
