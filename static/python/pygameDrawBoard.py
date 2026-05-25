@@ -36,7 +36,6 @@ class DrawBoardEngine:
             'selection rectangle': (158, 158, 158)
         }
         
-        self.surfaceDimensions = [self.CHUNK_SIZE_PX, self.CHUNK_SIZE_PX]
         self.boardBaseRectangle = None
         self.screenDimensions = [width, height]
 
@@ -125,7 +124,6 @@ class DrawBoardEngine:
         self.scaleStep = 0
         self.offsetVector = [0, 0]
         self.sidesForFlipX = {'T'}
-        self.surfaceDimensions = [self.CHUNK_SIZE_PX, self.CHUNK_SIZE_PX]
         self.boardBaseRectangle = None
         self.fontCache = {}
     
@@ -235,10 +233,6 @@ class DrawBoardEngine:
         bottomLeftPoint = gobj.Point(0, 0)
         topRightPoint = gobj.Point(baseWidth, baseHeight)
         self.boardBaseRectangle = gobj.Rectangle(bottomLeftPoint, topRightPoint)
-    
-    def _updateSurfaceDimensions(self, factor:float=1):
-        baseWidth, baseHeight = self._calculateBaseRectangleAreaWidthHeight()
-        self.surfaceDimensions = [baseWidth * factor, baseHeight * factor]
     
     def _calculateBaseRectangleAreaWidthHeight(self) -> tuple[float|int, float|int]:
         areaPoints = self.boardBaseRectangle.calculateArea()
@@ -388,6 +382,7 @@ class DrawBoardEngine:
         self.isShowComponentNames = not self.isShowComponentNames
     
     def _centerSurfaceInScreen(self):
+        raise ValueError
         surfaceWidth, surfaceHeight = self.surfaceDimensions
         screenWidth, screenHeight = self.screenDimensions        
 
@@ -424,7 +419,7 @@ class DrawBoardEngine:
             xCursor, yCursor = cursorPosition
             return xCursor - x, yCursor - y
         #####################################
-        
+        raise ValueError
         areaPoints = self.boardBaseRectangle.calculateArea()
         surfaceBaseDimensions = Shape.getAreaWidthHeight(areaPoints)
         originSurfaceDimensions = [val * previousScaleFactor for val in surfaceBaseDimensions]
@@ -443,8 +438,8 @@ class DrawBoardEngine:
         iRange, jRange = range(rows), range(cols)
         
         for i, j in itertools.product(iRange, jRange):
-            coords = i * self.CHUNK_SIZE_PX, j * self.CHUNK_SIZE_PX
-            chunkSurface = self._drawChunk(side, coords)
+            coordsPx = i * self.CHUNK_SIZE_PX, j * self.CHUNK_SIZE_PX
+            chunkSurface = self._drawChunk(side, coordsPx)
             self.surfaceChunks[(i, j)] = chunkSurface
 
 
@@ -468,10 +463,10 @@ class DrawBoardEngine:
         self._flipSurfaceXAxis(side)   
 
 
-    def _drawChunk(self, side:str, coords:tuple[int, int]) -> pygame.surface:
+    def _drawChunk(self, side:str, coordsPx:tuple[int, int]) -> pygame.surface:
         chunkSurface = self._getEmptySurfce()
 
-        chunkCornersXY =  self._calculateChunkBoundariesXYXY(coords)
+        chunkCornersXY =  self._calculateChunkBoundariesXYXY(coordsPx)
         chunkSurface = self._drawOutlinesInChunk(chunkSurface, chunkCornersXY)
         chunkSurface = self._drawComponentsInChunk(chunkSurface, chunkCornersXY, side)
         chunkSurface = self._drawCommonTypeComponentsInChunk(chunkSurface, chunkCornersXY, side)
@@ -700,19 +695,18 @@ class DrawBoardEngine:
         screenRight = screenLeft + screenWidth
         screenBottom = screenRight + screenHeight
 
-        iStart = int(screenLeft // self.CHUNK_SIZE_PX)
-        jStart = int(screenTop // self.CHUNK_SIZE_PX)
-        iEnd = int(screenRight // self.CHUNK_SIZE_PX)
-        jEnd = int(screenBottom // self.CHUNK_SIZE_PX)
-
+        iStart, iEnd = int(screenLeft // self.CHUNK_SIZE_PX), int(screenRight // self.CHUNK_SIZE_PX)
         rowRange = range(iStart, iEnd)
+
+        jStart, jEnd = int(screenTop // self.CHUNK_SIZE_PX), int(screenBottom // self.CHUNK_SIZE_PX)
         colRange = range(jStart, jEnd)
-        for i, j in itertools.product(rowRange, colRange):
-            chunkKey = i, j
+
+        for chunkKey in itertools.product(rowRange, colRange):
             if chunkKey not in self.surfaceChunks:
                 continue
-
             chunkSurface = self.surfaceChunks[chunkKey]
+
+            i, j = chunkKey
             xDraw = (i * self.CHUNK_SIZE_PX) + xOffset
             yDraw = (j * self.CHUNK_SIZE_PX) + yOffset
             
@@ -787,7 +781,8 @@ class DrawBoardEngine:
     
     def _getEmptySurfce(self) -> pygame.Surface:
         color = self.colorsDict['background']
-        surface = pygame.Surface(self.surfaceDimensions)
+        dimensions = [self.CHUNK_SIZE_PX, self.CHUNK_SIZE_PX]
+        surface = pygame.Surface(dimensions)
         surface.fill(color)
         return surface
     
@@ -811,6 +806,7 @@ class DrawBoardEngine:
         return self.fontCache[size]
     
     def _xForMirroredSurface(self, x:float) -> float:
+        raise ValueError
         surfaceWidth, _ = self.surfaceDimensions
         return surfaceWidth - x
     
