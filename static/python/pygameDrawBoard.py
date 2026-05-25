@@ -141,19 +141,19 @@ class DrawBoardEngine:
             isBlit = self._scaleDown(pointXY)
 
         if isBlit:
-            targetSurface = self.drawAndBlitInterface(targetSurface, side)
+            targetSurface = self.drawChunksAndBlitInterface(targetSurface, side)
         return targetSurface
     
     def changeSideInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
-        return self.drawAndBlitInterface(targetSurface, side)
+        return self.drawChunksAndBlitInterface(targetSurface, side)
     
     def rotateBoardInterface(self, targetSurface:pygame.Surface,  isClockwise:bool, side:str, angleDeg:float=None) -> pygame.Surface:
         self._rotate(isClockwise, angleDeg)     
-        return self.drawAndBlitInterface(targetSurface, side)
+        return self.drawChunksAndBlitInterface(targetSurface, side)
     
     def findComponentByNameInterface(self, targetSurface:pygame.Surface, componentName:str, side:str) -> pygame.Surface:
         self._findComponentByName(componentName)
-        return self.drawAndBlitInterface(targetSurface, side)
+        return self.drawChunksAndBlitInterface(targetSurface, side)
     
     def componentInScreenCenterInterface(self, targetSurface:pygame.Surface, componentName:str, side:str) -> pygame.Surface:
         componentInstance = self.boardData.getElementByName('components', componentName)
@@ -161,65 +161,65 @@ class DrawBoardEngine:
             componentSide  = componentInstance.getSide()
             if componentSide == side:
                 self._setComponentInScreenCenter(componentInstance, side)
-            return self.drawAndBlitInterface(targetSurface, side)
+            return self.drawChunksAndBlitInterface(targetSurface, side)
     
     def clearFindComponentByNameInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
         self._unselectComponents()
-        return self.drawAndBlitInterface(targetSurface, side)
+        return self.drawChunksAndBlitInterface(targetSurface, side)
     
     def selectNetByNameInterface(self, targetSurface:pygame.Surface, netName:str, side:str) -> pygame.Surface:
         if netName:
             self._selectNet(netName)
         else:
             self._unselectNet()
-        return self.drawAndBlitInterface(targetSurface, side)
+        return self.drawChunksAndBlitInterface(targetSurface, side)
     
     def selectNetComponentByNameInterface(self, targetSurface:pygame.Surface, componentName:str, side:str) -> pygame.Surface:
         self._selectNetComponentByName(componentName)
-        return self.drawAndBlitInterface(targetSurface, side)
+        return self.drawChunksAndBlitInterface(targetSurface, side)
     
     def unselectNetInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
         self._unselectNet()
-        return self.drawAndBlitInterface(targetSurface, side)
+        return self.drawChunksAndBlitInterface(targetSurface, side)
     
     def showCommonTypeComponentsInterface(self, targetSurface:pygame.Surface, prefix:str, side:str) -> pygame.Surface:
         self._selectCommonTypeComponents(side, prefix)
-        return self.drawAndBlitInterface(targetSurface, side)
+        return self.drawChunksAndBlitInterface(targetSurface, side)
     
     def clearCommonTypeComponentsInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
         self._unselectCommonTypeComponents()
-        return self.drawAndBlitInterface(targetSurface, side)
+        return self.drawChunksAndBlitInterface(targetSurface, side)
     
     def flipUnflipCurrentSideInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
         self._flipUnflipCurrentSide(side)
-        return self.drawAndBlitInterface(targetSurface, side)
+        return self.drawChunksAndBlitInterface(targetSurface, side)
     
     def useComponentAreaInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
         BoardWrapper.useAreaFromComponentsInPlace(self.boardData)
         boardDataNormalized = self._getNormalizedBoard(self.screenDimensions, self.boardData)
         self.setBoardData(boardDataNormalized, isMakeBackup=False)
-        return self.drawAndBlitInterface(targetSurface, side)
+        return self.drawChunksAndBlitInterface(targetSurface, side)
     
     def resetToDefaultViewInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
         self.boardData = copy.deepcopy(self.boardDataBackup)
         self.setBoardData(self.boardData)
-        return self.drawAndBlitInterface(targetSurface, side)
+        return self.drawChunksAndBlitInterface(targetSurface, side)
 
     def showHideOutlinesInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
-        self._showHideOutlines()
-        return self.drawAndBlitInterface(targetSurface, side)
+        self.isShowOutlines = not self.isShowOutlines
+        return self.drawChunksAndBlitInterface(targetSurface, side)
 
     def showHideComponentNamesInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
         self._showHideComponentNames()
-        return self.drawAndBlitInterface(targetSurface, side)
+        return self.drawChunksAndBlitInterface(targetSurface, side)
 
     def changeScreenDimensionsInterface(self, targetSurface:pygame.Surface, dimensions:tuple[int, int], side:str) -> pygame.Surface:
         self.screenDimensions = dimensions[:]
         boardDataNormalized = self._getNormalizedBoard(dimensions, self.boardData)
         self.setBoardData(boardDataNormalized, isMakeBackup=True)
-        return self.drawAndBlitInterface(targetSurface, side)
+        return self.drawChunksAndBlitInterface(targetSurface, side)
 
-    def drawAndBlitInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
+    def drawChunksAndBlitInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
         self._chunkifyBoard(side)
         return self._blitVisibleChunksIntoScreen(targetSurface, side)
 
@@ -885,7 +885,7 @@ if __name__ == '__main__':
     print('Components: ', engine.getComponents())
     print('Nets: ', engine.getNets())
 
-    engine.drawAndBlitInterface(WIN, side)
+    engine.drawChunksAndBlitInterface(WIN, side)
     print('====================================')
     print('Pygame draw PCB engine')
     print('Move - mouse dragging')
