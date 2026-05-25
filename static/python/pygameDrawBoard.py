@@ -157,11 +157,13 @@ class DrawBoardEngine:
     
     def componentInScreenCenterInterface(self, targetSurface:pygame.Surface, componentName:str, side:str) -> pygame.Surface:
         componentInstance = self.boardData.getElementByName('components', componentName)
-        if componentInstance:
-            componentSide  = componentInstance.getSide()
-            if componentSide == side:
-                self._setComponentInScreenCenter(componentInstance, side)
-            return self.drawChunksAndBlitInterface(targetSurface, side)
+        if not componentInstance:
+            return targetSurface
+        
+        componentSide  = componentInstance.getSide()
+        if componentSide == side:
+            self._setComponentInScreenCenter(componentInstance, side)
+        return self.drawChunksAndBlitInterface(targetSurface, side)
     
     def clearFindComponentByNameInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
         self._unselectComponents()
@@ -245,7 +247,10 @@ class DrawBoardEngine:
     def _updateOffsetVector(self, relativeVector:tuple[int, int], side:str):
         xMove, yMove = self.offsetVector
         dx, dy = relativeVector
-        dx = -dx if side in self.sidesForFlipX else dx
+
+        if side in self.sidesForFlipX:
+            dx *= -1
+
         self.offsetVector = [xMove + dx, yMove + dy]
     
     def _rotate(self, isClockwise:bool, angleDeg:float=None):
@@ -340,11 +345,16 @@ class DrawBoardEngine:
         xComp, yComp = coords.getXY()
         xScreen, yScreen = self.screenDimensions
 
+        
         if side in self.sidesForFlipX:
             xComp = self._xForMirroredSurface(xComp)
-        x = xScreen / 2 - xComp
-        y = yScreen / 2 - yComp
 
+        y = yScreen / 2 - yComp
+        x = xScreen / 2 - xComp
+
+        if side in self.sidesForFlipX:
+            x *= -1
+            
         self._setOffsetVector([x, y])
     
     def _selectNet(self, netName:str):
@@ -463,7 +473,6 @@ class DrawBoardEngine:
         raise ValueError        
         drawSelectedNets(side)
         renderText(side)
-        self._flipSurfaceXAxis(side)   
 
 
     def _drawChunk(self, side:str, coordsPx:tuple[int, int]) -> pygame.surface:
@@ -672,13 +681,6 @@ class DrawBoardEngine:
                 x = self._xForMirroredSurface(x)
             textRect = renderedText.get_rect(center=(x, y))
             surface.blit(renderedText, textRect)
-    
-    def _flipSurfaceXAxis(self, side:str):   
-        if side in self.sidesForFlipX:  
-            self.boardLayer = pygame.transform.flip(self.boardLayer, True, False)
-            self.selectedComponentsSurface = pygame.transform.flip(self.selectedComponentsSurface, True, False)
-            self.selectedNetSurface = pygame.transform.flip(self.selectedNetSurface, True, False)
-            self.commonTypeComponentsSurface = pygame.transform.flip(self.commonTypeComponentsSurface, True, False)
     
     def _drawInstanceAsCirlceOrPolygon(self, surface:pygame.Surface, instance: pin.Pin|comp.Component, color:tuple[int, int, int], 
                                             chunkOffsetXY:tuple[int, int], width:int=1):
@@ -976,7 +978,7 @@ if __name__ == '__main__':
                 
                 elif event.key == pygame.K_a:
                     prefix = input('Common type prefix: ')
-                    engine.showCommonTypeComponentsInterface(WIN, prefix, side) 
+                    engine.showCommonTypeComponentsInterface(WIN, prefix, side)
                 
                 elif event.key == pygame.K_s:
                     engine.clearCommonTypeComponentsInterface(WIN, side)
