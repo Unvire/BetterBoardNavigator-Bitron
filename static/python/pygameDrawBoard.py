@@ -567,9 +567,11 @@ class DrawBoardEngine:
         xChunkOffset, yChunkOffset, *_ = chunkCornersXYXY
         chunkOffsetXY = [xChunkOffset, yChunkOffset]
         for componentName in self.selectedNet:
-            componentArea = self.areaCache[side][componentName]
+            componentArea = self.areaCache[side].get(componentName, None)
+            if not componentArea:
+                continue
+            
             areaCornersXYXY = Shape.getAreaAsXYXY(componentArea)
-
             if self._is2AreasOverlap(chunkCornersXYXY, areaCornersXYXY):
                 componentsToDraw.append(componentName)
 
@@ -592,7 +594,7 @@ class DrawBoardEngine:
                 componentsToDraw.append(componentName)
 
         color = self.colorsDict['selected net marker']
-        self._drawMarkers(surface=self.selectedNetSurface, componentNamesList=componentsToDraw, color=color, side=side, chunkOffsetXY=chunkOffsetXY)
+        self._drawMarkers(surface=chunkSurface, componentNamesList=componentsToDraw, color=color, side=side, chunkOffsetXY=chunkOffsetXY)
         return chunkSurface
 
 
