@@ -6,10 +6,10 @@ from abstractShape import Shape
 import component as comp
 
 class DrawBoardEngine:
-    CHUNK_SIZE_PX = 512
+    CHUNK_SIZE_PX = 768
     BONUS_SCALE_FACTOR = 1.05
     SCALE_BASE = 1.23
-    STEP_MAX = 30
+    STEP_MAX = 15
     STEP_MIN = -5
     DELTA_ROTATION_ANGLE_DEG = 5
     MIN_FONT_SIZE = 10
@@ -715,7 +715,7 @@ class DrawBoardEngine:
         screenLeft = -xOffset
         screenTop = -yOffset
         screenRight = screenLeft + screenWidth
-        screenBottom = screenRight + screenHeight
+        screenBottom = screenTop + screenHeight
 
         iStart, iEnd = math.floor(screenLeft / self.CHUNK_SIZE_PX), math.ceil(screenRight / self.CHUNK_SIZE_PX)
         rowRange = range(iStart, iEnd)
