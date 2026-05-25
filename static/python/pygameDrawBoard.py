@@ -396,11 +396,11 @@ class DrawBoardEngine:
         self.offsetVector = [xSurfaceOffset, ySurfaceOffset]
     
     def _centerBoard(self):
-        surfaceWidth, surfaceHeight = self.surfaceDimensions
+        screenWidth, screenHeight = self.screenDimensions
         boardWidth, boardHeight = self.boardData.getWidthHeight()
 
-        xBoardOffset = (surfaceWidth - boardWidth) / 2
-        yBoardOffset = (surfaceHeight - boardHeight) / 2
+        xBoardOffset = (screenWidth - boardWidth) / 2
+        yBoardOffset = (screenHeight - boardHeight) / 2
         self.offsetVector = [xBoardOffset, yBoardOffset]
     
     def _calculateOffsetVectorForScaledSurface(self, zoomingPoint:tuple[int, int], previousScaleFactor:float):
