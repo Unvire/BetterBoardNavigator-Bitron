@@ -221,7 +221,7 @@ class DrawBoardEngine:
 
     def drawAndBlitInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
         self._chunkifyBoard(side)
-        return self._blitVisibleChunksIntoScreen(targetSurface)
+        return self._blitVisibleChunksIntoScreen(targetSurface, side)
 
     def _getNormalizedBoard(self, surfaceDimensions:tuple[int, int], boardInstance:board.Board) -> board.Board:
         width, height = surfaceDimensions
@@ -473,6 +473,9 @@ class DrawBoardEngine:
         chunkSurface = self._drawMarkersInChunk(chunkSurface, chunkCornersXY, side)
         chunkSurface = self._drawSelectedNetPadsInChunk(chunkSurface, chunkCornersXY, side)
         chunkSurface = self._drawSelectedNetComponentsInChunk(chunkSurface, chunkCornersXY, side)
+
+        if side in self.sidesForFlipX:
+           chunkSurface = pygame.transform.flip(chunkSurface, True, False)
         # add rendering text when above will work
 
         ## DEBUG
@@ -683,12 +686,33 @@ class DrawBoardEngine:
             pointsList = instance.getShapePoints()
             self._drawPolygon(surface, color, pointsList, chunkOffsetXY, width)
     
-    def _blitVisibleChunksIntoScreen(self, targetSurface:pygame.Surface) -> pygame.Surface:
+    def _blitVisibleChunksIntoScreen(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
         color = self.colorsDict['background']
         targetSurface.fill(color)
-
-        screenWidth, screenHeight = self.screenDimensions
+        
+        rowRange, colRange = self._calculateVisibleChunkRowAndColRanges(self.screenDimensions, self.offsetVector)
         xOffset, yOffset = self.offsetVector
+        for chunkKey in itertools.product(rowRange, colRange):      
+            if chunkKey not in self.surfaceChunks:
+                continue
+            chunkSurface = self.surfaceChunks[chunkKey]
+
+            i, j = chunkKey
+            xDraw = (i * self.CHUNK_SIZE_PX) + xOffset
+            yDraw = (j * self.CHUNK_SIZE_PX) + yOffset
+            
+            if side in self.sidesForFlipX:
+                screenWidth = self.screenDimensions[0]
+                xDraw = screenWidth - xDraw - self.CHUNK_SIZE_PX
+            
+            chunkSurface.set_colorkey(color)
+            targetSurface.blit(chunkSurface, [xDraw, yDraw])
+            
+        return targetSurface
+
+    def _calculateVisibleChunkRowAndColRanges(self, screenDimensions:tuple[int, int], currentOffset:tuple[int, int]) -> tuple[range, range]:
+        screenWidth, screenHeight = screenDimensions
+        xOffset, yOffset = currentOffset
 
         screenLeft = -xOffset
         screenTop = -yOffset
@@ -700,20 +724,7 @@ class DrawBoardEngine:
 
         jStart, jEnd = int(screenTop // self.CHUNK_SIZE_PX), int(screenBottom // self.CHUNK_SIZE_PX)
         colRange = range(jStart, jEnd)
-
-        for chunkKey in itertools.product(rowRange, colRange):
-            if chunkKey not in self.surfaceChunks:
-                continue
-            chunkSurface = self.surfaceChunks[chunkKey]
-
-            i, j = chunkKey
-            xDraw = (i * self.CHUNK_SIZE_PX) + xOffset
-            yDraw = (j * self.CHUNK_SIZE_PX) + yOffset
-            
-            chunkSurface.set_colorkey(color)
-            targetSurface.blit(chunkSurface, [xDraw, yDraw])
-            
-        return targetSurface
+        return rowRange, colRange
         
     def _blitBoardSurfacesIntoTarget(self, targetSurface:pygame.Surface) -> pygame.Surface:
         raise ValueError
