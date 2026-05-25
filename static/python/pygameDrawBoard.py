@@ -7,7 +7,7 @@ import component as comp
 
 class DrawBoardEngine:
     IS_DEBUG = False
-    CHUNK_SIZE_PX = 768
+    CHUNK_SIZE_PX = 512
     BONUS_SCALE_FACTOR = 1.05
     SCALE_BASE = 1.23
     STEP_MAX = 15
@@ -450,31 +450,12 @@ class DrawBoardEngine:
                 pygame.draw.rect(chunkSurface, (255, 0, 0), (0, 0, self.CHUNK_SIZE_PX, self.CHUNK_SIZE_PX), width=2)
 
                 debug_font = pygame.font.SysFont('Arial', 24)
-                id_text = f"[{i}, {j}]"
+                id_text = f'[{i}, {j}]'
                 text_surf = debug_font.render(id_text, True, (255, 0, 0))
                 text_bg = pygame.Surface(text_surf.get_size(), pygame.SRCALPHA)
                 text_bg.fill((0, 0, 0, 150))
                 text_bg.blit(text_surf, (0, 0))
                 chunkSurface.blit(text_bg, (5, 5))
-
-    def _drawBoard(self, side:str):         
-        def drawSelectedNets(side:str):
-            componentNames = list(self.selectedNetComponentSet)
-            color = self.colorsDict['selected net marker']
-            self._drawSelectedPins(surface=self.selectedNetSurface, color=color, side=side)
-            self._drawMarkers(surface=self.selectedNetSurface, componentNamesList=componentNames, color=color, side=side)
-        
-        def renderText(side:str):
-            if self.isShowComponentNames:
-                color = self.colorsDict['outlines']
-                sideComponents = self.boardData.getSideGroupedComponents()[side]
-                isFlipX = side in self.sidesForFlipX
-                self._renderComponentNames(surface=self.fontSurface, sideComponents=sideComponents, color=color, isFlipX=isFlipX)
-        
-        raise ValueError        
-        drawSelectedNets(side)
-        renderText(side)
-
 
     def _drawChunk(self, side:str, coordsPx:tuple[int, int]) -> pygame.surface:
         chunkSurface = self._getEmptySurfce()
@@ -486,9 +467,11 @@ class DrawBoardEngine:
         chunkSurface = self._drawMarkersInChunk(chunkSurface, chunkCornersXY, side)
         chunkSurface = self._drawSelectedNetPadsInChunk(chunkSurface, chunkCornersXY, side)
         chunkSurface = self._drawSelectedNetComponentsInChunk(chunkSurface, chunkCornersXY, side)
-
+    
         if side in self.sidesForFlipX:
            chunkSurface = pygame.transform.flip(chunkSurface, True, False)
+        
+        chunkSurface = self._drawComponentNamesInChunk(chunkSurface, chunkCornersXY, side)
         # add rendering text when above will work
 
         return chunkSurface
@@ -594,6 +577,23 @@ class DrawBoardEngine:
         color = self.colorsDict['selected net marker']
         self._drawMarkers(surface=chunkSurface, componentNamesList=componentsToDraw, color=color, side=side, chunkOffsetXY=chunkOffsetXY)
         return chunkSurface
+    
+    def _drawComponentNamesInChunk(self, chunkSurface:pygame.Surface, chunkCornersXYXY:tuple[int, int, int, int], side:str) -> pygame.Surface:
+        if not self.isShowComponentNames:
+            return chunkSurface
+        
+        componentsToName = []
+        xChunkOffset, yChunkOffset, *_ = chunkCornersXYXY
+        chunkOffsetXY = [xChunkOffset, yChunkOffset]
+        for componentName, componentArea in self.areaCache[side].items():
+            componentArea = self.areaCache[side][componentName]
+            areaCornersXYXY = Shape.getAreaAsXYXY(componentArea)
+
+            if self._is2AreasOverlap(chunkCornersXYXY, areaCornersXYXY):
+                componentsToName.append(componentName)
+        
+        self._renderComponentNames(surface=chunkSurface, sideComponents=componentsToName, chunkOffsetXY=chunkOffsetXY, side=side)
+        return chunkSurface
 
 
     def _calculateChunkBoundariesXYXY(self, chunkCoords:tuple[int, int]) -> tuple[int, int, int, int]:
@@ -657,10 +657,11 @@ class DrawBoardEngine:
         for _, pinInstance in pinsDict.items():
             self._drawInstanceAsCirlceOrPolygon(surface, pinInstance, color, chunkOffsetXY, width)
     
-    def _renderComponentNames(self, surface:pygame.Surface, sideComponents:list[str], color:tuple[int, int, int], isFlipX:bool):
+    def _renderComponentNames(self, surface:pygame.Surface, sideComponents:list[str], chunkOffsetXY:tuple[int, int], side:str):
         MIN_COMPONENT_SIZE_PX = 10
         EXAMPLE_FONT_SIZE = 10
 
+        color = self.colorsDict['outlines']
         for componentName in sideComponents:
             componentInstance = self.boardData.getElementByName('components', componentName)
             area = componentInstance.getArea()
@@ -677,8 +678,12 @@ class DrawBoardEngine:
 
             centerPoint = componentInstance.getCoords()
             x, y = centerPoint.getXY()
-            if isFlipX:
-                x = self._xForMirroredSurface(x)
+            xOffset, yOffset = chunkOffsetXY
+
+            x -= xOffset
+            y -= yOffset
+            if side in self.sidesForFlipX:
+                x = self.CHUNK_SIZE_PX - x
             textRect = renderedText.get_rect(center=(x, y))
             surface.blit(renderedText, textRect)
     
