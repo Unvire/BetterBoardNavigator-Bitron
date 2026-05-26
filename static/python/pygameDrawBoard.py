@@ -146,6 +146,7 @@ class DrawBoardEngine:
         self.sidesForFlipX = {'T'}
         self.boardBaseRectangle = None
         self.fontCache = {}
+        self.isShowComponentNames = False
 
     def _buildAreaCache(self):
         self.areaCache = {}
@@ -500,8 +501,6 @@ class DrawBoardEngine:
             if chunkKey not in self.surfaceChunks:
                 continue
 
-            xDraw, yDraw = self._calculateChunkDrawingOffset(chunkKey)
-
             surfaceDataDict = self.surfaceChunks[chunkKey]
             if 'chunkSurface' in surfaceDataDict:
                 chunkSurface = surfaceDataDict['chunkSurface']
@@ -512,7 +511,7 @@ class DrawBoardEngine:
             chunkSurface = self._blitDebugData(chunkSurface, chunkKey)
             
             chunkSurface.set_colorkey(color)
-            xDraw, yDraw = self._calculateChunkDrawingOffset(chunkKey)
+            xDraw, yDraw = self._calculateChunkDrawingOffset(chunkKey, side)
             targetSurface.blit(chunkSurface, [xDraw, yDraw])
         return targetSurface        
 
@@ -605,7 +604,7 @@ class DrawBoardEngine:
         chunkSurface.blit(textBackground, (5, 5))
         return chunkSurface
     
-    def _calculateChunkDrawingOffset(self, chunkCoords:tuple[int, int]) -> tuple[float, float]:
+    def _calculateChunkDrawingOffset(self, chunkCoords:tuple[int, int], side:str) -> tuple[float, float]:
         i, j = chunkCoords
         xOffset, yOffset = self.offsetVector
 

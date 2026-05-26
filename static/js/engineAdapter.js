@@ -38,11 +38,14 @@ class EngineAdapter{
         return pyodide.globals.get("clickedComponents").toJs();
     }
 
-    static moveBoard(x, y){
+    static moveBoard(x, y){        
+        const sideHandler = globalInstancesMap.sideHandler;
+
+        const side = sideHandler.currentSide();
         pyodide.runPythonAsync(`
             if engine:
                 deltaVector = [int("${x}"), int("${y}")]
-                engine.moveBoardInterface(SURFACE, deltaVector)
+                engine.moveBoardInterface(SURFACE, deltaVector, "${side}")
                 pygame.display.flip()
         `);
     }

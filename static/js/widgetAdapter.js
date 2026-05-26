@@ -3,6 +3,9 @@ class WidgetAdapter{
         WidgetAdapter.resetSelectedComponentsWidgets();
         TreeViewAdapter.resetTreeview();
         WidgetAdapter.resetSpans();
+
+        const toggleComponentNamesButton = globalInstancesMap.toggleComponentNamesButton;
+        EventHandler.forcedUntoggleButton(toggleComponentNamesButton);
     }
 
     static resetSelectedComponentsWidgets(){

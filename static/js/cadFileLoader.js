@@ -36,10 +36,10 @@ class CadFileLoader{
                 allComponents = engine.getComponents()
                 netsDict = engine.getNets()
 
-                engine.drawAndBlitInterface(SURFACE, "${side}")
+                engine.drawChunksAndBlitInterface(SURFACE, "${side}")
                 pygame.display.flip()
 
-                mostCommonPrefix = engine.getMostCommonPrefixInterface()
+                mostCommonPrefix = engine.getMostCommonPrefix()
             `);
             const allComponents = pyodide.globals.get("allComponents").toJs();
             DynamicSelectableListAdapter.generateList(globalInstancesMap.allComponentsList, allComponents, DynamicSelectableListAdapter.selectItemFromListEvent, "single");

@@ -93,7 +93,7 @@ class EventHandler{
         globalInstancesMap.rotateButton.disabled = false;
         globalInstancesMap.mirrorSideButton.disabled = false;
         globalInstancesMap.toggleOutlinesButton.disabled = false;
-        globalInstancesMap.toggleCompponentNamesButton.disabled = false;
+        globalInstancesMap.toggleComponentNamesButton.disabled = false;
         globalInstancesMap.resetViewButton.disabled = false;
         globalInstancesMap.areaFromComponentsButton.disabled = false;
         globalInstancesMap.preserveComponentMarkersButton.disabled = false;
@@ -117,7 +117,7 @@ class EventHandler{
     }
 
     static toggleComponentNames(){
-        const toggleComponentNamesButton = globalInstancesMap.toggleCompponentNamesButton;
+        const toggleComponentNamesButton = globalInstancesMap.toggleComponentNamesButton;
 
         EngineAdapter.toggleComponentNames();
         EventHandler.toggleButton(toggleComponentNamesButton);
