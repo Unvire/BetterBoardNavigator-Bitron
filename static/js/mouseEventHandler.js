@@ -3,14 +3,14 @@ class MouseEventHandler{
         isMousePressed = false;
     }
 
-    static mouseDownEvent(event){
+    static async mouseDownEvent(event){
         isMousePressed = true;
         isMouseClickedFirstTime = true;
             
         const x = event.offsetX; 
         const y = event.offsetY;
         
-        let clickedComponents = EngineAdapter.findClickedComponents(x, y, isSelectionModeSingle);
+        let clickedComponents = await EngineAdapter.findClickedComponents(x, y, isSelectionModeSingle);
         SpanListAdapter.generateSpanList(clickedComponents);
     }
 
@@ -19,7 +19,7 @@ class MouseEventHandler{
             if (!isMouseClickedFirstTime){
                 const x = event.movementX; 
                 const y = event.movementY;
-                EngineAdapter.moveBoard(x, y);
+                await EngineAdapter.moveBoard(x, y);
             } else {
                 isMouseClickedFirstTime = false;
             }

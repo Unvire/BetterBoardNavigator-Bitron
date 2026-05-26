@@ -16,7 +16,7 @@ async function main(){
         _initWidgetClasses();
         _bindIframeResponseEvent();
         _bindMouseAndKeyboardEvents();
-        _bindLoadFilesEvents();
+        await _bindLoadFilesEvents();
         _bindOnClickEvents();
     });
 }
@@ -274,7 +274,7 @@ function _bindLoadFilesEvents(){
     globalInstancesMap.loadFilesButton.addEventListener("click", () => {
             globalInstancesMap.loadFilesInput.click();
     });
-    globalInstancesMap.loadFilesInput.addEventListener("change", (event) => {
+    globalInstancesMap.loadFilesInput.addEventListener("change", async (event) => {
         const files = [...event.target.files];
 
         const cadFile = files.find(f =>
@@ -294,9 +294,9 @@ function _bindLoadFilesEvents(){
             return;
         }
 
-        EventHandler.loadCadFile(cadFile);
+        await EventHandler.loadCadFile(cadFile);
         if (pdfFile) {
-            EventHandler.loadPdfFile(pdfFile);
+            await EventHandler.loadPdfFile(pdfFile);
         }
     });
 }

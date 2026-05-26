@@ -3,12 +3,12 @@ class WidgetAdapter{
         WidgetAdapter.resetSelectedComponentsWidgets();
         TreeViewAdapter.resetTreeview();
         WidgetAdapter.resetSpans();
-
+        
         const toggleComponentNamesButton = globalInstancesMap.toggleComponentNamesButton;
         EventHandler.forcedUntoggleButton(toggleComponentNamesButton);
     }
 
-    static resetSelectedComponentsWidgets(){
+    static async resetSelectedComponentsWidgets(){
         const allComponentsList = globalInstancesMap.allComponentsList;
         const pinoutTable = globalInstancesMap.pinoutTable;
         const clickedComponentSpanList = globalInstancesMap.clickedComponentSpanList;
@@ -16,7 +16,7 @@ class WidgetAdapter{
         const preserveComponentMarkersButton = globalInstancesMap.preserveComponentMarkersButton;
         
         allComponentsList.unselectAllItems();
-        EngineAdapter.clearMarkers();
+        await EngineAdapter.clearMarkers();
 
         // change selection mode to single component
         if (!isSelectionModeSingle){
@@ -100,7 +100,7 @@ class DynamicSelectableListAdapter{
         listInstance.clearList();
     }
 
-    static selectItemFromListEvent(itemElement){
+    static async selectItemFromListEvent(itemElement){
         const itemName = DynamicSelectableListAdapter.generatePinoutTableForComponent(itemElement);
 
         const markedComponentsList = globalInstancesMap.markedComponentsList;
@@ -108,15 +108,15 @@ class DynamicSelectableListAdapter{
             return;
         }
 
-        EngineAdapter.findComponentByName(itemName);
-        EngineAdapter.componentInScreenCenter(itemName);
+        await EngineAdapter.findComponentByName(itemName);
+        await EngineAdapter.componentInScreenCenter(itemName);
         DynamicSelectableListAdapter.generateMarkedComponentsList();
         PartNumberSpanAdapter.displayPartNumberOfComponent(itemName);
     }
 
-    static onClickItemEvent(itemElement){
+    static async onClickItemEvent(itemElement){
         const itemName = DynamicSelectableListAdapter.generatePinoutTableForComponent(itemElement);
-        EngineAdapter.componentInScreenCenter(itemName);
+        await EngineAdapter.componentInScreenCenter(itemName);
         PartNumberSpanAdapter.displayPartNumberOfComponent(itemName);
     }
 
@@ -126,10 +126,10 @@ class DynamicSelectableListAdapter{
         return itemName;
     }
 
-    static generateMarkedComponentsList(){
+    static async generateMarkedComponentsList(){
         const markedComponentsList = globalInstancesMap.markedComponentsList;
 
-        pyodide.runPython(`
+        await pyodide.runPythonAsync(`
             componentsList = engine.getSelectedComponents()
         `);
         const componentsList = pyodide.globals.get("componentsList").toJs();
@@ -137,11 +137,11 @@ class DynamicSelectableListAdapter{
         markedComponentsList.onCloseIconClick = DynamicSelectableListAdapter.unselectComponentAndRemoveItemFromList;
     }
 
-    static unselectComponentAndRemoveItemFromList(componentName){
+    static async unselectComponentAndRemoveItemFromList(componentName){
         if (isSelectionModeSingle) {
-            EngineAdapter.clearMarkers();
+            await EngineAdapter.clearMarkers();
         } else {
-            EngineAdapter.findComponentByName(componentName);
+            await EngineAdapter.findComponentByName(componentName);
         }        
         DynamicSelectableListAdapter.generateMarkedComponentsList();
 
@@ -158,8 +158,8 @@ class PinoutTableAdapter{
         return table;
     }
 
-    static generatePinoutTable(componentName){
-        pyodide.runPython(`
+    static async generatePinoutTable(componentName){
+        await pyodide.runPythonAsync(`
             pinoutDict = engine.getComponentPinout("${componentName}")
         `);
         let pinoutMap = pyodide.globals.get("pinoutDict").toJs();
@@ -178,14 +178,14 @@ class PinoutTableAdapter{
         selectedComponentSpan.innerText = `${componentName}\n`;
     }
 
-    static selectNetFromTableEvent(netName){
+    static async selectNetFromTableEvent(netName){
         const netsTreeview = globalInstancesMap.netsTreeview;
         const pinoutTable = globalInstancesMap.pinoutTable;
         const selectedRowsList = pinoutTable.getSelectedRows();
 
         netsTreeview.scrollToBranchByName(netName);
         if(selectedRowsList.length > 0){
-            EngineAdapter.selectNet(netName);
+            await EngineAdapter.selectNet(netName);
         }
     }
 
@@ -214,19 +214,19 @@ class TreeViewAdapter{
         netsTreeview.generate();
     }
     
-    static selectNetFromTreeviewEvent(netName){
+    static async selectNetFromTreeviewEvent(netName){
         const netsTreeview = globalInstancesMap.netsTreeview;
         const pinoutTable = globalInstancesMap.pinoutTable;
 
         pinoutTable.selectRowByName(netName);    
 
         if(netsTreeview.getSelectedNet()){
-            EngineAdapter.selectNet(netName);
+            await EngineAdapter.selectNet(netName);
         }
     }
 
-    static selectNetComponentByName(componentName){
-        EngineAdapter.selectNetComponentByName(componentName);
+    static async selectNetComponentByName(componentName){
+        await EngineAdapter.selectNetComponentByName(componentName);
         PartNumberSpanAdapter.displayPartNumberOfComponent(componentName);
     }
 
@@ -247,9 +247,9 @@ class InputModalBoxAdapter{
         modalboxInstance.show();
     }
 
-    static getComponentNameFromInput(componentName){
+    static async getComponentNameFromInput(componentName){
         const modalBoxComponentName = componentName.toUpperCase();
-        const isComponentExist = EngineAdapter.findComponentByName(modalBoxComponentName);
+        const isComponentExist = await EngineAdapter.findComponentByName(modalBoxComponentName);
 
         if (!isComponentExist){ 
             return;
@@ -268,16 +268,16 @@ class InputModalBoxAdapter{
         }
         allComponentsList.selectItemByName(modalBoxComponentName);
 
-        EngineAdapter.componentInScreenCenter(modalBoxComponentName);
+        await EngineAdapter.componentInScreenCenter(modalBoxComponentName);
         PinoutTableAdapter.generatePinoutTable(modalBoxComponentName);
         DynamicSelectableListAdapter.generateMarkedComponentsList();
         PartNumberSpanAdapter.displayPartNumberOfComponent(modalBoxComponentName);
     }
 
-    static getCommonPrefixFromInput(commonPrefix){
+    static async getCommonPrefixFromInput(commonPrefix){
         const modalBoxCommonPrefix = commonPrefix.toUpperCase();
     
-        const isPrefixExist = EngineAdapter.showCommonPrefixComponents(modalBoxCommonPrefix);
+        const isPrefixExist = await EngineAdapter.showCommonPrefixComponents(modalBoxCommonPrefix);
         if (isPrefixExist){
             const  commonPrefixSpan = globalInstancesMap.commonPrefixSpan;
             commonPrefixSpan.innerText = modalBoxCommonPrefix;
@@ -348,7 +348,7 @@ class BoardHistoryAdapter{
         }, targetOrigin);
     }
 
-    static showFailedComponents(tracebiliyTestNames){
+    static async showFailedComponents(tracebiliyTestNames){
         if (!Array.isArray(tracebiliyTestNames) || tracebiliyTestNames.length === 0){
             return;
         }
@@ -362,11 +362,11 @@ class BoardHistoryAdapter{
             isSelectionModeSingle = EventHandler.preserveComponentMarkers(isSelectionModeSingle);
         };
 
-        EngineAdapter.clearMarkers();
+        await EngineAdapter.clearMarkers();
         allComponentsList.unselectAllItems();
 
         pyodide.globals.set("tracebiliyTestNames", tracebiliyTestNames);
-        pyodide.runPython(`
+        pyodide.runPythonAsync(`
             from tracebilityFailsParser import TracebilityFailsParser
             
             failsParser = TracebilityFailsParser()
@@ -381,12 +381,13 @@ class BoardHistoryAdapter{
             }
         });
 
-        failedComponents.forEach(componentName => {
-            const ifComponentExist = EngineAdapter.findComponentByName(componentName);
-            if (ifComponentExist){
+        for (const componentName of failedComponents) {
+            const ifComponentExist = await EngineAdapter.findComponentByName(componentName);
+            
+            if (ifComponentExist) {
                 allComponentsList.selectItemByName(componentName);
             }
-        });
+        }
 
         DynamicSelectableListAdapter.generateMarkedComponentsList();        
         

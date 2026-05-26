@@ -8,14 +8,14 @@ class CadFileLoader{
         LoadingScreen.setLoadingScreenMessage(loadingMessage);
         LoadingScreen.showLoadingDots();
 
-        reader.onload = (event) => {
+        reader.onload = async (event) => {
             const fileContent = event.target.result;
             pyodide.FS.writeFile(fileName, new Uint8Array(fileContent));
             
             const sideHandler = globalInstancesMap.sideHandler;
             const side = sideHandler.currentSide();
 
-            pyodide.runPython(`
+            await pyodide.runPythonAsync(`
                 from boardWrapper import BoardWrapper
                 from pygameDrawBoard import DrawBoardEngine
 

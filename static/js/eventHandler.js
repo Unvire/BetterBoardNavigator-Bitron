@@ -43,12 +43,12 @@ class EventHandler{
         canvas.height = canvasParent.clientHeight;
     }
 
-    static loadCadFile(loadedFileName){
+    static async loadCadFile(loadedFileName){
         const partNumberSearcherIframe = globalInstancesMap.partNumberSearcherIframe;
         const partNumberSearcherButton = globalInstancesMap.partNumberSearcherButton;
 
         CadFileLoader.removePreviousFileFromFS(pyodide, loadedFileName);
-        CadFileLoader.openAndLoadCadFile(pyodide, loadedFileName);
+        await CadFileLoader.openAndLoadCadFile(pyodide, loadedFileName);
         EventHandler.enableButtons();
         
         isPdfFileLoaded = false;
@@ -116,15 +116,15 @@ class EventHandler{
         return isSelectionModeSingle;
     }
 
-    static toggleComponentNames(){
+    static async toggleComponentNames(){
         const toggleComponentNamesButton = globalInstancesMap.toggleComponentNamesButton;
 
-        EngineAdapter.toggleComponentNames();
+        await EngineAdapter.toggleComponentNames();
         EventHandler.toggleButton(toggleComponentNamesButton);
     }
 
-    static unselectNet(){
-        EngineAdapter.unselectNet();
+    static async unselectNet(){
+        await EngineAdapter.unselectNet();
         WidgetAdapter.resetSelectedNet();
     }
 
@@ -144,17 +144,17 @@ class EventHandler{
         InputModalBoxAdapter.generateModalBox(modalSubmit, componentNameText, InputModalBoxAdapter.getCommonPrefixFromInput);
     }
     
-    static hideCommonPrefixComponents(){
+    static async hideCommonPrefixComponents(){
         const commonPrefixSpan = globalInstancesMap.commonPrefixSpan;
         
-        EngineAdapter.hideCommonPrefixComponents();
+        await EngineAdapter.hideCommonPrefixComponents();
         commonPrefixSpan.innerText = "";
     }
 
-    static toggleOutlines(){
+    static async toggleOutlines(){
         const toggleOutlinesButton = globalInstancesMap.toggleOutlinesButton;
 
-        EngineAdapter.toggleOutlines();
+        await EngineAdapter.toggleOutlines();
         EventHandler.toggleButton(toggleOutlinesButton);
     }
 
@@ -191,9 +191,9 @@ class EventHandler{
     static loadDemoFile(loadedFileName){
         fetch("./static/cad_files/demo.cad")
             .then(response => response.blob())
-            .then(blob => {
+            .then(async blob => {           // async blob needs to be refactored in the future...
                 const demofile = new File([blob], "demo.cad", {type: "application/octet-stream"});
-                EventHandler.loadCadFile(demofile);
+                await EventHandler.loadCadFile(demofile);
                 
                 globalInstancesMap.partNumberSearcherButton.disabled = false;
                 isPdfFileLoaded = true;

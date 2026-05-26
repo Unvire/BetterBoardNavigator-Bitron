@@ -17,8 +17,8 @@ class SideHandler{
         return this.currentSide();
     }
 
-    getSideOfComponent(componentName){
-        pyodide.runPython(`
+    async getSideOfComponent(componentName){
+        await pyodide.runPythonAsync(`
             componentSide = engine.getSideOfComponent("${componentName}")
         `);
         return pyodide.globals.get("componentSide");
