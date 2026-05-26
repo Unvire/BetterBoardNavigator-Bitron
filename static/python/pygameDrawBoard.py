@@ -775,12 +775,12 @@ class DrawBoardEngine:
 
     def _drawCircle(self, surface:pygame.Surface, color:tuple[int, int, int], circleInstance:gobj.Circle, chunkOffsetXY:tuple[int, int], width:int=1):
         centerPoint, radius = circleInstance.getCenterRadius()
-        x0, y0 = centerPoint.getXY()
+        x, y = centerPoint.getXY()
         xOffset, yOffset = chunkOffsetXY
 
-        xStart = x0 - radius - xOffset
-        yStart = y0 - radius - yOffset
-        pygame.draw.circle(surface, color, (xStart, yStart), radius, width)
+        x -= xOffset
+        y -= yOffset
+        pygame.draw.circle(surface, color, (x, y), radius, width)
 
     def _drawPolygon(self, surface:pygame.Surface, color:tuple[int, int, int], pointsList:list[gobj.Point], chunkOffsetXY:tuple[int, int], width:int=1):
         def applyOffset(pointXY:tuple[float, float], offsetXY:tuple[int, int]) -> tuple[float, float]:
