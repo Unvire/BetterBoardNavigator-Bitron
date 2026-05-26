@@ -110,7 +110,7 @@ class DynamicSelectableListAdapter{
 
         await EngineAdapter.findComponentByName(itemName);
         await EngineAdapter.componentInScreenCenter(itemName);
-        DynamicSelectableListAdapter.generateMarkedComponentsList();
+        await DynamicSelectableListAdapter.generateMarkedComponentsList();
         PartNumberSpanAdapter.displayPartNumberOfComponent(itemName);
     }
 
@@ -366,7 +366,7 @@ class BoardHistoryAdapter{
         allComponentsList.unselectAllItems();
 
         pyodide.globals.set("tracebiliyTestNames", tracebiliyTestNames);
-        pyodide.runPythonAsync(`
+        await pyodide.runPythonAsync(`
             from tracebilityFailsParser import TracebilityFailsParser
             
             failsParser = TracebilityFailsParser()

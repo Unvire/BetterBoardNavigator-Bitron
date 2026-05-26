@@ -142,7 +142,7 @@ class EngineAdapter{
     static async componentInScreenCenter(componentName){
         const sideHandler = globalInstancesMap.sideHandler;
 
-        const side = sideHandler.setComponentSideAsCurrentSide(componentName);
+        const side = await sideHandler.setComponentSideAsCurrentSide(componentName);
         await pyodide.runPythonAsync(`
             engine.componentInScreenCenterInterface(SURFACE, "${componentName}", "${side}")
             pygame.display.flip()
@@ -162,7 +162,7 @@ class EngineAdapter{
     static async selectNetComponentByName(componentName){
         const sideHandler = globalInstancesMap.sideHandler;
 
-        const side = sideHandler.setComponentSideAsCurrentSide(componentName);
+        const side = await sideHandler.setComponentSideAsCurrentSide(componentName);
         await pyodide.runPythonAsync(`
             engine.selectNetComponentByNameInterface(SURFACE, "${componentName}", "${side}")
             pygame.display.flip()
@@ -207,12 +207,12 @@ class EngineAdapter{
     static async findComponentByName(componentName){
         const sideHandler = globalInstancesMap.sideHandler;
         
-        const componentSide = sideHandler.getSideOfComponent(componentName);
+        const componentSide = await sideHandler.getSideOfComponent(componentName);
         if (!componentSide){
             return false;
         }
         
-        const side = sideHandler.setComponentSideAsCurrentSide(componentName);
+        const side = await sideHandler.setComponentSideAsCurrentSide(componentName);
         await pyodide.runPythonAsync(`
             if "${isSelectionModeSingle}" == "true":
                 engine.clearFindComponentByNameInterface(SURFACE, "${side}")
