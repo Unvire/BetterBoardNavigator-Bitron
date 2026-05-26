@@ -827,7 +827,7 @@ class DrawBoardEngine:
     def _getFont(self, fontSize:int) -> pygame.font.Font:
         size = max(1, int(fontSize))
         if size not in self.fontCache:
-            self.fontCache[size] = pygame.font.SysFont('Arial', size)
+            self.fontCache[size] = pygame.font.Font(None, size)
         return self.fontCache[size]
     
 
