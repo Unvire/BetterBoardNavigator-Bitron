@@ -6,7 +6,6 @@ from abstractShape import Shape
 import component as comp
 
 class DrawBoardEngine:
-    IS_DEBUG = False
     CHUNK_SIZE_PX = 512
     BONUS_SCALE_FACTOR = 1.05
     SCALE_BASE = 1.23
@@ -62,6 +61,7 @@ class DrawBoardEngine:
         self.sidesForFlipX = {}
         self.isShowOutlines = True
         self.isShowComponentNames = False
+        self.isDebug = False
 
     def getComponents(self) -> list[str]:
         componentsList = list(self.boardData.getComponents().keys())
@@ -227,6 +227,10 @@ class DrawBoardEngine:
         boardDataNormalized = self._getNormalizedBoard(dimensions, self.boardData)
         self.setBoardData(boardDataNormalized, isMakeBackup=True)
         return self.drawChunksAndBlitInterface(targetSurface, side)
+    
+    def toggleDebugModeInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
+        self._toggleDebugMode()
+        self.drawChunksAndBlitInterface(targetSurface, side)
 
     def drawChunksAndBlitInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
         self._chunkifyBoard(side)
@@ -393,6 +397,9 @@ class DrawBoardEngine:
     def _showHideComponentNames(self):
         self.isShowComponentNames = not self.isShowComponentNames
     
+    def _toggleDebugMode(self):
+        self.isDebug = not self.isDebug
+    
     def _centerBoard(self):
         screenWidth, screenHeight = self.screenDimensions
         boardWidth, boardHeight = self.boardData.getWidthHeight()
@@ -553,7 +560,7 @@ class DrawBoardEngine:
                 chunkSurface = self._drawChunkSurface(surfaceDataDict, side)
                 surfaceDataDict['chunkSurface'] = chunkSurface
 
-                if self.IS_DEBUG:
+                if self.isDebug:
                     pygame.draw.rect(chunkSurface, (255, 0, 0), (0, 0, self.CHUNK_SIZE_PX, self.CHUNK_SIZE_PX), width=2)
 
                     debug_font = pygame.font.SysFont('Arial', 24)
@@ -587,32 +594,62 @@ class DrawBoardEngine:
 
     def _drawChunkSurface(self, chunkData:dict, side:str) -> pygame.Surface:
         chunkSurface = self._getEmptySurfce()
-        
         chunkOffsetXY = chunkData['chunkOffsetXY']
-        self._drawOutlinesInChunkInPlace(chunkSurface, chunkOffsetXY, chunkData['outlinesInChunk'])
 
-        componentNamesList = chunkData['componentsInChunk']
-        self._drawComponentsInPlace(surface=chunkSurface, componentNamesList=chunkData['componentsInChunk'], side=side, chunkOffsetXY=chunkOffsetXY, width=1)
+        self._drawOutlinesInChunkInPlace(
+            chunkSurface = chunkSurface, 
+            chunkOffsetXY = chunkOffsetXY, 
+            shapesList = chunkData['outlinesInChunk']
+        )
 
-        componentNamesList = chunkData['commonTypeComponents']
-        self._drawComponentsInPlace(surface=chunkSurface, componentNamesList=componentNamesList, side=side, chunkOffsetXY=chunkOffsetXY, width=0)
+        self._drawComponentsInPlace(
+            surface = chunkSurface, 
+            componentNamesList = chunkData['componentsInChunk'], 
+            side = side, 
+            chunkOffsetXY = chunkOffsetXY, 
+            width = 1
+        )
 
-        color = self.colorsDict['selected component marker']
-        componentNamesList = chunkData['markedComponents']
-        self._drawMarkersInPlace(surface=chunkSurface, componentNamesList=componentNamesList, color=color, side=side, chunkOffsetXY=chunkOffsetXY)
+        self._drawComponentsInPlace(
+            surface = chunkSurface, 
+            componentNamesList = chunkData['commonTypeComponents'], 
+            side = side, 
+            chunkOffsetXY = chunkOffsetXY, 
+            width = 0
+        )
+
+        self._drawMarkersInPlace(
+            surface = chunkSurface, 
+            componentNamesList = chunkData['markedComponents'], 
+            color = self.colorsDict['selected component marker'], 
+            side = side, 
+            chunkOffsetXY = chunkOffsetXY
+        )
         
-        componentNamesSet = chunkData['selectedNetAllComponents']
-        self._drawSelectedPinsInPlace(surface=chunkSurface, componentNamesSet=componentNamesSet, side=side, chunkOffsetXY=chunkOffsetXY)
+        self._drawSelectedPinsInPlace(
+            surface = chunkSurface, 
+            componentNamesSet = chunkData['selectedNetAllComponents'], 
+            side = side, 
+            chunkOffsetXY = chunkOffsetXY
+        )
 
-        color = self.colorsDict['selected net marker']
-        componentNamesList = chunkData['selectedNetMarkedComponents']
-        self._drawMarkersInPlace(surface=chunkSurface, componentNamesList=componentNamesList, color=color, side=side, chunkOffsetXY=chunkOffsetXY)
+        self._drawMarkersInPlace(
+            surface = chunkSurface, 
+            componentNamesList = chunkData['selectedNetMarkedComponents'], 
+            color = self.colorsDict['selected net marker'], 
+            side = side, 
+            chunkOffsetXY = chunkOffsetXY
+        )
     
         if side in self.sidesForFlipX:
            chunkSurface = pygame.transform.flip(chunkSurface, True, False)
         
-        componentNamesList = chunkData['componentsInChunk']
-        self._renderComponentNames(surface=chunkSurface, sideComponents=componentNamesList, chunkOffsetXY=chunkOffsetXY, side=side)
+        self._renderComponentNamesInPlace(
+            surface = chunkSurface, 
+            sideComponents = chunkData['componentsInChunk'] if self.isShowComponentNames else [], 
+            chunkOffsetXY = chunkOffsetXY, 
+            side = side
+        )
 
         return chunkSurface
 
@@ -684,7 +721,7 @@ class DrawBoardEngine:
         for _, pinInstance in pinsDict.items():
             self._drawInstanceAsCirlceOrPolygon(surface, pinInstance, color, chunkOffsetXY, width)
     
-    def _renderComponentNames(self, surface:pygame.Surface, sideComponents:list[str], chunkOffsetXY:tuple[int, int], side:str):
+    def _renderComponentNamesInPlace(self, surface:pygame.Surface, sideComponents:list[str], chunkOffsetXY:tuple[int, int], side:str):
         MIN_COMPONENT_SIZE_PX = 10
         EXAMPLE_FONT_SIZE = 10
 
@@ -900,6 +937,7 @@ if __name__ == '__main__':
     print('Set component in screen center - h')
     print('Select component on net (net must be drawn before) - j')
     print('Show/hide component names - k')
+    print('Toggle/untoggle debug mode - l')
     print('====================================')
 
     run = True
@@ -1002,6 +1040,9 @@ if __name__ == '__main__':
                 
                 elif event.key == pygame.K_k:
                     engine.showHideComponentNamesInterface(WIN, side)
+                
+                elif event.key == pygame.K_l:
+                    engine.toggleDebugModeInterface(WIN, side)
 
         
         ## display image
