@@ -10,8 +10,8 @@ class DrawBoardEngine:
     COMPONENT_AREA_BONUS_BUFFER_PX = 30
     BONUS_SCALE_FACTOR = 1.05
     SCALE_BASE = 1.23
-    STEP_MAX = 15
-    STEP_MIN = -5
+    STEP_MAX = 17
+    STEP_MIN = -3
     DELTA_ROTATION_ANGLE_DEG = 5
     MIN_FONT_SIZE = 10
     MAX_FONT_SIZE = 26
@@ -64,6 +64,7 @@ class DrawBoardEngine:
         self.isShowComponentNames = False
         self.isDebug = False
 
+    # === public methods ===
     def getComponents(self) -> list[str]:
         componentsList = list(self.boardData.getComponents().keys())
         return sorted(componentsList, key=self._componentStringValue)
@@ -102,7 +103,25 @@ class DrawBoardEngine:
 
     def checkIfPrefixExists(self, prefix:str) -> bool:
         return prefix in self.boardData.getCommonTypeGroupedComponents()['T'] or prefix in self.boardData.getCommonTypeGroupedComponents()['B']
+    
+    def getMostCommonPrefix(self) -> str:
+        return self.boardData.getMostCommonPrefix()
 
+    def findComponentByClick(self, cursorXY:list[int, int], side:str) -> list[str]:
+        x, y = cursorXY
+        xOffset, yOffset = self.offsetVector
+
+        if side in self.sidesForFlipX:
+            x = self._xForMirroredSurface(x + xOffset)
+        else:
+            x = x - xOffset
+        y = y - yOffset
+        
+        clickedPoint = gobj.Point(x, y)
+        return self.boardData.findComponentByCoords(clickedPoint, side)
+
+
+    # === setting board data + helper methods ===
     def setBoardData(self, boardData:board.Board, isMakeBackup:bool=True):
         self._resetSelectionCollections()
         self._resetSurfaceVariables()
@@ -114,7 +133,6 @@ class DrawBoardEngine:
         self._buildAreaCache()
         self._centerBoard()
         
-    
     def _resetSelectionCollections(self):
         self.selectedComponentsSet = set()
         self.allSelectedNetComponentsSet = set()
@@ -128,10 +146,28 @@ class DrawBoardEngine:
         self.sidesForFlipX = {'T'}
         self.boardBaseRectangle = None
         self.fontCache = {}
-    
-    def getMostCommonPrefixInterface(self) -> str:
-        return self.boardData.getMostCommonPrefix()
 
+    def _buildAreaCache(self):
+        self.areaCache = {}
+        self.areaCache['outlines'] = self.boardData.getOutlines()
+
+        sideComponentsDict = self.boardData.getSideGroupedComponents()
+        for side, sideComponentsList in sideComponentsDict.items():
+            self.areaCache[side] = {}
+            for componentName in sideComponentsList:
+                componentInstance = self.boardData.getElementByName('components', componentName)
+                self.areaCache[side][componentName] = componentInstance.getArea()
+    
+    def _centerBoard(self):
+        screenWidth, screenHeight = self.screenDimensions
+        boardWidth, boardHeight = self.boardData.getWidthHeight()
+
+        xBoardOffset = (screenWidth - boardWidth) / 2
+        yBoardOffset = (screenHeight - boardHeight) / 2
+        self.offsetVector = [xBoardOffset, yBoardOffset]
+    
+
+    # === public interfaces for frame generation ===
     def moveBoardInterface(self, targetSurface:pygame.Surface, relativeXY:list[int, int], side:str) -> pygame.Surface:
         self._updateOffsetVector(relativeXY, side)                    
         return self._blitVisibleChunksIntoScreen(targetSurface, side)
@@ -156,7 +192,7 @@ class DrawBoardEngine:
     
     def rotateBoardInterface(self, targetSurface:pygame.Surface,  isClockwise:bool, side:str, angleDeg:float=None) -> pygame.Surface:
         self._rotate(isClockwise, angleDeg)   
-        self._buildAreaCache() # area is normalized after rotation, so references must be updated
+        self._buildAreaCache() # each area is normalized after rotation, so references must be updated
         return self.drawChunksAndBlitInterface(targetSurface, side)
     
     def findComponentByNameInterface(self, targetSurface:pygame.Surface, componentName:str, side:str) -> pygame.Surface:
@@ -236,25 +272,14 @@ class DrawBoardEngine:
     def drawChunksAndBlitInterface(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
         self._chunkifyBoard(side)
         return self._blitVisibleChunksIntoScreen(targetSurface, side)
+    
 
+    ## === private helper methods for interfces ===
     def _getNormalizedBoard(self, surfaceDimensions:tuple[int, int], boardInstance:board.Board) -> board.Board:
         width, height = surfaceDimensions
         wrapper = BoardWrapper(width, height)
         wrapper.setBoard(boardInstance)
         return wrapper.normalizeBoard()
-    
-    def _setBaseRectangle(self, baseWidth:float|int, baseHeight:float|int):
-        bottomLeftPoint = gobj.Point(0, 0)
-        topRightPoint = gobj.Point(baseWidth, baseHeight)
-        self.boardBaseRectangle = gobj.Rectangle(bottomLeftPoint, topRightPoint)
-    
-    def _calculateBaseRectangleAreaWidthHeight(self) -> tuple[float|int, float|int]:
-        areaPoints = self.boardBaseRectangle.calculateArea()
-        baseWidth, baseHeight = Shape.getAreaWidthHeight(areaPoints)
-        return baseWidth, baseHeight
-    
-    def _setOffsetVector(self, vector:tuple[int, int]):
-        self.offsetVector = vector
     
     def _updateOffsetVector(self, relativeVector:tuple[int, int], side:str):
         xMove, yMove = self.offsetVector
@@ -312,19 +337,6 @@ class DrawBoardEngine:
 
         self._updateOffsetVectorForScaledSurface(zoomingPoint, originBoardWidthHeight, scaledBoardWidthHeight)
     
-    def findComponentByClick(self, cursorXY:list[int, int], side:str) -> list[str]:
-        x, y = cursorXY
-        xOffset, yOffset = self.offsetVector
-
-        if side in self.sidesForFlipX:
-            x = self._xForMirroredSurface(x + xOffset)
-        else:
-            x = x - xOffset
-        y = y - yOffset
-        
-        clickedPoint = gobj.Point(x, y)
-        return self.boardData.findComponentByCoords(clickedPoint, side)
-    
     def _findComponentByName(self, componentName:str) -> comp.Component|None:
         componentInstance = self.boardData.getElementByName('components', componentName)
         if not componentInstance:
@@ -359,7 +371,7 @@ class DrawBoardEngine:
         if side in self.sidesForFlipX:
             x *= -1
             
-        self._setOffsetVector([x, y])
+        self.offsetVector = [x, y]
     
     def _selectNet(self, netName:str):
         net = self.boardData.getElementByName('nets', netName)
@@ -401,16 +413,8 @@ class DrawBoardEngine:
     def _toggleDebugMode(self):
         self.isDebug = not self.isDebug
     
-    def _centerBoard(self):
-        screenWidth, screenHeight = self.screenDimensions
-        boardWidth, boardHeight = self.boardData.getWidthHeight()
-
-        xBoardOffset = (screenWidth - boardWidth) / 2
-        yBoardOffset = (screenHeight - boardHeight) / 2
-        self.offsetVector = [xBoardOffset, yBoardOffset]
-    
     def _updateOffsetVectorForScaledSurface(self, zoomingPoint:tuple[int, int], originSurfaceDimensions:tuple[int|float, int|float], 
-                                               scaledSurfaceDimensions:tuple[int|float, int|float]):
+                scaledSurfaceDimensions:tuple[int|float, int|float]):
         def reverseSurfaceLinearTranslation(screenCoords:list[int, int], offset:list[int, int]) -> tuple[int, int]:
             xScreen, yScreen = screenCoords
             xMove, yMove = offset
@@ -440,6 +444,7 @@ class DrawBoardEngine:
         self.offsetVector = [xOffset, yOffset]
         
     
+    # === private chunk generation logic ===
     def _chunkifyBoard(self, side:str):
         self.surfaceChunks = {}
 
@@ -457,6 +462,7 @@ class DrawBoardEngine:
                 'componentsInChunk': []
             }
 
+        # map component to each chunk that overlap with its area
         sideComponentsCached =  self.areaCache[side].items()
         for componentName, componentArea in sideComponentsCached:
             instanceAreaXYXY = Shape.getAreaAsXYXY(componentArea)
@@ -483,37 +489,18 @@ class DrawBoardEngine:
             if key not in self.surfaceChunks:
                 continue
 
-            self.surfaceChunks[key]['componentsInChunk'].append(componentName)
-        
-    
-    def _findOutlinesInChunk(self, coordsPx:tuple[int, int]) -> list[gobj.Line|gobj.Arc]:
-        result = []
-        chunkCornersXYXY = self._calculateChunkBoundariesXYXY(coordsPx)
-        for shape in self.areaCache['outlines']:
-            areaCornersXYXY = Shape.getAreaAsXYXY(shape.getArea())
-            if self._is2AreasOverlap(chunkCornersXYXY, areaCornersXYXY):
-                result.append(shape)
-
-        return result
-    
-
+            self.surfaceChunks[key]['componentsInChunk'].append(componentName)    
 
     def _blitVisibleChunksIntoScreen(self, targetSurface:pygame.Surface, side:str) -> pygame.Surface:
         color = self.colorsDict['background']
         targetSurface.fill(color)
         
         rowRange, colRange = self._calculateVisibleChunkRowAndColRanges(self.screenDimensions, self.offsetVector)
-        xOffset, yOffset = self.offsetVector
         for chunkKey in itertools.product(rowRange, colRange):      
             if chunkKey not in self.surfaceChunks:
                 continue
 
-            i, j = chunkKey
-            xDraw = (i * self.CHUNK_SIZE_PX) + xOffset
-            yDraw = (j * self.CHUNK_SIZE_PX) + yOffset
-            if side in self.sidesForFlipX:
-                xDraw = self._xForMirroredSurface(xDraw)
-                xDraw -= self.CHUNK_SIZE_PX
+            xDraw, yDraw = self._calculateChunkDrawingOffset(chunkKey)
 
             surfaceDataDict = self.surfaceChunks[chunkKey]
             if 'chunkSurface' in surfaceDataDict:
@@ -522,9 +509,10 @@ class DrawBoardEngine:
                 chunkSurface = self._drawChunkSurface(surfaceDataDict, side)
                 surfaceDataDict['chunkSurface'] = chunkSurface
 
-            chunkSurface = self._blitDebugData(chunkSurface, (i, j))
-
+            chunkSurface = self._blitDebugData(chunkSurface, chunkKey)
+            
             chunkSurface.set_colorkey(color)
+            xDraw, yDraw = self._calculateChunkDrawingOffset(chunkKey)
             targetSurface.blit(chunkSurface, [xDraw, yDraw])
         return targetSurface        
 
@@ -543,25 +531,6 @@ class DrawBoardEngine:
         jStart, jEnd = math.floor(screenTop / self.CHUNK_SIZE_PX), math.ceil(screenBottom / self.CHUNK_SIZE_PX)
         colRange = range(jStart, jEnd)
         return rowRange, colRange
-    
-    def _blitDebugData(self, chunkSurface:pygame.Surface, chunkCoords:tuple[int, int]) -> pygame.Surface:
-        if not self.isDebug:
-            return chunkSurface
-        
-        pygame.draw.rect(chunkSurface, (255, 0, 0), (0, 0, self.CHUNK_SIZE_PX, self.CHUNK_SIZE_PX), width=2)
-        #pygame.image.save(chunkSurface, f'chunk {chunkCoords}.png')
-
-        i, j = chunkCoords
-        chunkIdText = f'[{i}, {j}]'
-
-        debugFont = pygame.font.SysFont('Arial', 24)
-        textSurface = debugFont.render(chunkIdText, True, (255, 0, 0))
-        textBackground = pygame.Surface(textSurface.get_size(), pygame.SRCALPHA)
-        textBackground.fill((0, 0, 0, 150))
-        textBackground.blit(textSurface, (0, 0))
-        chunkSurface.blit(textBackground, (5, 5))
-        return chunkSurface
-
 
     def _drawChunkSurface(self, chunkData:dict, side:str) -> pygame.Surface:
         chunkSurface = self._getEmptySurfce()
@@ -617,13 +586,52 @@ class DrawBoardEngine:
         )
 
         return chunkSurface
+    
+    def _blitDebugData(self, chunkSurface:pygame.Surface, chunkCoords:tuple[int, int]) -> pygame.Surface:
+        if not self.isDebug:
+            return chunkSurface
+        
+        pygame.draw.rect(chunkSurface, (255, 0, 0), (0, 0, self.CHUNK_SIZE_PX, self.CHUNK_SIZE_PX), width=2)
+        #pygame.image.save(chunkSurface, f'chunk {chunkCoords}.png')
+
+        i, j = chunkCoords
+        chunkIdText = f'[{i}, {j}]'
+
+        debugFont = pygame.font.SysFont('Arial', 24)
+        textSurface = debugFont.render(chunkIdText, True, (255, 0, 0))
+        textBackground = pygame.Surface(textSurface.get_size(), pygame.SRCALPHA)
+        textBackground.fill((0, 0, 0, 150))
+        textBackground.blit(textSurface, (0, 0))
+        chunkSurface.blit(textBackground, (5, 5))
+        return chunkSurface
+    
+    def _calculateChunkDrawingOffset(self, chunkCoords:tuple[int, int]) -> tuple[float, float]:
+        i, j = chunkCoords
+        xOffset, yOffset = self.offsetVector
+
+        xDraw = (i * self.CHUNK_SIZE_PX) + xOffset
+        yDraw = (j * self.CHUNK_SIZE_PX) + yOffset
+        if side in self.sidesForFlipX:
+            xDraw = self._xForMirroredSurface(xDraw)
+            xDraw -= self.CHUNK_SIZE_PX
+
+        return xDraw, yDraw
+    
+    def _findOutlinesInChunk(self, coordsPx:tuple[int, int]) -> list[gobj.Line|gobj.Arc]:
+        result = []
+        chunkCornersXYXY = self._calculateChunkBoundariesXYXY(coordsPx)
+        for shape in self.areaCache['outlines']:
+            areaCornersXYXY = Shape.getAreaAsXYXY(shape.getArea())
+            if self._is2AreasOverlap(chunkCornersXYXY, areaCornersXYXY):
+                result.append(shape)
+
+        return result
 
     def _drawOutlinesInChunkInPlace(self, chunkSurface:pygame.Surface, chunkOffsetXY:tuple[int, int], shapesList:list[gobj.Line|gobj.Point]):
         for shape in shapesList:
             shapeType = shape.getType()
             color = self.colorsDict['outlines']
             self.drawHandler[shapeType](chunkSurface, color, shape, chunkOffsetXY=chunkOffsetXY, width=1)
-
 
     def _calculateChunkBoundariesXYXY(self, chunkCoords:tuple[int, int]) -> tuple[int, int, int, int]:
         x0, y0 = chunkCoords
@@ -636,7 +644,22 @@ class DrawBoardEngine:
         overlapX = (xA_Min <= xC_Max) and (xA_Max >= xC_Min)
         overlapY = (yA_Min <= yC_Max) and (yA_Max >= yC_Min)
         return overlapX and overlapY
+
+    def _getEmptySurfce(self) -> pygame.Surface:
+        color = self.colorsDict['background']
+        dimensions = [self.CHUNK_SIZE_PX, self.CHUNK_SIZE_PX]
+        surface = pygame.Surface(dimensions)
+        surface.fill(color)
+        return surface
+        
+    def _getCommonPrefixComponents(self, side:str, prefix:str) -> list[str]:
+        commonTypeSideComponents = self.boardData.getCommonTypeGroupedComponents()[side]
+        commonPrefixSideComponentNames = commonTypeSideComponents.get(prefix, [])
+        return commonPrefixSideComponentNames
+
     
+
+    # === draw complex shapes logic (components, pads, outlines ...) ===    
     def _drawComponentsInPlace(self, surface:pygame.Surface, componentNamesList:list[str], side:str, chunkOffsetXY:tuple[int, int], width:int=1):
         componentColor = self.colorsDict['components']
         pinColorDict = {
@@ -716,8 +739,6 @@ class DrawBoardEngine:
             textRect = renderedText.get_rect(center=(x, y))
             surface.blit(renderedText, textRect)
     
-
-
     def _drawInstanceAsCirlceOrPolygon(self, surface:pygame.Surface, instance: pin.Pin|comp.Component, color:tuple[int, int, int], 
                                             chunkOffsetXY:tuple[int, int], width:int=1):
         if  instance.getShape() == 'CIRCLE':
@@ -727,6 +748,8 @@ class DrawBoardEngine:
             pointsList = instance.getShapePoints()
             self._drawPolygon(surface, color, pointsList, chunkOffsetXY, width)    
 
+
+    # === draw most basic shapes (lines, arcs, rectangles, arrows) ===
     def _drawLine(self, surface:pygame.Surface, color:tuple[int, int, int], lineInstance:gobj.Line, chunkOffsetXY:tuple[int, int], width:int=1):
         startPoint, endPoint = lineInstance.getPoints()
         xOffset, yOffset = chunkOffsetXY
@@ -787,13 +810,8 @@ class DrawBoardEngine:
         ]
         pygame.draw.polygon(surface, color, markerCoords, width=0)
     
-    def _getEmptySurfce(self) -> pygame.Surface:
-        color = self.colorsDict['background']
-        dimensions = [self.CHUNK_SIZE_PX, self.CHUNK_SIZE_PX]
-        surface = pygame.Surface(dimensions)
-        surface.fill(color)
-        return surface
-    
+
+    # === font generation helpers === 
     def _getFontWidthHeight(self, fontSize:int, textToRender:str) -> tuple[int, int]:
         font = self._getFont(fontSize)
         textWidth, textHeight = font.size(textToRender)
@@ -813,6 +831,8 @@ class DrawBoardEngine:
             self.fontCache[size] = pygame.font.SysFont('Arial', size)
         return self.fontCache[size]
     
+
+    # === multi use helpers ===
     def _xForMirroredSurface(self, x:float) -> float:
         surfaceWidth = self.screenDimensions[0]
         return surfaceWidth - x
@@ -835,23 +855,6 @@ class DrawBoardEngine:
             componentType = componentName
             componentNumber = 0
         return stringValue(componentType) + int(componentNumber)
-    
-    def _buildAreaCache(self):
-        self.areaCache = {}
-        self.areaCache['outlines'] = self.boardData.getOutlines()
-
-        sideComponentsDict = self.boardData.getSideGroupedComponents()
-        for side, sideComponentsList in sideComponentsDict.items():
-            self.areaCache[side] = {}
-            for componentName in sideComponentsList:
-                componentInstance = self.boardData.getElementByName('components', componentName)
-                self.areaCache[side][componentName] = componentInstance.getArea()
-    
-    def _getCommonPrefixComponents(self, side:str, prefix:str) -> list[str]:
-        commonTypeSideComponents = self.boardData.getCommonTypeGroupedComponents()[side]
-        commonPrefixSideComponentNames = commonTypeSideComponents.get(prefix, [])
-        return commonPrefixSideComponentNames
-
         
 
 
