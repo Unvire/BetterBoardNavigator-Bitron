@@ -72,9 +72,7 @@ class AllComponentDynamicSelectableList extends AbstractDynamicList{
     }
 
     #multipleSelectionMode(itemDiv){
-        if (itemDiv.classList.contains("selected")){
-            itemDiv.classList.remove("selected");
-        } else {
+        if (!itemDiv.classList.contains("selected")){
             itemDiv.classList.add("selected");
         }
     }

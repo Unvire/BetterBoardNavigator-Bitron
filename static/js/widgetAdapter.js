@@ -101,10 +101,11 @@ class DynamicSelectableListAdapter{
     }
 
     static async selectItemFromListEvent(itemElement){
-        const itemName = DynamicSelectableListAdapter.generatePinoutTableForComponent(itemElement);
+        const itemName = await DynamicSelectableListAdapter.generatePinoutTableForComponent(itemElement);
 
         const markedComponentsList = globalInstancesMap.markedComponentsList;
         if (markedComponentsList.includes(itemName)){
+            await EngineAdapter.componentInScreenCenter(itemName);
             return;
         }
 
@@ -115,14 +116,14 @@ class DynamicSelectableListAdapter{
     }
 
     static async onClickItemEvent(itemElement){
-        const itemName = DynamicSelectableListAdapter.generatePinoutTableForComponent(itemElement);
+        const itemName = await DynamicSelectableListAdapter.generatePinoutTableForComponent(itemElement);
         await EngineAdapter.componentInScreenCenter(itemName);
         PartNumberSpanAdapter.displayPartNumberOfComponent(itemName);
     }
 
-    static generatePinoutTableForComponent(itemElement){
+    static async generatePinoutTableForComponent(itemElement){
         let itemName = itemElement.getAttribute("data-key");
-        PinoutTableAdapter.generatePinoutTable(itemName);
+        await PinoutTableAdapter.generatePinoutTable(itemName);
         return itemName;
     }
 
@@ -143,7 +144,7 @@ class DynamicSelectableListAdapter{
         } else {
             await EngineAdapter.findComponentByName(componentName);
         }        
-        DynamicSelectableListAdapter.generateMarkedComponentsList();
+        await DynamicSelectableListAdapter.generateMarkedComponentsList();
 
         const allComponentsList = globalInstancesMap.allComponentsList;
         allComponentsList.unselectItemByName(componentName);
