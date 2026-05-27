@@ -249,6 +249,10 @@ class InputModalBoxAdapter{
     }
 
     static async getComponentNameFromInput(componentName){
+        if (!componentName || componentName.trim() === "") {
+            return; 
+        }
+
         const modalBoxComponentName = componentName.toUpperCase();
         const isComponentExist = await EngineAdapter.findComponentByName(modalBoxComponentName);
 
@@ -270,12 +274,16 @@ class InputModalBoxAdapter{
         allComponentsList.selectItemByName(modalBoxComponentName);
 
         await EngineAdapter.componentInScreenCenter(modalBoxComponentName);
-        PinoutTableAdapter.generatePinoutTable(modalBoxComponentName);
-        DynamicSelectableListAdapter.generateMarkedComponentsList();
+        await PinoutTableAdapter.generatePinoutTable(modalBoxComponentName);
+        await DynamicSelectableListAdapter.generateMarkedComponentsList();
         PartNumberSpanAdapter.displayPartNumberOfComponent(modalBoxComponentName);
     }
 
     static async getCommonPrefixFromInput(commonPrefix){
+        if (!commonPrefix || commonPrefix.trim() === "") {
+            return; 
+        }
+        
         const modalBoxCommonPrefix = commonPrefix.toUpperCase();
     
         const isPrefixExist = await EngineAdapter.showCommonPrefixComponents(modalBoxCommonPrefix);
