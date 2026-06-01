@@ -1,5 +1,5 @@
 class EventHandler{
-    static compensateUserDevicePixelRatio(){
+    static async compensateUserDevicePixelRatio(){
         const dpr = window.devicePixelRatio;
         const dynamicVH = dpr * 100;
 

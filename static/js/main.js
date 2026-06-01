@@ -1,8 +1,8 @@
 async function main(){   
-    EventHandler.compensateUserDevicePixelRatio();
+    await EventHandler.compensateUserDevicePixelRatio();
 
     document.addEventListener("DOMContentLoaded", async () => { 
-        _bindHtmlElements();
+        await _bindHtmlElements();
 
         LoadingScreen.showLoadingScreen();
         LoadingScreen.showLoadingDots();
@@ -13,11 +13,11 @@ async function main(){
         await _loadTranslations();
         await _initPyodide();
             
-        _initWidgetClasses();
-        _bindIframeResponseEvent();
-        _bindMouseAndKeyboardEvents();
+        await _initWidgetClasses();
+        await _bindIframeResponseEvent();
+        await _bindMouseAndKeyboardEvents();
         await _bindLoadFilesEvents();
-        _bindOnClickEvents();
+        await _bindOnClickEvents();
     });
 }
 
@@ -38,7 +38,7 @@ async function loadServerIP() {
     }
 }
 
-function _bindHtmlElements(){
+async function _bindHtmlElements(){
     // buttons row
     globalInstancesMap.loadFilesButton = document.getElementById("load-files-button");
     globalInstancesMap.loadFilesInput = document.getElementById("load-files-input");
@@ -130,7 +130,7 @@ function _bindHtmlElements(){
     globalInstancesMap.loadingScreenText = document.getElementById("loading-text");
 }
 
-function _bindBoardHistoryOnLoadEvent(tracebilityRootUrl){
+async function _bindBoardHistoryOnLoadEvent(tracebilityRootUrl){
     globalInstancesMap.boardHistoryIframe.onload = () => {
         BoardHistoryAdapter.passTracebilityUrlToIframe(tracebilityRootUrl);
     };
@@ -142,7 +142,7 @@ async function _loadTranslations(){
 }
 
 
-function _initWidgetClasses(){
+async function _initWidgetClasses(){
     const modalSubmit = new ModalSubmit(
         globalInstancesMap.textModalContainer, 
         globalInstancesMap.textModalCloseSpan, 
@@ -226,7 +226,7 @@ async function _initPyodide(){
     globalInstancesMap.boardHistoryButton.disabled = false;
 }
 
-function _bindMouseAndKeyboardEvents(){
+async function _bindMouseAndKeyboardEvents(){
     document.addEventListener("click", () => {
         globalInstancesMap.languagePickerMenu.classList.remove("show");
     });
@@ -257,7 +257,7 @@ function _bindMouseAndKeyboardEvents(){
     globalInstancesMap.canvas.addEventListener("wheel", EngineAdapter.zoomInOut);
 }
 
-function _bindIframeResponseEvent(){
+async function _bindIframeResponseEvent(){
     const targetOrigin = window.location.origin;
 
     window.addEventListener("message", (event) => {
@@ -270,7 +270,7 @@ function _bindIframeResponseEvent(){
     });
 }
 
-function _bindLoadFilesEvents(){
+async function _bindLoadFilesEvents(){
     globalInstancesMap.loadFilesButton.addEventListener("click", () => {
             globalInstancesMap.loadFilesInput.click();
     });
@@ -301,7 +301,7 @@ function _bindLoadFilesEvents(){
     });
 }
 
-function _bindOnClickEvents(){
+async function _bindOnClickEvents(){
     globalInstancesMap.changeSideButton.addEventListener("click", EngineAdapter.changeSide);
     globalInstancesMap.rotateButton.addEventListener("click", EngineAdapter.rotateBoard);
     globalInstancesMap.mirrorSideButton.addEventListener("click", EngineAdapter.mirrorSide);

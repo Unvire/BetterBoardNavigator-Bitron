@@ -1,6 +1,6 @@
 class WidgetAdapter{
-    static resetWidgets(){
-        WidgetAdapter.resetSelectedComponentsWidgets();
+    static async resetWidgets(){
+        await WidgetAdapter.resetSelectedComponentsWidgets();
         TreeViewAdapter.resetTreeview();
         WidgetAdapter.resetSpans();
         
