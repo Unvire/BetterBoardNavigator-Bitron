@@ -73,12 +73,17 @@ class CadFileLoader{
         }
     }
 
-    static removePreviousFileFromFS(pyodide, fileOrName){
-        const fileName = typeof fileOrName === 'string' ? fileOrName : fileOrName.name;
-        
+    static removeAllCadFilesFromFS(pyodide) {
         const pydodideFiles = pyodide.FS.readdir("/");
-        if (pydodideFiles.includes(fileName)){
-            pyodide.FS.unlink(`/${fileName}`);
-        }
+        
+        pydodideFiles.forEach(fileName => {
+            if (/\.(cad|gcd|tgz|zip)$/i.test(fileName)) {
+                try {
+                    pyodide.FS.unlink(`/${fileName}`);
+                } catch (error) {
+                    console.warn(`Removing file ${fileName} from Virtual File System error:`, error);
+                }
+            }
+        });
     }
 }

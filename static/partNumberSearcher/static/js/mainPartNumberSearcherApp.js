@@ -19,6 +19,7 @@ class PartNumberSearcherApp {
 
     renderBody() {
         this.tableBodyContainer.innerHTML = "";
+        const fragment = document.createDocumentFragment();
 
         this.filteredItems.forEach(partNumberItem => {
             const row = document.createElement("div");
@@ -41,8 +42,10 @@ class PartNumberSearcherApp {
                 row.appendChild(cell);
             });
 
-            this.tableBodyContainer.appendChild(row);
+            fragment.appendChild(row);
         });
+        
+        this.tableBodyContainer.appendChild(fragment);
     }
 
     #initEventListeners() {

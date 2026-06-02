@@ -323,7 +323,7 @@ async function _bindOnClickEvents(){
     globalInstancesMap.unselectAllComponentsButton.addEventListener("click", WidgetAdapter.resetSelectedComponentsWidgets);
 
     globalInstancesMap.showDemoBoardButton.addEventListener("click", () => {
-        EventHandler.loadDemoFile(loadedFileName);
+        EventHandler.loadDemoFile();
     });
     
     globalInstancesMap.textModalInput.addEventListener("focus", () => {

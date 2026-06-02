@@ -43,13 +43,13 @@ class EventHandler{
         canvas.height = canvasParent.clientHeight;
     }
 
-    static async loadCadFile(loadedFileName){
+    static async loadCadFile(loadedFileObject){
         const partNumberSearcherIframe = globalInstancesMap.partNumberSearcherIframe;
         const partNumberSearcherButton = globalInstancesMap.partNumberSearcherButton;
 
-        CadFileLoader.removePreviousFileFromFS(pyodide, loadedFileName);
-        await CadFileLoader.openAndLoadCadFile(pyodide, loadedFileName);
-        EventHandler.enableButtons();
+        CadFileLoader.removeAllCadFilesFromFS(pyodide);
+        await CadFileLoader.openAndLoadCadFile(pyodide, loadedFileObject);
+        EventHandler.enableButtons(loadedFileObject.name);
         
         isPdfFileLoaded = false;
         partNumberSearcherButton.disabled = true;
@@ -60,7 +60,7 @@ class EventHandler{
                 payload: {}
             }, targetOrigin);
 
-        return loadedFileName.name;
+        return loadedFileObject.name;
     }
 
     static async loadPdfFile(loadedFileName){
@@ -81,6 +81,8 @@ class EventHandler{
         } else {
             partNumberSearcherButton.disabled = false;
             isPdfFileLoaded = true;
+
+            await new Promise(resolve => setTimeout(resolve, 300));
             iframe.contentWindow.postMessage({
                 type: "PN_DICT",
                 payload: pnDict
@@ -188,7 +190,7 @@ class EventHandler{
         SimpleModalAdapter.generateModalBox(modalPartNumberSearcher);
     }
 
-    static loadDemoFile(loadedFileName){
+    static loadDemoFile(){
         fetch("./static/cad_files/demo.cad")
             .then(response => response.blob())
             .then(async blob => {           // async blob needs to be refactored in the future...
