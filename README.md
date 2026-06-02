@@ -1,4 +1,5 @@
 ## Better Board Navigator
+**Works best with firefox, because of GC and RAM allocation restrictions**
 Web application for displaying PCBs (Printed Schematic Boards) given as a schematic file. Currently working formats are:
  - cad - CAMCAD
  - gcd - GenCAD
