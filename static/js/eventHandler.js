@@ -49,18 +49,16 @@ class EventHandler{
 
         CadFileLoader.removeAllCadFilesFromFS(pyodide);
         await CadFileLoader.openAndLoadCadFile(pyodide, loadedFileObject);
-        EventHandler.enableButtons(loadedFileObject.name);
+        EventHandler.enableButtons();
         
         isPdfFileLoaded = false;
         partNumberSearcherButton.disabled = true;
 
         const targetOrigin = window.location.origin;
         partNumberSearcherIframe.contentWindow.postMessage({
-                type: "PN_DICT",
-                payload: {}
-            }, targetOrigin);
-
-        return loadedFileObject.name;
+            type: "PN_DICT",
+            payload: {}
+        }, targetOrigin);
     }
 
     static async loadPdfFile(loadedFileName){
