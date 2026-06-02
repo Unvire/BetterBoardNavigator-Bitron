@@ -1,20 +1,21 @@
 class CadFileLoader{
-    static openAndLoadCadFile(pyodide, file) {
+    static async openAndLoadCadFile(pyodide, file){
         const fileName = `/${file.name}`;
-        const reader = new FileReader();
-
+        
         const lang = document.documentElement.lang;
         const loadingMessage = translationsDict[lang]?.["js-loading-screen-in-progress"] || "Przetwarzanie schematu";
         LoadingScreen.setLoadingScreenMessage(loadingMessage);
         LoadingScreen.showLoadingDots();
 
-        reader.onload = async (event) => {
-            const fileContent = event.target.result;
+        try {
+            const fileContent = await file.arrayBuffer();
+
             pyodide.FS.writeFile(fileName, new Uint8Array(fileContent));
             
             const sideHandler = globalInstancesMap.sideHandler;
             const side = sideHandler.currentSide();
 
+            
             await pyodide.runPythonAsync(`
                 from boardWrapper import BoardWrapper
                 from pygameDrawBoard import DrawBoardEngine
@@ -41,10 +42,16 @@ class CadFileLoader{
 
                 mostCommonPrefix = engine.getMostCommonPrefix()
             `);
-            const allComponents = pyodide.globals.get("allComponents").toJs();
+
+            const allComponentsProxy = pyodide.globals.get("allComponents");
+            const allComponents = allComponentsProxy.toJs();
+            allComponentsProxy.destroy();
+
             DynamicSelectableListAdapter.generateList(globalInstancesMap.allComponentsList, allComponents, DynamicSelectableListAdapter.selectItemFromListEvent, "single");
 
-            const netsMap = pyodide.globals.get("netsDict").toJs();
+            const netsMapProxy = pyodide.globals.get("netsDict");
+            const netsMap = netsMapProxy.toJs();
+            netsMapProxy.destroy();
             TreeViewAdapter.generateTreeView(netsMap);
             
             mostCommonPrefix = pyodide.globals.get("mostCommonPrefix");
@@ -54,13 +61,21 @@ class CadFileLoader{
             const toggleOutlinesButton = globalInstancesMap.toggleOutlinesButton;
             toggleOutlinesButton.classList.add("button-selected");
 
+        } catch (error) {
+            const lang = document.documentElement.lang;
+            const alertMessage = translationsDict[lang]?.["js-no-ip-adress-alert"] || "Błąd podczas przetwarzania pliku CAD przez Pyodide:";
+
+            console.error(alertMessage, error);
+
+        } finally {
             LoadingScreen.hideLoadingDots();
             LoadingScreen.hideLoadingScreen();
         }
-        reader.readAsArrayBuffer(file);
     }
 
-    static removePreviousFileFromFS(pyodide, fileName){
+    static removePreviousFileFromFS(pyodide, fileOrName){
+        const fileName = typeof fileOrName === 'string' ? fileOrName : fileOrName.name;
+        
         const pydodideFiles = pyodide.FS.readdir("/");
         if (pydodideFiles.includes(fileName)){
             pyodide.FS.unlink(`/${fileName}`);

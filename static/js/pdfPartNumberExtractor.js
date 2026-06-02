@@ -19,22 +19,38 @@ class PartNumberPDFExtractor {
     }
 
     async _extractTextFromPDF(file) {
-        const buf = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+        const fileUrl = URL.createObjectURL(file);
 
-        let fullText = "";
+        const pdf = await pdfjsLib.getDocument(fileUrl).promise;
+
+        const textLines = [];
+
         for (let i = 1; i <= pdf.numPages; i++) {
             const page = await pdf.getPage(i);
             const content = await page.getTextContent();
 
-            const pageText = content.items.map(item => item.str).join("\n");
-            fullText += pageText + "\n";
+            for (const item of content.items) {
+                const fragments = item.str.split(/\r?\n/);
+                for (const frag of fragments) {
+                    const cleanStr = frag.trim();
+                    if (cleanStr.length > 0) {
+                        textLines.push(cleanStr);
+                    }
+                }
+            }
+
+            page.cleanup();
+
+            if (i % 10 === 0) {
+                await new Promise(resolve => setTimeout(resolve, 0));
+            }
         }
 
-        return fullText
-            .split(/\r?\n/)
-            .map((s) => s.trim())
-            .filter((s) => s.length > 0);
+        await pdf.destroy();
+        
+        URL.revokeObjectURL(fileUrl);
+
+        return textLines;
     }
 
     _searchComponentsData(text) {

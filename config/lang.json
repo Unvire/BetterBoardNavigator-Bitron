@@ -94,7 +94,8 @@
         "help-modal-colors-violet-mark-description": " - Komponent, którego pady należą do zaznaczonej siatki.",
 
         "js-loading-screen-in-progress": "Przetwarzanie schematu",
-        "js-loading-screen-success": "Aplikacja załadowana. Wczytaj schemat!",
+        "js-loading-screen-success": "Aplikacja załadowana. Wczytaj schemat!",        
+        "js-loading-cad-file-error": "Błąd podczas przetwarzania pliku CAD przez Pyodide:",
         "js-no-part-numbers-in-pdf-alert": "W pliku PDF nie ma tabel z part numberami!",
         "js-find-component-by-name-modal-title": "Nazwa komponentu",
         "js-find-prefix-modal-title": "Wspólny prefix",
@@ -224,6 +225,7 @@
 
         "js-loading-screen-in-progress": "Processing schematic",
         "js-loading-screen-success": "Application loaded. Load a schematic!",
+        "js-loading-cad-file-error": "Error woth processing CAD file with pyodide:",
         "js-no-part-numbers-in-pdf-alert": "No part number tables found in the PDF file!",
         "js-find-component-by-name-modal-title": "Component name",
         "js-find-prefix-modal-title": "Common prefix",

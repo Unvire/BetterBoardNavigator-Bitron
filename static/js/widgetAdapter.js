@@ -133,7 +133,10 @@ class DynamicSelectableListAdapter{
         await pyodide.runPythonAsync(`
             componentsList = engine.getSelectedComponents()
         `);
-        const componentsList = pyodide.globals.get("componentsList").toJs();
+        const componentsListProxy = pyodide.globals.get("componentsList");
+        const componentsList = componentsListProxy.toJs();
+        componentsListProxy.destroy()
+
         DynamicSelectableListAdapter.generateList(markedComponentsList, componentsList, DynamicSelectableListAdapter.onClickItemEvent, "no");
         markedComponentsList.onCloseIconClick = DynamicSelectableListAdapter.unselectComponentAndRemoveItemFromList;
     }
@@ -163,7 +166,9 @@ class PinoutTableAdapter{
         await pyodide.runPythonAsync(`
             pinoutDict = engine.getComponentPinout("${componentName}")
         `);
-        let pinoutMap = pyodide.globals.get("pinoutDict").toJs();
+        let pinoutMapProxy = pyodide.globals.get("pinoutDict");  
+        let pinoutMap = pinoutMapProxy.toJs();
+        pinoutMapProxy.destroy();
         
         const pinoutTable = globalInstancesMap.pinoutTable;
         pinoutTable.rowEvent = PinoutTableAdapter.selectNetFromTableEvent;

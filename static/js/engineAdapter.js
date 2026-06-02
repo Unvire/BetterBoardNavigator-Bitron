@@ -35,7 +35,12 @@ class EngineAdapter{
                 clickedXY = [int("${x}"), int("${y}")]
                 clickedComponents = engine.findComponentByClick(clickedXY, "${side}")
         `);
-        return pyodide.globals.get("clickedComponents").toJs();
+
+        const clickedComponetsProxy = pyodide.globals.get("clickedComponents");
+        const clickedComponentsList = clickedComponetsProxy.toJs();
+        clickedComponetsProxy.destroy();
+
+        return clickedComponentsList;
     }
 
     static async moveBoard(x, y){        
