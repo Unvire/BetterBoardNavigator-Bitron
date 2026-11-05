@@ -23,7 +23,7 @@ class Board:
     def getArea(self) -> list[gobj.Point]:
         bottomLeftPoint, topRightPoint = gobj.getDefaultBottomLeftTopRightPoints()
         bottomLeftPoint, topRightPoint = gobj.updateBottomLeftTopRightPoints([bottomLeftPoint, topRightPoint], self.area)
-        return bottomLeftPoint, topRightPoint
+        return [bottomLeftPoint, topRightPoint]
 
     def getWidthHeight(self) -> list[float|int, float|int]:
         xBL, yBL, xTR, yTR = Shape.getAreaAsXYXY(self.getArea())
