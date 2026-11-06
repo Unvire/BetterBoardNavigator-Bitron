@@ -11,7 +11,8 @@ function BoardCanvas() {
   const { 
     boardData, currentSide, setCurrentSide, isMirrored, setIsMirrored, 
     isDarkMode, showOutlines, selectedComponents, selectComponents, 
-    selectedNet, componentToFocus, clearFocus, inspectedComponent
+    selectedNet, componentToFocus, clearFocus, inspectedComponent,
+    setInspectedComponent, clearSelection
   } = useBoardStore();
 
   useEffect(() => {
@@ -71,7 +72,6 @@ function BoardCanvas() {
 
   const handleCanvasClick = useCallback((clickWorldX: number, clickWorldY: number, isMultiSelect: boolean) => {
     if (!boardData) return;
-    if (!isMultiSelect) return;
 
     const worldX = isMirrored ? (boardCenterX * 2 - clickWorldX) : clickWorldX;
     const worldY = clickWorldY;
@@ -125,17 +125,32 @@ function BoardCanvas() {
 
     const clickedNames = clickedComps.map(c => c[0]);
 
-    // ignore clicking in background
-    if (clickedNames.length === 0) return; 
+    // clicking in the background -> remove cyan
+    if (clickedNames.length === 0) {
+      if (!isMultiSelect) setInspectedComponent(null);
+      return; 
+    }
 
-    const firstComp = boardData.components[clickedNames[0]];
+    const firstCompName = clickedNames[0];
+    const firstComp = boardData.components[firstCompName];
+
     if (firstComp && firstComp.side !== currentSide) {
       setCurrentSide(firstComp.side);
       setIsMirrored(firstComp.side === 'B');
     }
 
-    selectComponents(clickedNames, isMultiSelect);
-  }, [boardData, currentSide, isMirrored, selectComponents, setCurrentSide, setIsMirrored]);
+    if (isMultiSelect) {
+      if (inspectedComponent === firstCompName) setInspectedComponent(null);
+      selectComponents(clickedNames, true);
+
+    } else {
+      setInspectedComponent(firstCompName);
+    }
+  }, [
+    boardData, currentSide, isMirrored, boardCenterX, selectComponents, 
+    setCurrentSide, setIsMirrored, inspectedComponent, 
+    setInspectedComponent, clearSelection
+  ]);
 
 
   const { scale, offset, handlers, resetView, focusOnBoundingBox } = usePanZoom(canvasRef, handleCanvasClick);
