@@ -26,15 +26,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const selectedNames = Array.from(selectedComponents);
-  const isPanelOpen = selectedNames.length > 0;
-  
-  const [detailedComp, setDetailedComp] = useState<string | null>(null);
-
-
-  useEffect(() => {
-    if (selectedNames.length === 0) setDetailedComp(null);
-    if (detailedComp && !selectedNames.includes(detailedComp)) setDetailedComp(null);
-  }, [selectedComponents, detailedComp]);
+  const isPanelOpen = selectedNames.length > 0 || inspectedComponent !== null;
 
   const compToShow = inspectedComponent || (selectedNames.length === 1 ? selectedNames[0] : null);
 
@@ -47,12 +39,22 @@ function App() {
       setIsMirrored(comp.side === 'B');
     }
 
-    if (e.ctrlKey || e.metaKey) {
-      selectComponents([compName], true);
+    const isAlreadySelected = selectedComponents.has(compName);
+    const isAlreadyInspected = inspectedComponent === compName;
 
+    // ctrl + left click
+    if (e.ctrlKey || e.metaKey) {
+      if (isAlreadyInspected) setInspectedComponent(null); 
+      selectComponents([compName], true);
+      if (!isAlreadySelected) triggerFocus(compName);
+    
+      // left click
     } else {
-      setInspectedComponent(compName);
-      triggerFocus(compName);
+      if (isAlreadyInspected) setInspectedComponent(null);
+      else {
+        setInspectedComponent(compName);
+        triggerFocus(compName);
+      }
     }
   };
 
@@ -318,7 +320,10 @@ function App() {
                   }`}
                 >
                   <button 
-                    onClick={() => setDetailedComp(name)}
+                    onClick={() => {
+                      setInspectedComponent(name);
+                      triggerFocus(name); 
+                    }}
                     className="flex-1 flex justify-between items-center text-left p-2.5 pl-3 transition-colors rounded-l-md hover:bg-blue-500/10 dark:hover:bg-slate-700/50"
                   >
                     <div className="flex flex-col">
@@ -361,16 +366,20 @@ function App() {
                 <div className="flex items-center gap-2">
                   {selectedNames.length > 1 ? (
                     <button 
-                      onClick={() => setDetailedComp(null)} 
-                      className="p-1.5 -ml-1 rounded-md text-blue-500 hover:bg-blue-500/15 transition-colors"
+                      onClick={() => setInspectedComponent(null)} 
+                      className={`p-1.5 -ml-1 rounded-md transition-colors ${
+                        inspectedComponent ? 'text-cyan-500 hover:bg-cyan-500/15' : 'text-rose-500 hover:bg-rose-500/15'
+                      }`}
                       title="Wróć do listy"
                     >
                       <ArrowLeft size={24} />
                     </button>
                   ) : (
-                    <Cpu size={24} className="text-rose-500 dark:text-rose-400"/>
+                    <Cpu size={24} className={inspectedComponent ? "text-cyan-500 dark:text-cyan-400" : "text-rose-500 dark:text-rose-400"}/>
                   )}
-                  <h2 className="text-lg font-bold text-rose-500 dark:text-rose-400">
+                  <h2 className={`text-lg font-bold ${
+                    inspectedComponent ? "text-cyan-500 dark:text-cyan-400" : "text-rose-500 dark:text-rose-400"
+                  }`}>
                     {compToShow}
                   </h2>
                 </div>
