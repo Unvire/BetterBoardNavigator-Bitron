@@ -16,6 +16,7 @@ interface BoardState {
   // --- Selection ---
   selectedComponents: Set<string>;
   toggleComponentSelection: (compName: string) => void;
+  selectComponents: (compNames: string[]) => void;
   clearComponentSelection: () => void;
   
   selectedNet: string | null;
@@ -56,6 +57,10 @@ export const useBoardStore = create<BoardState>((set) => ({
       newSet.add(compName);
     }
     return { selectedComponents: newSet };
+  }),
+
+  selectComponents: (compNames) => set(() => {
+    return { selectedComponents: new Set(compNames) };
   }),
 
   clearComponentSelection: () => set({ selectedComponents: new Set() }),

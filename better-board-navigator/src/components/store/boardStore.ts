@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { BoardData } from "../components/types/board";
+import type { BoardData } from "../../types/board";
 
 interface BoardState {
   boardData: BoardData | null;

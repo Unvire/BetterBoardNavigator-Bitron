@@ -1,12 +1,18 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import type { RefObject } from "react";
 
-export function usePanZoom(canvasRef: RefObject<HTMLCanvasElement | null>) {
+
+export function usePanZoom(
+  canvasRef: RefObject<HTMLCanvasElement | null>,
+  onCanvasClick?: (worldX: number, worldY: number) => void
+) {
   const [scale, setScale] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
 
   const [isDragging, setIsDragging] = useState(false);
   const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 });
+
+  const [mouseDownPos, setMouseDownPos] = useState({ x: 0, y: 0 });
 
   // storing offset and scale values for synchronus operations
   const scaleRef = useRef(scale);
@@ -24,6 +30,7 @@ export function usePanZoom(canvasRef: RefObject<HTMLCanvasElement | null>) {
   const onMouseDown = useCallback((e: React.MouseEvent) => {
     setIsDragging(true);
     setLastMousePos({ x: e.clientX, y: e.clientY });
+    setMouseDownPos({ x: e.clientX, y: e.clientY });
   }, []);
 
 
@@ -38,7 +45,24 @@ export function usePanZoom(canvasRef: RefObject<HTMLCanvasElement | null>) {
   }, [isDragging, lastMousePos]);
 
 
-  const onMouseUp = useCallback(() => setIsDragging(false), []);
+  const onMouseUp = useCallback((e: React.MouseEvent) => {
+    setIsDragging(false);
+
+    const dx = Math.abs(e.clientX - mouseDownPos.x);
+    const dy = Math.abs(e.clientY - mouseDownPos.y);
+
+    // calculate world (board) XY when mouse was moved less than 3px relative to previous position
+    if (dx < 3 && dy < 3 && canvasRef.current) {
+      const rect = canvasRef.current.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      const worldX = (mouseX - offsetRef.current.x) / scaleRef.current;
+      const worldY = (mouseY - offsetRef.current.y) / scaleRef.current;
+				
+      onCanvasClick?.(worldX, worldY);
+    }
+  }, [mouseDownPos, canvasRef, onCanvasClick]);
 
 
   useEffect(() => {

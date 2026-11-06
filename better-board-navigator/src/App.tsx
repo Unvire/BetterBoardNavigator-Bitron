@@ -7,13 +7,17 @@ import {
 } from 'lucide-react';
 
 function App() {
-  const { boardData, setBoardData, isDarkMode, toggleDarkMode } = useBoardStore();
+  const { boardData, setBoardData, isDarkMode, toggleDarkMode, 
+    selectedComponents, selectComponents } = useBoardStore();
   const [isLoading, setIsLoading] = useState(true);
 
   const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(true);
   const [activeTab, setActiveTab] = useState<'components' | 'nets'>('components');
 
   const [isRightPanelOpen, setIsRightPanelOpen] = useState(true);
+
+  const selectedNames = Array.from(selectedComponents);
+  const isPanelOpen = selectedNames.length > 0;
 
   useEffect(() => {
     async function loadMockData() {
@@ -137,30 +141,77 @@ function App() {
       {/* FLOATING RIGHT PANEL - component inspector */}
       <aside 
         className={`${glassPanelClass} right-4 w-72`}
-        style={{ transform: isRightPanelOpen ? 'translateX(0)' : 'translateX(120%)' }}
+        style={{ transform: isPanelOpen ? 'translateX(0)' : 'translateX(120%)' }}
       >
-        <div className="flex items-center justify-between p-3 border-b border-inherit shrink-0">
-          <h2 className="text-sm font-semibold flex items-center gap-2"><List size={16}/> Pinout: R1</h2>
-          <button onClick={() => setIsRightPanelOpen(false)} className="opacity-60 hover:opacity-100">
-            <X size={16}/>
-          </button>
-        </div>
+        {/* Case 1: stacked components clicked */}
+        {selectedNames.length > 1 && (
+          <div className="flex flex-col h-full">
+            <div className="flex items-center justify-between p-3 border-b border-inherit shrink-0">
+              <h2 className="text-sm font-bold text-amber-500">
+                Znaleziono {selectedNames.length} elementy
+              </h2>
+              <button onClick={() => selectComponents([])} className="opacity-60 hover:opacity-100">
+                <X size={18}/>
+              </button>
+            </div>
+            <div className="p-3 text-xs opacity-75">
+              Kliknij w konkretny komponent, aby zobaczyć jego detale:
+            </div>
+            <div className="flex-1 overflow-y-auto p-2 space-y-2">
+              {selectedNames.map(name => (
+                <button 
+                  key={name}
+                  onClick={() => selectComponents([name])}
+                  className={`w-full text-left p-3 rounded-md border transition-colors ${isDarkMode ? 'bg-slate-800 border-slate-700 hover:bg-slate-700 hover:border-blue-500' : 'bg-white border-slate-200 hover:bg-slate-50 hover:border-blue-400'}`}
+                >
+                  <span className="font-bold text-blue-500 block mb-1">{name}</span>
+                  <span className="text-xs opacity-70">
+                    Type: {boardData?.components[name]?.mountingType} | Side: {boardData?.components[name]?.side}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
-        <div className="flex-1 overflow-y-auto">
-          <table className="w-full text-sm text-left">
-            <thead className={`text-xs uppercase sticky top-0 ${isDarkMode ? 'bg-slate-900/95 text-slate-400' : 'bg-white/95 text-slate-500'}`}>
-              <tr><th className="px-4 py-2 font-medium">Pin</th><th className="px-4 py-2 font-medium">Net</th></tr>
-            </thead>
-            <tbody>
-              <tr className={`border-b border-inherit ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}`}>
-                <td className="px-4 py-2 font-mono">1</td><td className="px-4 py-2">+5V</td>
-              </tr>
-              <tr className={`border-b border-inherit ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}`}>
-                <td className="px-4 py-2 font-mono">2</td><td className="px-4 py-2 text-indigo-500 font-medium">GND</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        {/* Case 2: only 1 component clicked */}
+        {selectedNames.length === 1 && boardData && boardData.components[selectedNames[0]] && (
+          <div className="flex flex-col h-full">
+            <div className="flex flex-col p-3 border-b border-inherit shrink-0">
+              <div className="flex items-center justify-between">
+                <h2 className="text-base font-bold flex items-center gap-2 text-rose-500 dark:text-rose-400">
+                  <Cpu size={18}/> {selectedNames[0]}
+                </h2>
+                <button onClick={() => selectComponents([])} className="opacity-60 hover:opacity-100 transition-opacity">
+                  <X size={18}/>
+                </button>
+              </div>
+              <div className="text-xs opacity-70 mt-1 flex flex-col gap-0.5">
+                <span>Type: {boardData.components[selectedNames[0]].mountingType} | Side: {boardData.components[selectedNames[0]].side}</span>
+                <span className="font-mono mt-1 text-blue-500 dark:text-blue-400">PN: [Oczekuje na moduł PDF...]</span>
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto">
+              <table className="w-full text-sm text-left">
+                <thead className={`text-xs uppercase sticky top-0 ${isDarkMode ? 'bg-slate-900/95 text-slate-400' : 'bg-white/95 text-slate-500'}`}>
+                  <tr><th className="px-4 py-2 font-medium">Pin</th><th className="px-4 py-2 font-medium">Net</th></tr>
+                </thead>
+                <tbody>
+                  {boardData.components[selectedNames[0]].pins && Object.entries(boardData.components[selectedNames[0]].pins).map(([pinName, pin]) => (
+                    <tr key={pinName} className={`border-b border-inherit ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}`}>
+                      <td className="px-4 py-2 font-mono font-medium">{pin.name}</td>
+                      <td className="px-4 py-2 text-indigo-600 dark:text-indigo-400 font-semibold">{pin.net || "N/C"}</td>
+                    </tr>
+                  ))}
+                  {!boardData.components[selectedNames[0]].pins && (
+                    <tr><td colSpan={2} className="px-4 py-4 text-center opacity-50 text-xs">Brak zdefiniowanych pinów</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </aside>
 
     </div>
