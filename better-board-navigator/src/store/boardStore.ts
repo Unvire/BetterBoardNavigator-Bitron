@@ -16,8 +16,8 @@ interface BoardState {
   // --- Selection ---
   selectedComponents: Set<string>;
   toggleComponentSelection: (compName: string) => void;
-  selectComponents: (compNames: string[]) => void;
-  clearComponentSelection: () => void;
+  selectComponents: (compNames: string[], append?: boolean) => void;
+  clearSelection: () => void;
   
   selectedNet: string | null;
   setSelectedNet: (netName: string | null) => void;
@@ -59,11 +59,21 @@ export const useBoardStore = create<BoardState>((set) => ({
     return { selectedComponents: newSet };
   }),
 
-  selectComponents: (compNames) => set(() => {
-    return { selectedComponents: new Set(compNames) };
+  selectComponents: (compNames, append = false) => set((state) => {
+    // signle selection
+    if (!append) {
+      return { selectedComponents: new Set(compNames) };
+    }
+    // multi-select (Ctrl+Click)
+    const newSet = new Set(state.selectedComponents);
+    compNames.forEach(name => {
+      if (newSet.has(name)) newSet.delete(name);
+      else newSet.add(name);
+    });
+    return { selectedComponents: newSet };
   }),
 
-  clearComponentSelection: () => set({ selectedComponents: new Set() }),
+  clearSelection: () => set({ selectedComponents: new Set() }),
 
   setSelectedNet: (netName) => set({ selectedNet: netName }),
 

@@ -8,10 +8,10 @@ function BoardCanvas() {
   const { boardData, currentSide, isDarkMode, showOutlines, 
     selectedComponents, selectComponents } = useBoardStore();
 
-  const handleCanvasClick = useCallback((worldX: number, worldY: number) => {
+  const handleCanvasClick = useCallback((worldX: number, worldY: number, isMultiSelect: boolean) => {
     if (!boardData) return;
 
-    const clickedComps = Object.entries(boardData.components).filter(([name, comp]) => {
+    const clickedComps = Object.entries(boardData.components).filter(([_, comp]) => {
       if (comp.side !== currentSide && comp.mountingType !== 'TH') return false;
 
       let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
@@ -53,7 +53,14 @@ function BoardCanvas() {
     });
 
     const clickedNames = clickedComps.map(c => c[0]);
-    selectComponents(clickedNames);
+
+    // ignore clicking in background
+    if (clickedNames.length === 0) return; 
+
+    // prevent from losing selected components by accidental component click
+    if (selectedComponents.size > 1 && !isMultiSelect) return; 
+
+    selectComponents(clickedNames, isMultiSelect);
   }, [boardData, currentSide, selectComponents]);
 
 

@@ -4,7 +4,7 @@ import type { RefObject } from "react";
 
 export function usePanZoom(
   canvasRef: RefObject<HTMLCanvasElement | null>,
-  onCanvasClick?: (worldX: number, worldY: number) => void
+  onCanvasClick?: (worldX: number, worldY: number, isMultiSelect: boolean) => void
 ) {
   const [scale, setScale] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
@@ -59,8 +59,9 @@ export function usePanZoom(
 
       const worldX = (mouseX - offsetRef.current.x) / scaleRef.current;
       const worldY = (mouseY - offsetRef.current.y) / scaleRef.current;
-				
-      onCanvasClick?.(worldX, worldY);
+			
+      const isMultiSelect = e.ctrlKey || e.metaKey;
+      onCanvasClick?.(worldX, worldY,isMultiSelect);
     }
   }, [mouseDownPos, canvasRef, onCanvasClick]);
 

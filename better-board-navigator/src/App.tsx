@@ -3,12 +3,13 @@ import { useBoardStore } from './store/boardStore';
 import BoardCanvas from './components/canvas/BoardCanvas'; 
 import { 
   Upload, RotateCw, FlipHorizontal, Maximize, 
-  Settings2, HelpCircle, Layers, Search, Cpu, List, X, PanelLeftClose, PanelLeftOpen, Sun, Moon
+  Settings2, HelpCircle, Layers, Search, Cpu, List, X, PanelLeftClose, PanelLeftOpen, Sun, Moon,
+  ChevronRight, ArrowLeft
 } from 'lucide-react';
 
 function App() {
   const { boardData, setBoardData, isDarkMode, toggleDarkMode, 
-    selectedComponents, selectComponents } = useBoardStore();
+    selectedComponents, selectComponents, clearSelection } = useBoardStore();
   const [isLoading, setIsLoading] = useState(true);
 
   const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(true);
@@ -18,6 +19,15 @@ function App() {
 
   const selectedNames = Array.from(selectedComponents);
   const isPanelOpen = selectedNames.length > 0;
+  
+  const [detailedComp, setDetailedComp] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (selectedNames.length === 0) setDetailedComp(null);
+    if (detailedComp && !selectedNames.includes(detailedComp)) setDetailedComp(null);
+  }, [selectedComponents, detailedComp]);
+
+  const compToShow = detailedComp || (selectedNames.length === 1 ? selectedNames[0] : null);
 
   useEffect(() => {
     async function loadMockData() {
@@ -144,30 +154,33 @@ function App() {
         style={{ transform: isPanelOpen ? 'translateX(0)' : 'translateX(120%)' }}
       >
         {/* Case 1: stacked components clicked */}
-        {selectedNames.length > 1 && (
+        {selectedNames.length > 1 && !compToShow && (
           <div className="flex flex-col h-full">
             <div className="flex items-center justify-between p-3 border-b border-inherit shrink-0">
               <h2 className="text-sm font-bold text-amber-500">
-                Znaleziono {selectedNames.length} elementy
+                Zaznaczono: {selectedNames.length}
               </h2>
-              <button onClick={() => selectComponents([])} className="opacity-60 hover:opacity-100">
+              <button onClick={clearSelection} className="opacity-60 hover:opacity-100">
                 <X size={18}/>
               </button>
             </div>
             <div className="p-3 text-xs opacity-75">
-              Kliknij w konkretny komponent, aby zobaczyć jego detale:
+              Kliknij "Pokaż piny", aby przejrzeć szczegóły bez utraty zaznaczenia na Canvasie.
             </div>
             <div className="flex-1 overflow-y-auto p-2 space-y-2">
               {selectedNames.map(name => (
                 <button 
                   key={name}
-                  onClick={() => selectComponents([name])}
-                  className={`w-full text-left p-3 rounded-md border transition-colors ${isDarkMode ? 'bg-slate-800 border-slate-700 hover:bg-slate-700 hover:border-blue-500' : 'bg-white border-slate-200 hover:bg-slate-50 hover:border-blue-400'}`}
+                  onClick={() => setDetailedComp(name)}
+                  className={`flex justify-between items-center w-full text-left p-3 rounded-md border transition-all ${isDarkMode ? 'bg-slate-800 border-slate-700 hover:bg-slate-700 hover:border-blue-500' : 'bg-white border-slate-200 hover:bg-slate-50 hover:border-blue-400'}`}
                 >
-                  <span className="font-bold text-blue-500 block mb-1">{name}</span>
-                  <span className="text-xs opacity-70">
-                    Type: {boardData?.components[name]?.mountingType} | Side: {boardData?.components[name]?.side}
-                  </span>
+                  <div className="flex flex-col">
+                    <span className="font-bold text-blue-500 block mb-1">{name}</span>
+                    <span className="text-xs opacity-70">
+                      Side: {boardData?.components[name]?.side}
+                    </span>
+                  </div>
+                  <ChevronRight size={18} className="text-slate-400 dark:text-slate-500 opacity-60" />
                 </button>
               ))}
             </div>
@@ -175,19 +188,33 @@ function App() {
         )}
 
         {/* Case 2: only 1 component clicked */}
-        {selectedNames.length === 1 && boardData && boardData.components[selectedNames[0]] && (
+        {compToShow && boardData && boardData.components[compToShow] && (
           <div className="flex flex-col h-full">
             <div className="flex flex-col p-3 border-b border-inherit shrink-0">
               <div className="flex items-center justify-between">
-                <h2 className="text-base font-bold flex items-center gap-2 text-rose-500 dark:text-rose-400">
-                  <Cpu size={18}/> {selectedNames[0]}
-                </h2>
-                <button onClick={() => selectComponents([])} className="opacity-60 hover:opacity-100 transition-opacity">
+                <div className="flex items-center gap-2">
+                  {selectedNames.length > 1 ? (
+                    <button 
+                      onClick={() => setDetailedComp(null)} 
+                      className="p-1.5 -ml-1 rounded-md text-blue-500 hover:bg-blue-500/15 transition-colors"
+                      title="Wróć do listy"
+                    >
+                      <ArrowLeft size={24} />
+                    </button>
+                  ) : (
+                    <Cpu size={24} className="text-rose-500 dark:text-rose-400"/>
+                  )}
+                  <h2 className="text-lg font-bold text-rose-500 dark:text-rose-400">
+                    {compToShow}
+                  </h2>
+                </div>
+
+                <button onClick={clearSelection} className="opacity-60 hover:opacity-100 transition-opacity">
                   <X size={18}/>
                 </button>
               </div>
               <div className="text-xs opacity-70 mt-1 flex flex-col gap-0.5">
-                <span>Type: {boardData.components[selectedNames[0]].mountingType} | Side: {boardData.components[selectedNames[0]].side}</span>
+                <span>Type: {boardData.components[compToShow].mountingType} | Side: {boardData.components[compToShow].side}</span>
                 <span className="font-mono mt-1 text-blue-500 dark:text-blue-400">PN: [Oczekuje na moduł PDF...]</span>
               </div>
             </div>
@@ -198,13 +225,13 @@ function App() {
                   <tr><th className="px-4 py-2 font-medium">Pin</th><th className="px-4 py-2 font-medium">Net</th></tr>
                 </thead>
                 <tbody>
-                  {boardData.components[selectedNames[0]].pins && Object.entries(boardData.components[selectedNames[0]].pins).map(([pinName, pin]) => (
+                  {boardData.components[compToShow].pins && Object.entries(boardData.components[compToShow].pins).map(([pinName, pin]) => (
                     <tr key={pinName} className={`border-b border-inherit ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}`}>
                       <td className="px-4 py-2 font-mono font-medium">{pinName}</td>
                       <td className="px-4 py-2 text-indigo-600 dark:text-indigo-400 font-semibold">{pin.net || "N/C"}</td>
                     </tr>
                   ))}
-                  {!boardData.components[selectedNames[0]].pins && (
+                  {!boardData.components[compToShow].pins && (
                     <tr><td colSpan={2} className="px-4 py-4 text-center opacity-50 text-xs">Brak zdefiniowanych pinów</td></tr>
                   )}
                 </tbody>
