@@ -27,7 +27,6 @@ function BoardCanvas() {
         ctx.closePath();
       }
     }
-    ctx.stroke(); 
   };
 
 
@@ -53,23 +52,22 @@ function BoardCanvas() {
     ctx.save();
     ctx.translate(offset.x, offset.y);
     ctx.scale(scale, scale);
-    const baseLineWidth = 1 / scale; // constant line size
+    const baseLineWidth = 0.5 / scale; // constant line size
 
     // 1. Drawing outlines
     if (showOutlines && boardData.outlines) {
       ctx.beginPath();
       ctx.lineWidth = baseLineWidth * 2;
-      ctx.strokeStyle = isDarkMode ? '#475569' : '#94a3b8';
+      ctx.strokeStyle = isDarkMode ? '#94a3b8' : '#64748b';
       
       boardData.outlines.forEach(shape => addShapeToPath(ctx, shape));
       ctx.stroke();
     }
 
-    // Drawing pads and components
+    // Grouping pads and components
     const thtPads: ShapeData[] = [];
     const smtPads: ShapeData[] = [];
     const bodyShapes: ShapeData[] = [];
-
     Object.values(boardData.components).forEach(comp => {
       const isOnCurrentSide = comp.side === currentSide;
       const isTH = comp.mountingType === 'TH';
@@ -88,11 +86,11 @@ function BoardCanvas() {
       }
     });
 
-    // -2.  Drawing components
+    // 2. Drawing components
     if (bodyShapes.length > 0) {
       ctx.beginPath();
-      ctx.lineWidth = baseLineWidth * 1.5;
-      ctx.strokeStyle = isDarkMode ? '#22c55e' : '#16a34a'; // Zielony
+      ctx.lineWidth = baseLineWidth;
+      ctx.strokeStyle = isDarkMode ? '#22c55e' : '#16a34a';
       bodyShapes.forEach(shape => addShapeToPath(ctx, shape));
       ctx.stroke();
     }
