@@ -126,6 +126,25 @@ function App() {
     return availableNets.filter(net => net.toLowerCase().includes(q));
   }, [availableNets, searchQuery])
 
+  const componentsInSelectedNet = useMemo(() => {
+    if (!boardData || !selectedNet) return [];
+
+    const result: { comp: string, pin: string }[] = [];
+    
+    Object.entries(boardData.components).forEach(([compName, comp]) => {
+      if (comp.pins) {
+        Object.entries(comp.pins).forEach(([pinName, pin]) => {
+          if (pin.net === selectedNet) {
+            result.push({ comp: compName, pin: pinName });
+          }
+        });
+      }
+    });
+    
+    return result.sort((a, b) => a.comp.localeCompare(b.comp, undefined, { numeric: true }));
+  }, [boardData, selectedNet]);
+
+
   if (isLoading) {
     return (
       <div className={`flex h-screen w-screen items-center justify-center ${isDarkMode ? 'bg-slate-900 text-slate-300' : 'bg-slate-300 text-slate-700'}`}>
@@ -273,21 +292,58 @@ function App() {
               {filteredNets.map(net => {
                 const isSelected = selectedNet === net;
                 return (
-                  <li 
-                    key={net}
-                    onClick={() => selectNet(isSelected ? null : net)}
-                    className={`px-3 py-1.5 rounded-md cursor-pointer transition-colors text-sm flex items-center justify-between ${
-                      isSelected
-                        ? (isDarkMode 
-                            ? 'bg-fuchsia-500/20 text-fuchsia-400 border-fuchsia-500/30 font-medium' 
-                            : 'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200 font-medium shadow-sm')
-                        : (isDarkMode 
-                            ? 'text-slate-300 hover:bg-slate-800 hover:text-white' 
-                            : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900')
-                    } ${isSelected ? 'border' : 'border border-transparent'}`}
-                  >
-                    {net}
-                  </li>
+                  <div key={net} className="flex flex-col gap-0.5">
+                    <li 
+                      onClick={() => selectNet(isSelected ? null : net)}
+                      className={`px-3 py-1.5 rounded-md cursor-pointer transition-all text-sm flex items-center justify-between ${
+                        isSelected
+                          ? (isDarkMode 
+                              ? 'bg-fuchsia-500/20 text-fuchsia-400 border-fuchsia-500/30 font-bold' 
+                              : 'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200 font-bold shadow-sm')
+                          : (isDarkMode 
+                              ? 'text-slate-300 hover:bg-slate-800 hover:text-white' 
+                              : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900')
+                      } ${isSelected ? 'border' : 'border border-transparent'}`}
+                    >
+                      <span>{net}</span>
+                      
+                      {isSelected && (
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); selectNet(null); }}
+                          className="opacity-60 hover:opacity-100 p-0.5 rounded-full hover:bg-fuchsia-500/20"
+                        >
+                          <X size={14}/>
+                        </button>
+                      )}
+                    </li>
+
+                    {isSelected && (
+                      <div className={`ml-3 my-1 pl-2 border-l-2 space-y-1 ${isDarkMode ? 'border-fuchsia-900/50' : 'border-fuchsia-200'}`}>
+                        {componentsInSelectedNet.map(({ comp, pin }, idx) => (
+                          <button
+                            key={`${comp}-${pin}-${idx}`}
+                            onClick={() => {
+                              const targetComp = boardData?.components[comp];
+                              if (targetComp && targetComp.side !== currentSide) {
+                                setCurrentSide(targetComp.side);
+                                setIsMirrored(targetComp.side === 'B');
+                              }
+                              setInspectedComponent(comp);
+                              triggerFocus(comp);
+                            }}
+                            className={`w-full flex items-center justify-between px-2 py-1 rounded text-xs transition-colors ${
+                              isDarkMode 
+                                ? 'text-slate-400 hover:text-cyan-400 hover:bg-cyan-900/20' 
+                                : 'text-slate-500 hover:text-cyan-700 hover:bg-cyan-50'
+                            }`}
+                          >
+                            <span className="font-bold">{comp}</span>
+                            <span className="opacity-70 font-mono">Pin: {pin}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 );
               })}
             </ul>
