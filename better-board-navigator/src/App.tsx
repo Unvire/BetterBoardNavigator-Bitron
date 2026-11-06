@@ -200,7 +200,7 @@ function App() {
                 <tbody>
                   {boardData.components[selectedNames[0]].pins && Object.entries(boardData.components[selectedNames[0]].pins).map(([pinName, pin]) => (
                     <tr key={pinName} className={`border-b border-inherit ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}`}>
-                      <td className="px-4 py-2 font-mono font-medium">{pin.name}</td>
+                      <td className="px-4 py-2 font-mono font-medium">{pinName}</td>
                       <td className="px-4 py-2 text-indigo-600 dark:text-indigo-400 font-semibold">{pin.net || "N/C"}</td>
                     </tr>
                   ))}

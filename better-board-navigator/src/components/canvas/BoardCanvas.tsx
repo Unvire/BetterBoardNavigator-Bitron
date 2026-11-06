@@ -8,34 +8,44 @@ function BoardCanvas() {
   const { boardData, currentSide, isDarkMode, showOutlines, 
     selectedComponents, selectComponents } = useBoardStore();
 
-  const { scale, offset, handlers, resetView } = usePanZoom(canvasRef);
-
   const handleCanvasClick = useCallback((worldX: number, worldY: number) => {
     if (!boardData) return;
 
     const clickedComps = Object.entries(boardData.components).filter(([name, comp]) => {
       if (comp.side !== currentSide && comp.mountingType !== 'TH') return false;
 
-      const shape = comp.shapeData;
-      if (!shape) return;
-
       let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+      let hasGeometry = false;
+
       const addPoint = (x: number, y: number) => {
+        hasGeometry = true;
         if (x < minX) minX = x; if (x > maxX) maxX = x;
         if (y < minY) minY = y; if (y > maxY) maxY = y;
       };
 
-      if (shape.type === 'Line') {
-        addPoint(shape.start.x, shape.start.y);
-        addPoint(shape.end.x, shape.end.y);
+      const processShape = (shape: ShapeData) => {
+        if (shape.type === 'Line') {
+          addPoint(shape.start.x, shape.start.y);
+          addPoint(shape.end.x, shape.end.y);
 
-      } else if (shape.type === 'Rectangle' && shape.points) {
-        shape.points.forEach(p => addPoint(p.x, p.y));
+        } else if (shape.type === 'Rectangle' && shape.points) {
+          shape.points.forEach(p => addPoint(p.x, p.y));
 
-      } else if (shape.type === 'Circle' || shape.type === 'Arc') {
-        addPoint(shape.center.x - shape.radius, shape.center.y - shape.radius);
-        addPoint(shape.center.x + shape.radius, shape.center.y + shape.radius);
+        } else if (shape.type === 'Circle' || shape.type === 'Arc') {
+          addPoint(shape.center.x - shape.radius, shape.center.y - shape.radius);
+          addPoint(shape.center.x + shape.radius, shape.center.y + shape.radius);
+        }
       }
+
+      if (comp.shapeData) processShape(comp.shapeData);
+
+      if (comp.pins) {
+        Object.values(comp.pins).forEach(pin => {
+          if (pin.shapeData) processShape(pin.shapeData);
+        });
+      }
+
+      if (!hasGeometry) return false;
 
       const tolerance = 0.5;
       return (worldX >= minX - tolerance && worldX <= maxX + tolerance && 
@@ -46,8 +56,11 @@ function BoardCanvas() {
     selectComponents(clickedNames);
   }, [boardData, currentSide, selectComponents]);
 
+
+  const { scale, offset, handlers, resetView } = usePanZoom(canvasRef, handleCanvasClick);
+
   useEffect(() => {
-    if (boardData && boardData.boardDimensions) {
+    if (boardData) {
       resetView(boardData);
     }
   }, [boardData, resetView]);
@@ -163,7 +176,7 @@ function BoardCanvas() {
 
     if (selectedShapes.length > 0) {
       ctx.beginPath();
-      ctx.lineWidth = baseLineWidth * 3;
+      ctx.lineWidth = baseLineWidth * 1.5;
       ctx.strokeStyle = isDarkMode ? '#f43f5e' : '#e11d48'; 
       selectedShapes.forEach(shape => addShapeToPath(ctx, shape));
       ctx.stroke();
