@@ -1,16 +1,42 @@
-import { useRef, useEffect } from "react";
-import { useBoardStore } from "../../store/boardStore";
+import { useRef, useEffect } from 'react';
+import { useBoardStore } from '../../store/boardStore';
+import { usePanZoom } from '../../hooks/usePanZoom';
+import type { ShapeData } from '../../types/board';
 
 function BoardCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { boardData, currentSide, isDarkMode, showOutlines } = useBoardStore();
 
-  const boardData = useBoardStore((state) => state.boardData);
-  const currentSide = useBoardStore((state) => state.currentSide);
-  const isDarkMode = useBoardStore((state) => state.isDarkMode);
+  const { scale, offset, handlers } = usePanZoom(canvasRef);
+
+  const addShapeToPath = (ctx: CanvasRenderingContext2D, shape: ShapeData) => {
+    if (shape.type === 'Line') {
+      ctx.moveTo(shape.start.x, shape.start.y);
+      ctx.lineTo(shape.end.x, shape.end.y);
+    } else if (shape.type === 'Arc') {
+      ctx.arc(shape.center.x, shape.center.y, shape.radius, shape.startAngle, shape.endAngle);
+    } else if (shape.type === 'Circle') {
+      ctx.moveTo(shape.center.x + shape.radius, shape.center.y);
+      ctx.arc(shape.center.x, shape.center.y, shape.radius, 0, 2 * Math.PI);
+    } else if (shape.type === 'Rectangle') {
+      if (shape.points && shape.points.length === 4) {
+        ctx.moveTo(shape.points[0].x, shape.points[0].y);
+        ctx.lineTo(shape.points[1].x, shape.points[1].y);
+        ctx.lineTo(shape.points[2].x, shape.points[2].y);
+        ctx.lineTo(shape.points[3].x, shape.points[3].y);
+        ctx.closePath();
+      }
+    }
+    ctx.stroke(); 
+  };
+
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || !boardData) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
     const parent = canvas.parentElement;
     if (parent) {
@@ -18,30 +44,87 @@ function BoardCanvas() {
       canvas.height = parent.clientHeight;
     }
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    ctx.setTransform(1, 0, 0, 1, 0, 0); 
-    
-    ctx.fillStyle = isDarkMode ? '#0f172a' : '#f1f5f9';
+    // clearing and setting background
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = isDarkMode ? '#020617' : '#f8fafc';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.fillStyle = isDarkMode ? '#38bdf8' : '#2563eb';
-    ctx.font = 'bold 20px sans-serif';
-    ctx.fillText(`Canvas podłączony poprawnie! 🚀`, 40, 60);
-    
-    ctx.fillStyle = isDarkMode ? '#cbd5e1' : '#475569';
-    ctx.font = '16px sans-serif';
-    ctx.fillText(`Aktualna warstwa widoku (Side): ${currentSide}`, 40, 100);
-    ctx.fillText(`Ilość sieci (Nets): ${Object.keys(boardData.nets).length}`, 40, 130);
-  }, [boardData, currentSide, isDarkMode]);
+    // transformations
+    ctx.save();
+    ctx.translate(offset.x, offset.y);
+    ctx.scale(scale, scale);
+    const baseLineWidth = 1 / scale; // constant line size
+
+    // 1. Drawing outlines
+    if (showOutlines && boardData.outlines) {
+      ctx.beginPath();
+      ctx.lineWidth = baseLineWidth * 2;
+      ctx.strokeStyle = isDarkMode ? '#475569' : '#94a3b8';
+      
+      boardData.outlines.forEach(shape => addShapeToPath(ctx, shape));
+      ctx.stroke();
+    }
+
+    // Drawing pads and components
+    const thtPads: ShapeData[] = [];
+    const smtPads: ShapeData[] = [];
+    const bodyShapes: ShapeData[] = [];
+
+    Object.values(boardData.components).forEach(comp => {
+      const isOnCurrentSide = comp.side === currentSide;
+      const isTH = comp.mountingType === 'TH';
+      
+      if (isOnCurrentSide && comp.shapeData) {
+        bodyShapes.push(comp.shapeData);
+      }
+
+      if ((isOnCurrentSide || isTH) && comp.pins) {
+        Object.values(comp.pins).forEach(pin => {
+          if (pin.shapeData) {
+            if (isTH) thtPads.push(pin.shapeData);
+            else smtPads.push(pin.shapeData);
+          }
+        });
+      }
+    });
+
+    // -2.  Drawing components
+    if (bodyShapes.length > 0) {
+      ctx.beginPath();
+      ctx.lineWidth = baseLineWidth * 1.5;
+      ctx.strokeStyle = isDarkMode ? '#22c55e' : '#16a34a'; // Zielony
+      bodyShapes.forEach(shape => addShapeToPath(ctx, shape));
+      ctx.stroke();
+    }
+
+    // 3. SMT pads
+    if (smtPads.length > 0) {
+      ctx.beginPath();
+      ctx.lineWidth = baseLineWidth;
+      ctx.strokeStyle = isDarkMode ? '#eab308' : '#d97706'; 
+      smtPads.forEach(shape => addShapeToPath(ctx, shape));
+      ctx.stroke();
+    }
+
+    // 4. THT pads
+    if (thtPads.length > 0) {
+      ctx.beginPath();
+      ctx.lineWidth = baseLineWidth;
+      ctx.strokeStyle = isDarkMode ? '#60a5fa' : '#3b82f6';
+      thtPads.forEach(shape => addShapeToPath(ctx, shape));
+      ctx.stroke();
+    }
+
+    ctx.restore(); 
+  }, [boardData, currentSide, isDarkMode, showOutlines, scale, offset]);
 
   return (
-    <div className="w-full h-full relative block">
-      <canvas 
-        ref={canvasRef}
-        className="absolute inset-0 block w-full h-full cursor-crosshair touch-none"
-      />
+    <div className="w-full h-full relative block overflow-hidden">
+        <canvas 
+          ref={canvasRef}
+          {...handlers}
+          className="absolute inset-0 block w-full h-full cursor-grab active:cursor-grabbing touch-none"
+        />
     </div>
   );
 }
