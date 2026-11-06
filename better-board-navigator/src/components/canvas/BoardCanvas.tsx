@@ -1,15 +1,38 @@
-import { useRef, useEffect, useCallback, useMemo } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useBoardStore } from '../../store/boardStore';
 import { usePanZoom } from '../../hooks/usePanZoom';
 import type { ShapeData } from '../../types/board';
 
 function BoardCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+
   const { 
     boardData, currentSide, setCurrentSide, isMirrored, setIsMirrored, 
     isDarkMode, showOutlines, selectedComponents, selectComponents, 
     selectedNet, componentToFocus, clearFocus 
   } = useBoardStore();
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Control' || e.key === 'Meta') setIsSelectionMode(true);
+    };
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key === 'Control' || e.key === 'Meta') setIsSelectionMode(false);
+    };
+    const handleBlur = () => setIsSelectionMode(false);
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('blur', handleBlur);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('blur', handleBlur);
+    };
+  }, []);
 
 
   const boardCenterX = useMemo(() => {
@@ -48,6 +71,7 @@ function BoardCanvas() {
 
   const handleCanvasClick = useCallback((clickWorldX: number, clickWorldY: number, isMultiSelect: boolean) => {
     if (!boardData) return;
+    if (!isMultiSelect) return;
 
     const worldX = isMirrored ? (boardCenterX * 2 - clickWorldX) : clickWorldX;
     const worldY = clickWorldY;
@@ -109,9 +133,6 @@ function BoardCanvas() {
       setCurrentSide(firstComp.side);
       setIsMirrored(firstComp.side === 'B');
     }
-
-    // prevent from losing selected components by accidental component click
-    if (selectedComponents.size > 1 && !isMultiSelect) return; 
 
     selectComponents(clickedNames, isMultiSelect);
   }, [boardData, currentSide, isMirrored, selectComponents, setCurrentSide, setIsMirrored]);
@@ -341,7 +362,11 @@ function BoardCanvas() {
         <canvas 
           ref={canvasRef}
           {...handlers}
-          className="absolute inset-0 block w-full h-full cursor-grab active:cursor-grabbing touch-none"
+          className={`absolute inset-0 block w-full h-full touch-none ${
+            isSelectionMode 
+              ? 'cursor-crosshair' 
+              : 'cursor-grab active:cursor-grabbing'
+          }`}
         />
     </div>
   );
