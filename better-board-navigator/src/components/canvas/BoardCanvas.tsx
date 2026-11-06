@@ -1,5 +1,5 @@
 import { useRef, useEffect } from "react";
-import { useBoardStore } from "../store/boardStore";
+import { useBoardStore } from "../../store/boardStore";
 
 function BoardCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
