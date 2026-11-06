@@ -163,7 +163,7 @@ function BoardCanvas() {
 
     // clearing and setting background
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.fillStyle = isDarkMode ? '#0a0a0a' : '#cbd5e1';
+    ctx.fillStyle = isDarkMode ? '#0a0a0a' : '#f1f5f9';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // transformations

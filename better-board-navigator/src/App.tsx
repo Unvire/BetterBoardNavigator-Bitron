@@ -98,8 +98,8 @@ function App() {
     );
   }
 
-  const glassPanelClass = `absolute top-16 bottom-4 rounded-xl border shadow-2xl flex flex-col transition-transform duration-300 z-10 backdrop-blur-md overflow-hidden ` + 
-    (isDarkMode ? 'bg-slate-900/85 border-slate-700 text-slate-300' : 'bg-white/85 border-slate-200 text-slate-800');
+  const glassPanelClass = `absolute top-16 bottom-4 rounded-xl border shadow-lg flex flex-col transition-transform duration-300 z-10 backdrop-blur-xl overflow-hidden ` + 
+    (isDarkMode ? 'bg-slate-900/85 border-slate-700 text-slate-300' : 'bg-white/95 border-slate-200 text-slate-700');
 
   const topBarBtnClass = "p-2 rounded-lg transition-colors hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center gap-1";
 
@@ -114,7 +114,7 @@ function App() {
   };
 
   return (
-    <div className={`relative w-screen h-screen overflow-hidden ${isDarkMode ? 'bg-slate-950' : 'bg-slate-300'}`}>
+    <div className={`relative w-screen h-screen overflow-hidden ${isDarkMode ? 'bg-slate-950' : 'bg-slate-100'}`}>
       
       {/* LAYER 0: CANVAS - background */}
       <div className="absolute inset-0 z-0">
@@ -191,7 +191,12 @@ function App() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={`Search ${activeTab}...`}
-              className={`w-full pl-9 pr-3 py-1.5 text-sm rounded-md outline-none transition-colors border ${isDarkMode ? 'bg-slate-800 border-slate-700 focus:border-blue-500' : 'bg-slate-100 border-slate-300 focus:border-blue-500'}`}
+              className={`w-full pl-9 pr-3 py-2 text-sm rounded-md outline-none transition-all border ${
+                isDarkMode 
+                  ? 'bg-slate-950/50 border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500' 
+                  : 'bg-slate-50 border-slate-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:bg-white hover:border-slate-300'
+                }`
+              }
             />
           </div>
         </div>
@@ -230,11 +235,15 @@ function App() {
                   <li 
                     key={net}
                     onClick={() => selectNet(isSelected ? null : net)}
-                    className={`px-3 py-1.5 rounded-md cursor-pointer font-semibold transition-colors ${
+                    className={`px-3 py-1.5 rounded-md cursor-pointer transition-colors text-sm flex items-center justify-between ${
                       isSelected
-                        ? 'bg-fuchsia-500/20 text-fuchsia-600 dark:text-fuchsia-400 border border-fuchsia-500/30'
-                        : (isDarkMode ? 'text-indigo-400 hover:bg-slate-800' : 'text-indigo-700 hover:bg-slate-200/70')
-                    }`}
+                        ? (isDarkMode 
+                            ? 'bg-fuchsia-500/20 text-fuchsia-400 border-fuchsia-500/30 font-medium' 
+                            : 'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200 font-medium shadow-sm')
+                        : (isDarkMode 
+                            ? 'text-slate-300 hover:bg-slate-800 hover:text-white' 
+                            : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900')
+                    } ${isSelected ? 'border' : 'border border-transparent'}`}
                   >
                     {net}
                   </li>
