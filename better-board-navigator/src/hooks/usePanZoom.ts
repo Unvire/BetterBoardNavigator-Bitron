@@ -40,6 +40,7 @@ export function usePanZoom(canvasRef: RefObject<HTMLCanvasElement | null>) {
 
   const onMouseUp = useCallback(() => setIsDragging(false), []);
 
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -66,15 +67,56 @@ export function usePanZoom(canvasRef: RefObject<HTMLCanvasElement | null>) {
 
       setScale(newScale);
       setOffset({ x: newOffsetX, y: newOffsetY });
-
     };
 
     canvas.addEventListener('wheel', handleWheel, { passive: false });
     return () => canvas.removeEventListener('wheel', handleWheel);
   }, [canvasRef]);
 
+
+  const resetView = useCallback((boardData: any) => {
+    const canvas = canvasRef.current;
+    if (!canvas || !boardData) return;
+
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+
+    const expandBoundingBox = (x: number, y: number) => {
+      if (x < minX) minX = x;
+      if (x > maxX) maxX = x;
+      if (y < minY) minY = y;
+      if (y > maxY) maxY = y;
+    };
+
+    if (boardData.area && boardData.area.length > 0) {
+      boardData.area.forEach((point: any) => expandBoundingBox(point.x, point.y));
+    } else {
+      Object.values(boardData.components).forEach((comp: any) => {
+        if (comp.coords) expandBoundingBox(comp.coords.x, comp.coords.y);
+      });
+    }
+
+    if (minX === Infinity) { minX = 0; maxX = 100; minY = 0; maxY = 100; }
+
+    const boardWidth = maxX - minX;
+    const boardHeight = maxY - minY;
+
+    const canvasWidth = canvas.clientWidth;
+    const canvasHeight = canvas.clientHeight;
+
+    const scaleX = (canvasWidth * 0.9) / boardWidth;
+    const scaleY = (canvasHeight * 0.9) / boardHeight;
+    const newScale = Math.min(scaleX, scaleY);
+
+    const newOffsetX = (canvasWidth - (boardWidth * newScale)) / 2 - (minX * newScale);
+    const newOffsetY = (canvasHeight - (boardHeight * newScale)) / 2 - (minY * newScale);
+
+    setScale(newScale);
+    setOffset({ x: newOffsetX, y: newOffsetY });
+  }, [canvasRef]);
+
   return {
-    scale, offset, handlers: {
+    scale, offset, resetView, 
+    handlers: {
       onMouseDown,
       onMouseMove,
       onMouseUp,

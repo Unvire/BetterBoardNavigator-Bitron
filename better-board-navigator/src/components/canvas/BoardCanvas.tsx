@@ -7,7 +7,13 @@ function BoardCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { boardData, currentSide, isDarkMode, showOutlines } = useBoardStore();
 
-  const { scale, offset, handlers } = usePanZoom(canvasRef);
+  const { scale, offset, handlers, resetView } = usePanZoom(canvasRef);
+
+  useEffect(() => {
+    if (boardData && boardData.boardDimensions) {
+      resetView(boardData);
+    }
+  }, [boardData, resetView]);
 
   const addShapeToPath = (ctx: CanvasRenderingContext2D, shape: ShapeData) => {
     if (shape.type === 'Line') {
@@ -45,20 +51,20 @@ function BoardCanvas() {
 
     // clearing and setting background
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.fillStyle = isDarkMode ? '#020617' : '#f8fafc';
+    ctx.fillStyle = isDarkMode ? '#0a0a0a' : '#f8fafc';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // transformations
     ctx.save();
     ctx.translate(offset.x, offset.y);
     ctx.scale(scale, scale);
-    const baseLineWidth = 0.5 / scale; // constant line size
+    const baseLineWidth = 1 / scale; // constant line size
 
     // 1. Drawing outlines
     if (showOutlines && boardData.outlines) {
       ctx.beginPath();
       ctx.lineWidth = baseLineWidth * 2;
-      ctx.strokeStyle = isDarkMode ? '#94a3b8' : '#64748b';
+      ctx.strokeStyle = isDarkMode ? '#e2e8f0' : '#475569';
       
       boardData.outlines.forEach(shape => addShapeToPath(ctx, shape));
       ctx.stroke();
@@ -90,7 +96,7 @@ function BoardCanvas() {
     if (bodyShapes.length > 0) {
       ctx.beginPath();
       ctx.lineWidth = baseLineWidth;
-      ctx.strokeStyle = isDarkMode ? '#22c55e' : '#16a34a';
+      ctx.strokeStyle = isDarkMode ? '#4ade80' : '#16a34a';
       bodyShapes.forEach(shape => addShapeToPath(ctx, shape));
       ctx.stroke();
     }
@@ -99,7 +105,7 @@ function BoardCanvas() {
     if (smtPads.length > 0) {
       ctx.beginPath();
       ctx.lineWidth = baseLineWidth;
-      ctx.strokeStyle = isDarkMode ? '#eab308' : '#d97706'; 
+      ctx.strokeStyle = isDarkMode ? '#fbbf24' : '#d97706';
       smtPads.forEach(shape => addShapeToPath(ctx, shape));
       ctx.stroke();
     }
@@ -108,7 +114,7 @@ function BoardCanvas() {
     if (thtPads.length > 0) {
       ctx.beginPath();
       ctx.lineWidth = baseLineWidth;
-      ctx.strokeStyle = isDarkMode ? '#60a5fa' : '#3b82f6';
+      ctx.strokeStyle = isDarkMode ? '#60a5fa' : '#2563eb';
       thtPads.forEach(shape => addShapeToPath(ctx, shape));
       ctx.stroke();
     }
