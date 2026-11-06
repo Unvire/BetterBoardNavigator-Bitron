@@ -38,6 +38,19 @@ function App() {
 
 
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        clearSelection();
+        setDetailedComp(null);
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [clearSelection]);
+
+
+  useEffect(() => {
     async function loadMockData() {
       try {
         const res = await fetch('/mockBoard.json');
@@ -271,21 +284,47 @@ function App() {
             <div className="p-3 text-xs opacity-75">
               Kliknij "Pokaż piny", aby przejrzeć szczegóły bez utraty zaznaczenia na Canvasie.
             </div>
-            <div className="flex-1 overflow-y-auto p-2 space-y-2">
+            <div className="flex-1 overflow-y-auto p-2 space-y-1.5">
               {selectedNames.map(name => (
-                <button 
-                  key={name}
-                  onClick={() => setDetailedComp(name)}
-                  className={`flex justify-between items-center w-full text-left p-3 rounded-md border transition-all ${isDarkMode ? 'bg-slate-800 border-slate-700 hover:bg-slate-700 hover:border-blue-500' : 'bg-white border-slate-200 hover:bg-slate-50 hover:border-blue-400'}`}
+                <div 
+                  key={name} 
+                  className={`group flex items-stretch w-full rounded-md border transition-all ${
+                    isDarkMode 
+                      ? 'bg-slate-800/50 border-slate-700 hover:border-slate-500' 
+                      : 'bg-white border-slate-200 hover:border-slate-300 shadow-sm'
+                  }`}
                 >
-                  <div className="flex flex-col">
-                    <span className="font-bold text-blue-500 block mb-1">{name}</span>
-                    <span className="text-xs opacity-70">
-                      Side: {boardData?.components[name]?.side}
-                    </span>
-                  </div>
-                  <ChevronRight size={18} className="text-slate-400 dark:text-slate-500 opacity-60" />
-                </button>
+                  <button 
+                    onClick={() => setDetailedComp(name)}
+                    className="flex-1 flex justify-between items-center text-left p-2.5 pl-3 transition-colors rounded-l-md hover:bg-blue-500/10 dark:hover:bg-slate-700/50"
+                  >
+                    <div className="flex flex-col">
+                      <span className="font-bold text-blue-500 block leading-tight">{name}</span>
+                      <span className="text-xs opacity-60 mt-0.5">
+                        Side: {boardData?.components[name]?.side}
+                      </span>
+                    </div>
+                    
+                    <ChevronRight 
+                      size={16} 
+                      className="text-blue-500/50 opacity-0 group-hover:opacity-100 transition-opacity -mr-1" 
+                    />
+                  </button>
+                  
+                  <div className={`w-px my-2 ${isDarkMode ? 'bg-slate-700' : 'bg-slate-100'}`}></div>
+
+                  <button
+                    onClick={() => selectComponents([name], true)} 
+                    className={`px-3 flex items-center justify-center rounded-r-md transition-colors ${
+                      isDarkMode 
+                        ? 'text-slate-500 hover:text-rose-400 hover:bg-rose-500/10' 
+                        : 'text-slate-300 hover:text-rose-500 hover:bg-rose-50'
+                    }`}
+                    title="Odznacz komponent"
+                  >
+                    <X size={14} className="stroke-[2.5]" />
+                  </button>
+                </div>
               ))}
             </div>
           </div>
