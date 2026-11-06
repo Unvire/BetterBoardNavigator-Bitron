@@ -139,8 +139,28 @@ export function usePanZoom(
     setOffset({ x: newOffsetX, y: newOffsetY });
   }, [canvasRef]);
 
+  const focusOnBoundingBox = useCallback((minX: number, maxX: number, minY: number, maxY: number) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const compWidth = Math.max(maxX - minX, 1);
+    const compHeight = Math.max(maxY - minY, 1);
+    const canvasWidth = canvas.clientWidth;
+    const canvasHeight = canvas.clientHeight;
+    
+    const scaleX = (canvasWidth * 0.4) / compWidth;
+    const scaleY = (canvasHeight * 0.4) / compHeight;
+    const newScale = Math.min(scaleX, scaleY, 50);
+    
+    const newOffsetX = (canvasWidth - (compWidth * newScale)) / 2 - (minX * newScale);
+    const newOffsetY = (canvasHeight - (compHeight * newScale)) / 2 - (minY * newScale);
+
+    setScale(newScale);
+    setOffset({ x: newOffsetX, y: newOffsetY });
+  }, [canvasRef]);
+
   return {
-    scale, offset, resetView, 
+    scale, offset, resetView, focusOnBoundingBox,
     handlers: {
       onMouseDown,
       onMouseMove,

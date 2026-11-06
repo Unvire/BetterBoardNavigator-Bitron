@@ -5,11 +5,17 @@ import type { ShapeData } from '../../types/board';
 
 function BoardCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { boardData, currentSide, isDarkMode, showOutlines, 
-    selectedComponents, selectComponents } = useBoardStore();
+  const { 
+    boardData, currentSide, setCurrentSide, isMirrored, setIsMirrored, 
+    isDarkMode, showOutlines, selectedComponents, selectComponents, 
+    selectedNet, componentToFocus, clearFocus 
+  } = useBoardStore();
 
-  const handleCanvasClick = useCallback((worldX: number, worldY: number, isMultiSelect: boolean) => {
+  const handleCanvasClick = useCallback((clickWorldX: number, clickWorldY: number, isMultiSelect: boolean) => {
     if (!boardData) return;
+
+    const worldX = isMirrored ? -clickWorldX : clickWorldX;
+    const worldY = clickWorldY;
 
     const clickedComps = Object.entries(boardData.components).filter(([_, comp]) => {
       if (comp.side !== currentSide && comp.mountingType !== 'TH') return false;
@@ -61,16 +67,64 @@ function BoardCanvas() {
     if (selectedComponents.size > 1 && !isMultiSelect) return; 
 
     selectComponents(clickedNames, isMultiSelect);
-  }, [boardData, currentSide, selectComponents]);
+  }, [boardData, currentSide, isMirrored, selectComponents, setCurrentSide, setIsMirrored]);
 
 
-  const { scale, offset, handlers, resetView } = usePanZoom(canvasRef, handleCanvasClick);
+  const { scale, offset, handlers, resetView, focusOnBoundingBox } = usePanZoom(canvasRef, handleCanvasClick);
+
+
+  useEffect(() => {
+    if (componentToFocus && boardData && boardData.components[componentToFocus]) {
+      const comp = boardData.components[componentToFocus];
+      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+
+      const addPoint = (x: number, y: number) => {
+        if (x < minX) minX = x; if (x > maxX) maxX = x;
+        if (y < minY) minY = y; if (y > maxY) maxY = y;
+      };
+
+      const processShape = (shape: ShapeData) => {
+        if (shape.type === 'Line') {
+          addPoint(shape.start.x, shape.start.y);
+          addPoint(shape.end.x, shape.end.y);
+
+        } else if (shape.type === 'Rectangle' && shape.points) {
+          shape.points.forEach(p => addPoint(p.x, p.y));
+          
+        } else if ((shape.type === 'Circle' || shape.type === 'Arc') && shape.center) {
+          addPoint(shape.center.x - shape.radius, shape.center.y - shape.radius);
+          addPoint(shape.center.x + shape.radius, shape.center.y + shape.radius);
+        }
+      };
+
+      if (comp.shapeData) processShape(comp.shapeData);
+      if (comp.pins) {
+        Object.values(comp.pins).forEach(pin => {
+          if (pin.shapeData) processShape(pin.shapeData);
+        });
+      }
+
+      if (minX === Infinity && comp.coords) {
+        addPoint(comp.coords.x, comp.coords.y);
+      }
+
+      if (minX !== Infinity) {
+        const width = maxX - minX;
+        const height = maxY - minY;
+        const padding = Math.max(15, Math.max(width, height) * 0.5); 
+        focusOnBoundingBox(minX - padding, maxX + padding, minY - padding, maxY + padding);
+      }
+      clearFocus();
+    }
+  }, [componentToFocus, boardData, focusOnBoundingBox, clearFocus]);
+
 
   useEffect(() => {
     if (boardData) {
       resetView(boardData);
     }
   }, [boardData, resetView]);
+
 
   const addShapeToPath = (ctx: CanvasRenderingContext2D, shape: ShapeData) => {
     if (shape.type === 'Line') {
@@ -109,13 +163,16 @@ function BoardCanvas() {
 
     // clearing and setting background
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.fillStyle = isDarkMode ? '#0a0a0a' : '#f8fafc';
+    ctx.fillStyle = isDarkMode ? '#0a0a0a' : '#cbd5e1';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // transformations
     ctx.save();
     ctx.translate(offset.x, offset.y);
     ctx.scale(scale, scale);
+
+    if (isMirrored) ctx.scale(-1, 1);
+
     const baseLineWidth = 1 / scale; // constant line size
 
     // 1. Drawing outlines
@@ -132,7 +189,8 @@ function BoardCanvas() {
     const thtPads: ShapeData[] = [];
     const smtPads: ShapeData[] = [];
     const bodyShapes: ShapeData[] = [];
-    const selectedShapes: ShapeData[] = []
+    const selectedShapes: ShapeData[] = [];
+    const netShapes: ShapeData[] = [];
     Object.entries(boardData.components).forEach(([compName, comp]) => {
       const isOnCurrentSide = comp.side === currentSide;
       const isTH = comp.mountingType === 'TH';
@@ -146,7 +204,8 @@ function BoardCanvas() {
       if ((isOnCurrentSide || isTH) && comp.pins) {
         Object.values(comp.pins).forEach(pin => {
           if (pin.shapeData) {
-           if (isSelected) selectedShapes.push(pin.shapeData);
+            if (isSelected) selectedShapes.push(pin.shapeData);
+            else if (selectedNet && pin.net === selectedNet) netShapes.push(pin.shapeData);
             else if (isTH) thtPads.push(pin.shapeData);
             else smtPads.push(pin.shapeData);
           }
@@ -168,7 +227,9 @@ function BoardCanvas() {
       ctx.beginPath();
       ctx.lineWidth = baseLineWidth;
       ctx.strokeStyle = isDarkMode ? '#fbbf24' : '#d97706';
+      ctx.fillStyle = isDarkMode ? 'rgba(251, 191, 36, 0.2)' : 'rgba(217, 119, 6, 0.2)';
       smtPads.forEach(shape => addShapeToPath(ctx, shape));
+      ctx.fill();
       ctx.stroke();
     }
 
@@ -177,20 +238,36 @@ function BoardCanvas() {
       ctx.beginPath();
       ctx.lineWidth = baseLineWidth;
       ctx.strokeStyle = isDarkMode ? '#60a5fa' : '#2563eb';
+      ctx.fillStyle = isDarkMode ? 'rgba(96, 165, 250, 0.2)' : 'rgba(37, 99, 235, 0.2)';
       thtPads.forEach(shape => addShapeToPath(ctx, shape));
+      ctx.fill();
       ctx.stroke();
     }
 
+    // 5. Selected component
     if (selectedShapes.length > 0) {
       ctx.beginPath();
       ctx.lineWidth = baseLineWidth * 1.5;
       ctx.strokeStyle = isDarkMode ? '#f43f5e' : '#e11d48'; 
+      ctx.fillStyle = isDarkMode ? 'rgba(244, 63, 94, 0.4)' : 'rgba(225, 29, 72, 0.4)';
       selectedShapes.forEach(shape => addShapeToPath(ctx, shape));
+      ctx.fill();
+      ctx.stroke();
+    }
+
+    // 6. Selected net
+    if (netShapes.length > 0) {
+      ctx.beginPath();
+      ctx.lineWidth = baseLineWidth * 2;
+      ctx.strokeStyle = isDarkMode ? '#d946ef' : '#c026d3'; 
+      ctx.fillStyle = isDarkMode ? 'rgba(217, 70, 239, 0.5)' : 'rgba(192, 38, 211, 0.5)';
+      netShapes.forEach(shape => addShapeToPath(ctx, shape));
+      ctx.fill();
       ctx.stroke();
     }
 
     ctx.restore(); 
-  }, [boardData, currentSide, isDarkMode, showOutlines, scale, offset, selectedComponents]);
+  }, [boardData, currentSide, isMirrored, isDarkMode, showOutlines, scale, offset, selectedComponents, selectedNet]);
 
   return (
     <div className="w-full h-full relative block overflow-hidden">

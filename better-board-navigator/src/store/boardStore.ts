@@ -1,91 +1,90 @@
-import { create } from "zustand";
-import type { BoardData } from "../types/board";
+import { create } from 'zustand';
+import type { BoardData } from '../types/board';
 
 interface BoardState {
   boardData: BoardData | null;
-  setBoardData: (data: BoardData | null) => void;
+  setBoardData: (data: BoardData) => void;
 
-  // --- Canvas filters---
-  currentSide: 'T' | 'B';
-  toggleSide: () => void;
-  showOutlines: boolean;
-  toggleOutlines: () => void;
-  showComponentNames: boolean;
-  toggleComponentNames: () => void;
-
-  // --- Selection ---
-  selectedComponents: Set<string>;
-  toggleComponentSelection: (compName: string) => void;
-  selectComponents: (compNames: string[], append?: boolean) => void;
-  clearSelection: () => void;
-  
-  selectedNet: string | null;
-  setSelectedNet: (netName: string | null) => void;
-  
-  selectedPrefix: string | null;
-  setSelectedPrefix: (prefix: string | null) => void;
-
-  // --- Light/Dark mode ---
   isDarkMode: boolean;
   toggleDarkMode: () => void;
+  showOutlines: boolean;
+  toggleOutlines: () => void;
+  
+  currentSide: 'T' | 'B';
+  setCurrentSide: (side: 'T' | 'B') => void;
+  isMirrored: boolean;
+  setIsMirrored: (mirrored: boolean) => void;
+
+  // --- SELECTION ---
+  selectedComponents: Set<string>;
+  selectComponents: (names: string[], isMultiSelect?: boolean) => void;
+  clearSelection: () => void;
+
+  selectedNet: string | null;
+  selectNet: (net: string | null) => void;
+
+  // --- CAMERA / ZOOM ---
+  componentToFocus: string | null;
+  triggerFocus: (compName: string) => void;
+  clearFocus: () => void;
 }
 
 export const useBoardStore = create<BoardState>((set) => ({
   boardData: null,
-  currentSide: 'T',
+  isDarkMode: true,
   showOutlines: true,
-  showComponentNames: false,
-  selectedComponents: new Set(),
-  selectedNet: null,
-  selectedPrefix: null,
-  isDarkMode: true, 
-
   
-  setBoardData: (data) => set({ boardData: data }),
+  currentSide: 'T',
+  isMirrored: false,
+  
+  selectedComponents: new Set<string>(),
+  selectedNet: null,
+  componentToFocus: null,
 
-  toggleSide: () => set((state) => ({ currentSide: state.currentSide === 'T' ? 'B' : 'T' })),
+
+  setBoardData: (data) => set({ boardData: data }),
+  
+  toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
   
   toggleOutlines: () => set((state) => ({ showOutlines: !state.showOutlines })),
   
-  toggleComponentNames: () => set((state) => ({ showComponentNames: !state.showComponentNames })),
+  setCurrentSide: (side) => set({ currentSide: side }),
+  
+  setIsMirrored: (mirrored) => set({ isMirrored: mirrored }),
 
-  toggleComponentSelection: (compName) => set((state) => {
-    const newSet = new Set(state.selectedComponents);
-    if (newSet.has(compName)) {
-      newSet.delete(compName);
-    } else {
-      newSet.add(compName);
+  selectComponents: (names, isMultiSelect = false) => set((state) => {
+    if (isMultiSelect) {
+      const newSelection = new Set(state.selectedComponents);
+      names.forEach(name => {
+        if (newSelection.has(name)) {
+          newSelection.delete(name);
+        } else {
+          newSelection.add(name);
+        }
+      });
+      return { 
+        selectedComponents: newSelection,
+        selectedNet: null
+      };
     }
-    return { selectedComponents: newSet };
+    
+    return { 
+      selectedComponents: new Set(names),
+      selectedNet: null 
+    };
   }),
 
-  selectComponents: (compNames, append = false) => set((state) => {
-    // signle selection
-    if (!append) {
-      return { selectedComponents: new Set(compNames) };
-    }
-    // multi-select (Ctrl+Click)
-    const newSet = new Set(state.selectedComponents);
-    compNames.forEach(name => {
-      if (newSet.has(name)) newSet.delete(name);
-      else newSet.add(name);
-    });
-    return { selectedComponents: newSet };
+  clearSelection: () => set({ 
+    selectedComponents: new Set(), 
+    selectedNet: null 
   }),
 
-  clearSelection: () => set({ selectedComponents: new Set() }),
-
-  setSelectedNet: (netName) => set({ selectedNet: netName }),
-
-  setSelectedPrefix: (prefix) => set({ selectedPrefix: prefix }),
-
-  toggleDarkMode: () => set((state) => {
-    const newMode = !state.isDarkMode;
-    if (newMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    return { isDarkMode: newMode };
+  selectNet: (net) => set({ 
+    selectedNet: net,
+    selectedComponents: new Set()
   }),
+
+  triggerFocus: (compName) => set({ componentToFocus: compName }),
+  
+  clearFocus: () => set({ componentToFocus: null })
 }));
