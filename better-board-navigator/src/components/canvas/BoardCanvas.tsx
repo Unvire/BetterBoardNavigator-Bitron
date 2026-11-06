@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback, useMemo } from 'react';
 import { useBoardStore } from '../../store/boardStore';
 import { usePanZoom } from '../../hooks/usePanZoom';
 import type { ShapeData } from '../../types/board';
@@ -11,10 +11,45 @@ function BoardCanvas() {
     selectedNet, componentToFocus, clearFocus 
   } = useBoardStore();
 
+
+  const boardCenterX = useMemo(() => {
+    if (!boardData) return 0;
+    let minX = Infinity, maxX = -Infinity;
+
+    const addPoint = (x: number) => {
+      if (x < minX) minX = x;
+      if (x > maxX) maxX = x;
+    };
+
+    const processShape = (shape: ShapeData) => {
+      if (shape.type === 'Line' && shape.start && shape.end) {
+        addPoint(shape.start.x); addPoint(shape.end.x);
+      } else if (shape.type === 'Rectangle' && shape.points) {
+        shape.points.forEach(p => addPoint(p.x));
+      } else if ((shape.type === 'Circle' || shape.type === 'Arc') && shape.center) {
+        addPoint(shape.center.x - (shape.radius || 0));
+        addPoint(shape.center.x + (shape.radius || 0));
+      }
+    };
+
+    if (boardData.outlines && boardData.outlines.length > 0) {
+      boardData.outlines.forEach(processShape);
+    } else {
+      // Fallback: Brak zarysu płyty. Liczymy z komponentów (wymóg specyfikacji)
+      Object.values(boardData.components).forEach(comp => {
+        if (comp.shapeData) processShape(comp.shapeData);
+        if (comp.pins) Object.values(comp.pins).forEach(p => p.shapeData && processShape(p.shapeData));
+      });
+    }
+
+    return minX !== Infinity ? (minX + maxX) / 2 : 0;
+  }, [boardData]);
+
+
   const handleCanvasClick = useCallback((clickWorldX: number, clickWorldY: number, isMultiSelect: boolean) => {
     if (!boardData) return;
 
-    const worldX = isMirrored ? -clickWorldX : clickWorldX;
+    const worldX = isMirrored ? (boardCenterX * 2 - clickWorldX) : clickWorldX;
     const worldY = clickWorldY;
 
     const clickedComps = Object.entries(boardData.components).filter(([_, comp]) => {
@@ -22,6 +57,8 @@ function BoardCanvas() {
 
       let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
       let hasGeometry = false;
+      const pinKeys = comp.pins ? Object.keys(comp.pins) : [];
+      const hasSinglePin = pinKeys.length === 1;
 
       const addPoint = (x: number, y: number) => {
         hasGeometry = true;
@@ -30,20 +67,20 @@ function BoardCanvas() {
       };
 
       const processShape = (shape: ShapeData) => {
-        if (shape.type === 'Line') {
+        if (shape.type === 'Line' && shape.start && shape.end) {
           addPoint(shape.start.x, shape.start.y);
           addPoint(shape.end.x, shape.end.y);
 
         } else if (shape.type === 'Rectangle' && shape.points) {
           shape.points.forEach(p => addPoint(p.x, p.y));
 
-        } else if (shape.type === 'Circle' || shape.type === 'Arc') {
-          addPoint(shape.center.x - shape.radius, shape.center.y - shape.radius);
-          addPoint(shape.center.x + shape.radius, shape.center.y + shape.radius);
+        } else if (shape.type === 'Circle' || shape.type === 'Arc' && shape.center) {
+          addPoint(shape.center.x - (shape.radius || 0), shape.center.y - (shape.radius || 0));
+          addPoint(shape.center.x + (shape.radius || 0), shape.center.y + (shape.radius || 0));
         }
       }
 
-      if (comp.shapeData) processShape(comp.shapeData);
+      if (comp.shapeData && !hasSinglePin) processShape(comp.shapeData);
 
       if (comp.pins) {
         Object.values(comp.pins).forEach(pin => {
@@ -54,14 +91,24 @@ function BoardCanvas() {
       if (!hasGeometry) return false;
 
       const tolerance = 0.5;
-      return (worldX >= minX - tolerance && worldX <= maxX + tolerance && 
-          worldY >= minY - tolerance && worldY <= maxY + tolerance);
+      return (
+        worldX >= minX - tolerance && 
+        worldX <= maxX + tolerance && 
+        worldY >= minY - tolerance && 
+        worldY <= maxY + tolerance
+      );
     });
 
     const clickedNames = clickedComps.map(c => c[0]);
 
     // ignore clicking in background
     if (clickedNames.length === 0) return; 
+
+    const firstComp = boardData.components[clickedNames[0]];
+    if (firstComp && firstComp.side !== currentSide) {
+      setCurrentSide(firstComp.side);
+      setIsMirrored(firstComp.side === 'B');
+    }
 
     // prevent from losing selected components by accidental component click
     if (selectedComponents.size > 1 && !isMultiSelect) return; 
@@ -78,13 +125,16 @@ function BoardCanvas() {
       const comp = boardData.components[componentToFocus];
       let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
 
+      const pinKeys = comp.pins ? Object.keys(comp.pins) : [];
+      const hasSinglePin = pinKeys.length === 1;
+
       const addPoint = (x: number, y: number) => {
         if (x < minX) minX = x; if (x > maxX) maxX = x;
         if (y < minY) minY = y; if (y > maxY) maxY = y;
       };
 
       const processShape = (shape: ShapeData) => {
-        if (shape.type === 'Line') {
+        if (shape.type === 'Line' && shape.start && shape.end) {
           addPoint(shape.start.x, shape.start.y);
           addPoint(shape.end.x, shape.end.y);
 
@@ -92,12 +142,13 @@ function BoardCanvas() {
           shape.points.forEach(p => addPoint(p.x, p.y));
           
         } else if ((shape.type === 'Circle' || shape.type === 'Arc') && shape.center) {
-          addPoint(shape.center.x - shape.radius, shape.center.y - shape.radius);
-          addPoint(shape.center.x + shape.radius, shape.center.y + shape.radius);
+          addPoint(shape.center.x - (shape.radius || 0), shape.center.y - (shape.radius || 0));
+          addPoint(shape.center.x + (shape.radius || 0), shape.center.y + (shape.radius || 0));
         }
       };
 
-      if (comp.shapeData) processShape(comp.shapeData);
+      if (comp.shapeData && !hasSinglePin) processShape(comp.shapeData);
+
       if (comp.pins) {
         Object.values(comp.pins).forEach(pin => {
           if (pin.shapeData) processShape(pin.shapeData);
@@ -112,11 +163,19 @@ function BoardCanvas() {
         const width = maxX - minX;
         const height = maxY - minY;
         const padding = Math.max(15, Math.max(width, height) * 0.5); 
-        focusOnBoundingBox(minX - padding, maxX + padding, minY - padding, maxY + padding);
+        
+        if (isMirrored) {
+          const mirroredMinX = boardCenterX * 2 - maxX;
+          const mirroredMaxX = boardCenterX * 2 - minX;
+          focusOnBoundingBox(mirroredMinX - padding, mirroredMaxX + padding, minY - padding, maxY + padding);
+
+        } else {
+          focusOnBoundingBox(minX - padding, maxX + padding, minY - padding, maxY + padding);
+        }
       }
       clearFocus();
     }
-  }, [componentToFocus, boardData, focusOnBoundingBox, clearFocus]);
+  }, [componentToFocus, boardData, isMirrored, boardCenterX, focusOnBoundingBox, clearFocus]);
 
 
   useEffect(() => {
@@ -127,14 +186,14 @@ function BoardCanvas() {
 
 
   const addShapeToPath = (ctx: CanvasRenderingContext2D, shape: ShapeData) => {
-    if (shape.type === 'Line') {
+    if (shape.type === 'Line' && shape.start && shape.end) {
       ctx.moveTo(shape.start.x, shape.start.y);
       ctx.lineTo(shape.end.x, shape.end.y);
 
-    } else if (shape.type === 'Arc') {
+    } else if (shape.type === 'Arc' && shape.center && shape.radius !== undefined && shape.startAngle !== undefined && shape.endAngle !== undefined) {
       ctx.arc(shape.center.x, shape.center.y, shape.radius, shape.startAngle, shape.endAngle);
     
-    } else if (shape.type === 'Circle') {
+    } else if (shape.type === 'Circle' && shape.center && shape.radius !== undefined) {
       ctx.moveTo(shape.center.x + shape.radius, shape.center.y);
       ctx.arc(shape.center.x, shape.center.y, shape.radius, 0, 2 * Math.PI);
     
@@ -171,7 +230,11 @@ function BoardCanvas() {
     ctx.translate(offset.x, offset.y);
     ctx.scale(scale, scale);
 
-    if (isMirrored) ctx.scale(-1, 1);
+    if (isMirrored) {
+      ctx.translate(boardCenterX, 0);
+      ctx.scale(-1, 1);
+      ctx.translate(-boardCenterX, 0);
+    }
 
     const baseLineWidth = 1 / scale; // constant line size
 
@@ -191,12 +254,16 @@ function BoardCanvas() {
     const bodyShapes: ShapeData[] = [];
     const selectedShapes: ShapeData[] = [];
     const netShapes: ShapeData[] = [];
+
     Object.entries(boardData.components).forEach(([compName, comp]) => {
       const isOnCurrentSide = comp.side === currentSide;
       const isTH = comp.mountingType === 'TH';
       const isSelected = selectedComponents.has(compName);
+
+      const pinKeys = comp.pins ? Object.keys(comp.pins) : [];
+      const hasSinglePin = pinKeys.length === 1;
       
-      if (isOnCurrentSide && comp.shapeData) {
+      if (isOnCurrentSide && comp.shapeData && !hasSinglePin) {
         if (isSelected) selectedShapes.push(comp.shapeData);
         else bodyShapes.push(comp.shapeData);
       }
@@ -267,7 +334,7 @@ function BoardCanvas() {
     }
 
     ctx.restore(); 
-  }, [boardData, currentSide, isMirrored, isDarkMode, showOutlines, scale, offset, selectedComponents, selectedNet]);
+  }, [boardData, currentSide, isMirrored, boardCenterX, isDarkMode, showOutlines, scale, offset, selectedComponents, selectedNet]);
 
   return (
     <div className="w-full h-full relative block overflow-hidden">
