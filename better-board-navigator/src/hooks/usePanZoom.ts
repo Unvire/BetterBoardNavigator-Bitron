@@ -1,12 +1,24 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import type { RefObject } from "react";
 
 export function usePanZoom(canvasRef: RefObject<HTMLCanvasElement | null>) {
   const [scale, setScale] = useState(1);
-  const [offset, setOffset] = useState({ x: 0, y:0 });
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
 
   const [isDragging, setIsDragging] = useState(false);
   const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 });
+
+  // storing offset and scale values for synchronus operations
+  const scaleRef = useRef(scale);
+  useEffect(() => { 
+    scaleRef.current = scale; 
+  }, [scale]);
+
+  const offsetRef = useRef(offset);
+  useEffect(() => { 
+    offsetRef.current = offset; 
+  }, [offset]);
+
 
 
   const onMouseDown = useCallback((e: React.MouseEvent) => {
@@ -38,21 +50,23 @@ export function usePanZoom(canvasRef: RefObject<HTMLCanvasElement | null>) {
       const zoomSensitivity = 0.1;
       const zoomFactor = e.deltaY < 0 ? 1 + zoomSensitivity : 1 - zoomSensitivity;
       
-      setScale((prevScale) => {
-        const newScale = prevScale * zoomFactor;
-        if (newScale < 0.1 || newScale > 200) return prevScale;
+      const prevScale = scaleRef.current;
+      const prevOffset = offsetRef.current;
 
-        const rect = canvas.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
+      const newScale = prevScale * zoomFactor;
+      if (newScale < 0.1 || newScale > 200) return;
 
-        setOffset((prevOffset) => ({
-          x: mouseX - (mouseX - prevOffset.x) * zoomFactor,
-          y: mouseY - (mouseY - prevOffset.y) * zoomFactor,
-        }));
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+			
+      // zooming on cursor position
+      const newOffsetX = mouseX - (mouseX - prevOffset.x) * zoomFactor;
+      const newOffsetY = mouseY - (mouseY - prevOffset.y) * zoomFactor;
 
-        return newScale;
-      });
+      setScale(newScale);
+      setOffset({ x: newOffsetX, y: newOffsetY });
+
     };
 
     canvas.addEventListener('wheel', handleWheel, { passive: false });
