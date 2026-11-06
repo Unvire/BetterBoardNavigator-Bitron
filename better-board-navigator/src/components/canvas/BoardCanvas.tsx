@@ -11,7 +11,7 @@ function BoardCanvas() {
   const { 
     boardData, currentSide, setCurrentSide, isMirrored, setIsMirrored, 
     isDarkMode, showOutlines, selectedComponents, selectComponents, 
-    selectedNet, componentToFocus, clearFocus 
+    selectedNet, componentToFocus, clearFocus, inspectedComponent
   } = useBoardStore();
 
   useEffect(() => {
@@ -275,24 +275,28 @@ function BoardCanvas() {
     const bodyShapes: ShapeData[] = [];
     const selectedShapes: ShapeData[] = [];
     const netShapes: ShapeData[] = [];
+    const inspectedShapes: ShapeData[] = [];
 
     Object.entries(boardData.components).forEach(([compName, comp]) => {
       const isOnCurrentSide = comp.side === currentSide;
       const isTH = comp.mountingType === 'TH';
       const isSelected = selectedComponents.has(compName);
+      const isInspected = inspectedComponent === compName;
 
       const pinKeys = comp.pins ? Object.keys(comp.pins) : [];
       const hasSinglePin = pinKeys.length === 1;
       
       if (isOnCurrentSide && comp.shapeData && !hasSinglePin) {
-        if (isSelected) selectedShapes.push(comp.shapeData);
+        if (isInspected) inspectedShapes.push(comp.shapeData);
+        else if (isSelected) selectedShapes.push(comp.shapeData);
         else bodyShapes.push(comp.shapeData);
       }
 
       if ((isOnCurrentSide || isTH) && comp.pins) {
         Object.values(comp.pins).forEach(pin => {
           if (pin.shapeData) {
-            if (isSelected) selectedShapes.push(pin.shapeData);
+            if (isInspected) inspectedShapes.push(pin.shapeData);
+            else if (isSelected) selectedShapes.push(pin.shapeData);
             else if (selectedNet && pin.net === selectedNet) netShapes.push(pin.shapeData);
             else if (isTH) thtPads.push(pin.shapeData);
             else smtPads.push(pin.shapeData);
@@ -354,8 +358,20 @@ function BoardCanvas() {
       ctx.stroke();
     }
 
+    // 7. Inspected component (2nd selection)
+    if (inspectedShapes.length > 0) {
+      ctx.beginPath();
+      ctx.lineWidth = baseLineWidth * 2;
+      ctx.strokeStyle = isDarkMode ? '#22d3ee' : '#0891b2';
+      ctx.fillStyle = isDarkMode ? 'rgba(34, 211, 238, 0.4)' : 'rgba(8, 145, 178, 0.4)';
+      inspectedShapes.forEach(shape => addShapeToPath(ctx, shape));
+      ctx.fill();
+      ctx.stroke();
+    }
+
     ctx.restore(); 
-  }, [boardData, currentSide, isMirrored, boardCenterX, isDarkMode, showOutlines, scale, offset, selectedComponents, selectedNet]);
+  }, [boardData, currentSide, isMirrored, boardCenterX, isDarkMode, showOutlines, scale, 
+    offset, selectedComponents, selectedNet, inspectedComponent]);
 
   return (
     <div className="w-full h-full relative block overflow-hidden">

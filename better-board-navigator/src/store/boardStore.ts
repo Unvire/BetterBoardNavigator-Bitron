@@ -27,6 +27,10 @@ interface BoardState {
   componentToFocus: string | null;
   triggerFocus: (compName: string) => void;
   clearFocus: () => void;
+
+  // --- 2ND SELECTION ---
+  inspectedComponent: string | null;
+  setInspectedComponent: (name: string | null) => void;
 }
 
 export const useBoardStore = create<BoardState>((set) => ({
@@ -40,6 +44,8 @@ export const useBoardStore = create<BoardState>((set) => ({
   selectedComponents: new Set<string>(),
   selectedNet: null,
   componentToFocus: null,
+
+  inspectedComponent: null,
 
 
   setBoardData: (data) => set({ boardData: data }),
@@ -76,15 +82,19 @@ export const useBoardStore = create<BoardState>((set) => ({
 
   clearSelection: () => set({ 
     selectedComponents: new Set(), 
-    selectedNet: null 
+    selectedNet: null,
+    inspectedComponent: null
   }),
 
   selectNet: (net) => set({ 
     selectedNet: net,
-    selectedComponents: new Set()
+    selectedComponents: new Set(),
+    inspectedComponent: null
   }),
 
   triggerFocus: (compName) => set({ componentToFocus: compName }),
   
-  clearFocus: () => set({ componentToFocus: null })
+  clearFocus: () => set({ componentToFocus: null }),
+
+  setInspectedComponent: (name) => set({ inspectedComponent: name }),
 }));

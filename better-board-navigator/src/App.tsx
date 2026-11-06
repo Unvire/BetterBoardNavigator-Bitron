@@ -12,7 +12,9 @@ function App() {
     boardData, setBoardData, isDarkMode, toggleDarkMode, 
     selectedComponents, selectComponents, clearSelection, 
     selectedNet, selectNet, triggerFocus,
-    currentSide, setCurrentSide, isMirrored, setIsMirrored } = useBoardStore();
+    currentSide, setCurrentSide, isMirrored, setIsMirrored,
+    inspectedComponent, setInspectedComponent
+   } = useBoardStore();
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -34,20 +36,38 @@ function App() {
     if (detailedComp && !selectedNames.includes(detailedComp)) setDetailedComp(null);
   }, [selectedComponents, detailedComp]);
 
-  const compToShow = detailedComp || (selectedNames.length === 1 ? selectedNames[0] : null);
+  const compToShow = inspectedComponent || (selectedNames.length === 1 ? selectedNames[0] : null);
+
+
+  const handleComponentClick = (e: React.MouseEvent, compName: string) => {
+    const comp = boardData?.components[compName];
+
+    if (comp && comp.side !== currentSide) {
+      setCurrentSide(comp.side);
+      setIsMirrored(comp.side === 'B');
+    }
+
+    if (e.ctrlKey || e.metaKey) {
+      selectComponents([compName], true);
+
+    } else {
+      setInspectedComponent(compName);
+      triggerFocus(compName);
+    }
+  };
 
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        clearSelection();
-        setDetailedComp(null);
+        if (inspectedComponent) setInspectedComponent(null);
+        else clearSelection(); 
       }
     };
     
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [clearSelection]);
+  }, [clearSelection, inspectedComponent, setInspectedComponent]);
 
 
   useEffect(() => {
@@ -115,16 +135,6 @@ function App() {
     (isDarkMode ? 'bg-slate-900/85 border-slate-700 text-slate-300' : 'bg-white/95 border-slate-200 text-slate-700');
 
   const topBarBtnClass = "p-2 rounded-lg transition-colors hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center gap-1";
-
-  const handleComponentClick = (compName: string) => {
-    const comp = boardData?.components[compName];
-    if (comp && comp.side !== currentSide) {
-      setCurrentSide(comp.side);
-      setIsMirrored(comp.side === 'B');
-    }
-    selectComponents([compName], false);
-    triggerFocus(compName);
-  };
 
   return (
     <div className={`relative w-screen h-screen overflow-hidden ${isDarkMode ? 'bg-slate-950' : 'bg-slate-100'}`}>
@@ -219,15 +229,28 @@ function App() {
             <ul className="text-sm space-y-0.5">
               {filteredComponents.map(compName => {
                 const isSelected = selectedComponents.has(compName);
+                const isInspected = inspectedComponent === compName;
+
+                let liClass = "px-3 py-1.5 rounded-md cursor-pointer flex justify-between items-center transition-all border ";
+                if (isInspected) {
+                  liClass += isDarkMode 
+                    ? "border-cyan-500/50 bg-cyan-900/30 text-cyan-300 font-bold shadow-[0_0_10px_rgba(6,182,212,0.2)]" 
+                    : "border-cyan-400 bg-cyan-50 text-cyan-700 font-bold shadow-sm";
+                } else if (isSelected) {
+                  liClass += isDarkMode 
+                    ? "border-transparent bg-blue-600/30 text-blue-400 font-medium" 
+                    : "border-transparent bg-blue-200 text-blue-800 font-medium";
+                } else {
+                  liClass += isDarkMode 
+                    ? "border-transparent hover:bg-slate-800 text-slate-300" 
+                    : "border-transparent hover:bg-slate-200/70 text-slate-700";
+                }
+
                 return (
                   <li 
                     key={compName}
-                    onClick={() => handleComponentClick(compName)}
-                    className={`px-3 py-1.5 rounded-md cursor-pointer flex justify-between items-center transition-colors ${
-                      isSelected 
-                        ? (isDarkMode ? 'bg-blue-600/30 text-blue-400 font-medium' : 'bg-blue-200 text-blue-800 font-medium')
-                        : (isDarkMode ? 'hover:bg-slate-800 text-slate-300' : 'hover:bg-slate-200/70 text-slate-700')
-                    }`}
+                    onClick={(e) => handleComponentClick(e, compName)}
+                    className={liClass}
                   >
                     <span>{compName}</span>
                     <span className={`text-xs px-1.5 py-0.5 rounded ${boardData?.components[compName]?.side === 'T' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'}`}>
