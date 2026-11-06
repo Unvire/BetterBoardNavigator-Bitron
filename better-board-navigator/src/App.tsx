@@ -317,32 +317,46 @@ function App() {
                       )}
                     </li>
 
-                    {isSelected && (
-                      <div className={`ml-3 my-1 pl-2 border-l-2 space-y-1 ${isDarkMode ? 'border-fuchsia-900/50' : 'border-fuchsia-200'}`}>
-                        {componentsInSelectedNet.map(({ comp, pin }, idx) => (
-                          <button
-                            key={`${comp}-${pin}-${idx}`}
-                            onClick={() => {
-                              const targetComp = boardData?.components[comp];
-                              if (targetComp && targetComp.side !== currentSide) {
-                                setCurrentSide(targetComp.side);
-                                setIsMirrored(targetComp.side === 'B');
-                              }
-                              setInspectedComponent(comp);
-                              triggerFocus(comp);
-                            }}
-                            className={`w-full flex items-center justify-between px-2 py-1 rounded text-xs transition-colors ${
-                              isDarkMode 
-                                ? 'text-slate-400 hover:text-cyan-400 hover:bg-cyan-900/20' 
-                                : 'text-slate-500 hover:text-cyan-700 hover:bg-cyan-50'
-                            }`}
-                          >
-                            <span className="font-bold">{comp}</span>
-                            <span className="opacity-70 font-mono">Pin: {pin}</span>
-                          </button>
-                        ))}
-                      </div>
-                    )}
+                    {componentsInSelectedNet.map(({ comp, pin }, idx) => {
+                          // Sprawdzamy czy ten komponent jest w czerwonej grupie
+                          const isCompSelected = selectedComponents.has(comp);
+                          const isCompInspected = inspectedComponent === comp;
+                          
+                          return (
+                            <button
+                              key={`${comp}-${pin}-${idx}`}
+                              onClick={(e) => {
+                                const targetComp = boardData?.components[comp];
+                                if (targetComp && targetComp.side !== currentSide) {
+                                  setCurrentSide(targetComp.side);
+                                  setIsMirrored(targetComp.side === 'B');
+                                }
+                                
+                                if (e.ctrlKey || e.metaKey) {
+                                  if (isCompInspected) setInspectedComponent(null);
+                                  selectComponents([comp], true);
+                                } else {
+                                  if (isCompInspected) {
+                                    setInspectedComponent(null);
+                                  } else {
+                                    setInspectedComponent(comp);
+                                    if (!isCompSelected) triggerFocus(comp);
+                                  }
+                                }
+                              }}
+                              className={`w-full flex items-center justify-between px-2 py-1 rounded text-xs transition-colors ${
+                                isCompInspected
+                                  ? (isDarkMode ? 'bg-cyan-900/40 text-cyan-300 font-bold' : 'bg-cyan-100 text-cyan-800 font-bold')
+                                  : isCompSelected
+                                    ? (isDarkMode ? 'bg-rose-900/30 text-rose-300' : 'bg-rose-100 text-rose-700')
+                                    : (isDarkMode ? 'text-slate-400 hover:text-cyan-400 hover:bg-cyan-900/20' : 'text-slate-500 hover:text-cyan-700 hover:bg-cyan-50')
+                              }`}
+                            >
+                              <span className={isCompInspected || isCompSelected ? "font-bold" : "font-medium"}>{comp}</span>
+                              <span className="opacity-70 font-mono">Pin: {pin}</span>
+                            </button>
+                          );
+                        })}
                   </div>
                 );
               })}

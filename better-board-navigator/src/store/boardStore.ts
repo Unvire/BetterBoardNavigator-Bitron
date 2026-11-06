@@ -70,13 +70,11 @@ export const useBoardStore = create<BoardState>((set) => ({
       });
       return { 
         selectedComponents: newSelection,
-        selectedNet: null
       };
     }
     
     return { 
-      selectedComponents: new Set(names),
-      selectedNet: null 
+      selectedComponents: new Set(names)
     };
   }),
 
