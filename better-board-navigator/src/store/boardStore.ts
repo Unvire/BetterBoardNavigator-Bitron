@@ -87,9 +87,7 @@ export const useBoardStore = create<BoardState>((set) => ({
   }),
 
   selectNet: (net) => set({ 
-    selectedNet: net,
-    selectedComponents: new Set(),
-    inspectedComponent: null
+    selectedNet: net
   }),
 
   triggerFocus: (compName) => set({ componentToFocus: compName }),

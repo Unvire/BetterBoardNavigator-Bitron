@@ -63,7 +63,10 @@ function App() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         if (inspectedComponent) setInspectedComponent(null);
-        else clearSelection(); 
+        else {
+          clearSelection();
+          selectNet(null);
+        }; 
       }
     };
     
@@ -115,7 +118,7 @@ function App() {
     const q = searchQuery.toLowerCase();
     return Object.keys(boardData.components)
       .filter(name => name.toLowerCase().includes(q))
-      .sort();
+      .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
   }, [boardData, searchQuery]);
 
   const filteredNets = useMemo(() => {
