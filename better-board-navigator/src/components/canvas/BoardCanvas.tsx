@@ -7,14 +7,18 @@ function BoardCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
   const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
+  
+  const hoverStateRef = useRef(false); 
 
   const { 
     boardData, currentSide, setCurrentSide, isMirrored, setIsMirrored, 
     isDarkMode, showOutlines, selectedComponents, selectComponents, 
-    selectedNet, componentToFocus, clearFocus, inspectedComponent,
-    setInspectedComponent, clearSelection
+    selectedNet, componentToFocus, clearFocus, 
+    inspectedComponent, setInspectedComponent, clearSelection
   } = useBoardStore();
 
+  
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Control' || e.key === 'Meta') setIsSelectionMode(true);
@@ -35,7 +39,7 @@ function BoardCanvas() {
     };
   }, []);
 
-
+  
   const boardCenterX = useMemo(() => {
     if (!boardData) return 0;
     let minX = Infinity, maxX = -Infinity;
@@ -59,7 +63,6 @@ function BoardCanvas() {
     if (boardData.outlines && boardData.outlines.length > 0) {
       boardData.outlines.forEach(processShape);
     } else {
-      // Fallback: Brak zarysu płyty. Liczymy z komponentów (wymóg specyfikacji)
       Object.values(boardData.components).forEach(comp => {
         if (comp.shapeData) processShape(comp.shapeData);
         if (comp.pins) Object.values(comp.pins).forEach(p => p.shapeData && processShape(p.shapeData));
@@ -69,15 +72,13 @@ function BoardCanvas() {
     return minX !== Infinity ? (minX + maxX) / 2 : 0;
   }, [boardData]);
 
-
-  const handleCanvasClick = useCallback((clickWorldX: number, clickWorldY: number, isMultiSelect: boolean) => {
-    if (!boardData) return;
-
-    const worldX = isMirrored ? (boardCenterX * 2 - clickWorldX) : clickWorldX;
-    const worldY = clickWorldY;
-
-    const clickedComps = Object.entries(boardData.components).filter(([_, comp]) => {
-      if (comp.side !== currentSide && comp.mountingType !== 'TH') return false;
+  // --- HITBOXES for mouse hovering ---
+  const componentHitboxes = useMemo(() => {
+    if (!boardData) return [];
+    const boxes: { name: string, minX: number, maxX: number, minY: number, maxY: number }[] = [];
+    
+    Object.entries(boardData.components).forEach(([name, comp]) => {
+      if (comp.side !== currentSide && comp.mountingType !== 'TH') return;
 
       let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
       let hasGeometry = false;
@@ -94,40 +95,44 @@ function BoardCanvas() {
         if (shape.type === 'Line' && shape.start && shape.end) {
           addPoint(shape.start.x, shape.start.y);
           addPoint(shape.end.x, shape.end.y);
-
         } else if (shape.type === 'Rectangle' && shape.points) {
           shape.points.forEach(p => addPoint(p.x, p.y));
-
-        } else if (shape.type === 'Circle' || shape.type === 'Arc' && shape.center) {
+        } else if ((shape.type === 'Circle' || shape.type === 'Arc') && shape.center) {
           addPoint(shape.center.x - (shape.radius || 0), shape.center.y - (shape.radius || 0));
           addPoint(shape.center.x + (shape.radius || 0), shape.center.y + (shape.radius || 0));
         }
-      }
+      };
 
       if (comp.shapeData && !hasSinglePin) processShape(comp.shapeData);
+      if (comp.pins) Object.values(comp.pins).forEach(pin => pin.shapeData && processShape(pin.shapeData));
 
-      if (comp.pins) {
-        Object.values(comp.pins).forEach(pin => {
-          if (pin.shapeData) processShape(pin.shapeData);
-        });
-      }
-
-      if (!hasGeometry) return false;
-
-      const tolerance = 0.5;
-      return (
-        worldX >= minX - tolerance && 
-        worldX <= maxX + tolerance && 
-        worldY >= minY - tolerance && 
-        worldY <= maxY + tolerance
-      );
+      if (hasGeometry) boxes.push({ name, minX, maxX, minY, maxY });
     });
 
-    const clickedNames = clickedComps.map(c => c[0]);
+    return boxes;
+  }, [boardData, currentSide]);
 
-    // clicking in the background -> remove cyan
+  const handleCanvasClick = useCallback((clickWorldX: number, clickWorldY: number, isMultiSelect: boolean) => {
+    if (!boardData) return;
+
+    const worldX = isMirrored ? (boardCenterX * 2 - clickWorldX) : clickWorldX;
+    const worldY = clickWorldY;
+
+    const tolerance = 0.5;
+    const clickedNames: string[] = [];
+    
+    for (let i = 0; i < componentHitboxes.length; i++) {
+      const box = componentHitboxes[i];
+      if (worldX >= box.minX - tolerance && worldX <= box.maxX + tolerance &&
+          worldY >= box.minY - tolerance && worldY <= box.maxY + tolerance) {
+        clickedNames.push(box.name);
+      }
+    }
+
     if (clickedNames.length === 0) {
-      if (!isMultiSelect) setInspectedComponent(null);
+      if (!isMultiSelect) {
+        setInspectedComponent(null);
+      }
       return; 
     }
 
@@ -141,58 +146,30 @@ function BoardCanvas() {
 
     if (isMultiSelect) {
       if (inspectedComponent === firstCompName) setInspectedComponent(null);
-      selectComponents(clickedNames, true);
 
-    } else {
-      setInspectedComponent(firstCompName);
-    }
+      selectComponents(clickedNames, true);
+    } else setInspectedComponent(firstCompName);
   }, [
     boardData, currentSide, isMirrored, boardCenterX, selectComponents, 
-    setCurrentSide, setIsMirrored, inspectedComponent, 
-    setInspectedComponent, clearSelection
+    setCurrentSide, setIsMirrored, inspectedComponent, setInspectedComponent, componentHitboxes
   ]);
 
-
+  
   const { scale, offset, handlers, resetView, focusOnBoundingBox } = usePanZoom(canvasRef, handleCanvasClick);
 
-
+  
   useEffect(() => {
     if (componentToFocus && boardData && boardData.components[componentToFocus]) {
       const comp = boardData.components[componentToFocus];
+      const box = componentHitboxes.find(b => b.name === componentToFocus);
+      
       let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-
-      const pinKeys = comp.pins ? Object.keys(comp.pins) : [];
-      const hasSinglePin = pinKeys.length === 1;
-
-      const addPoint = (x: number, y: number) => {
-        if (x < minX) minX = x; if (x > maxX) maxX = x;
-        if (y < minY) minY = y; if (y > maxY) maxY = y;
-      };
-
-      const processShape = (shape: ShapeData) => {
-        if (shape.type === 'Line' && shape.start && shape.end) {
-          addPoint(shape.start.x, shape.start.y);
-          addPoint(shape.end.x, shape.end.y);
-
-        } else if (shape.type === 'Rectangle' && shape.points) {
-          shape.points.forEach(p => addPoint(p.x, p.y));
-          
-        } else if ((shape.type === 'Circle' || shape.type === 'Arc') && shape.center) {
-          addPoint(shape.center.x - (shape.radius || 0), shape.center.y - (shape.radius || 0));
-          addPoint(shape.center.x + (shape.radius || 0), shape.center.y + (shape.radius || 0));
-        }
-      };
-
-      if (comp.shapeData && !hasSinglePin) processShape(comp.shapeData);
-
-      if (comp.pins) {
-        Object.values(comp.pins).forEach(pin => {
-          if (pin.shapeData) processShape(pin.shapeData);
-        });
-      }
-
-      if (minX === Infinity && comp.coords) {
-        addPoint(comp.coords.x, comp.coords.y);
+      
+      if (box) {
+        minX = box.minX; maxX = box.maxX; minY = box.minY; maxY = box.maxY;
+      } else if (comp.coords) {
+        minX = comp.coords.x; maxX = comp.coords.x;
+        minY = comp.coords.y; maxY = comp.coords.y;
       }
 
       if (minX !== Infinity) {
@@ -204,35 +181,31 @@ function BoardCanvas() {
           const mirroredMinX = boardCenterX * 2 - maxX;
           const mirroredMaxX = boardCenterX * 2 - minX;
           focusOnBoundingBox(mirroredMinX - padding, mirroredMaxX + padding, minY - padding, maxY + padding);
-
         } else {
           focusOnBoundingBox(minX - padding, maxX + padding, minY - padding, maxY + padding);
         }
       }
       clearFocus();
     }
-  }, [componentToFocus, boardData, isMirrored, boardCenterX, focusOnBoundingBox, clearFocus]);
+  }, [componentToFocus, boardData, isMirrored, boardCenterX, focusOnBoundingBox, clearFocus, componentHitboxes]);
 
-
+  
   useEffect(() => {
     if (boardData) {
       resetView(boardData);
     }
   }, [boardData, resetView]);
 
-
+  
   const addShapeToPath = (ctx: CanvasRenderingContext2D, shape: ShapeData) => {
     if (shape.type === 'Line' && shape.start && shape.end) {
       ctx.moveTo(shape.start.x, shape.start.y);
       ctx.lineTo(shape.end.x, shape.end.y);
-
     } else if (shape.type === 'Arc' && shape.center && shape.radius !== undefined && shape.startAngle !== undefined && shape.endAngle !== undefined) {
       ctx.arc(shape.center.x, shape.center.y, shape.radius, shape.startAngle, shape.endAngle);
-    
     } else if (shape.type === 'Circle' && shape.center && shape.radius !== undefined) {
       ctx.moveTo(shape.center.x + shape.radius, shape.center.y);
       ctx.arc(shape.center.x, shape.center.y, shape.radius, 0, 2 * Math.PI);
-    
     } else if (shape.type === 'Rectangle' && shape.points && shape.points.length === 4) {
       ctx.moveTo(shape.points[0].x, shape.points[0].y);
       ctx.lineTo(shape.points[1].x, shape.points[1].y);
@@ -256,12 +229,10 @@ function BoardCanvas() {
       canvas.height = parent.clientHeight;
     }
 
-    // clearing and setting background
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.fillStyle = isDarkMode ? '#0a0a0a' : '#f1f5f9';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // transformations
     ctx.save();
     ctx.translate(offset.x, offset.y);
     ctx.scale(scale, scale);
@@ -272,14 +243,13 @@ function BoardCanvas() {
       ctx.translate(-boardCenterX, 0);
     }
 
-    const baseLineWidth = 1 / scale; // constant line size
+    const baseLineWidth = 1 / scale;
 
     // 1. Drawing outlines
     if (showOutlines && boardData.outlines) {
       ctx.beginPath();
       ctx.lineWidth = baseLineWidth * 2;
       ctx.strokeStyle = isDarkMode ? '#e2e8f0' : '#475569';
-      
       boardData.outlines.forEach(shape => addShapeToPath(ctx, shape));
       ctx.stroke();
     }
@@ -329,7 +299,7 @@ function BoardCanvas() {
       ctx.stroke();
     }
 
-    // 3. SMT pads
+    // B. Pady SMD
     if (smtPads.length > 0) {
       ctx.beginPath();
       ctx.lineWidth = baseLineWidth;
@@ -387,18 +357,58 @@ function BoardCanvas() {
     ctx.restore(); 
   }, [boardData, currentSide, isMirrored, boardCenterX, isDarkMode, showOutlines, scale, 
     offset, selectedComponents, selectedNet, inspectedComponent]);
+  
 
+  // --- MOUSE HOVER ---
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      const screenX = e.clientX - rect.left;
+      const screenY = e.clientY - rect.top;
+
+      let worldX = (screenX - offset.x) / scale;
+      const worldY = (screenY - offset.y) / scale;
+
+      if (isMirrored) worldX = boardCenterX * 2 - worldX;
+
+      const tolerance = 0.5;
+      let foundHover = false;
+
+      for (let i = 0; i < componentHitboxes.length; i++) {
+        const box = componentHitboxes[i];
+        if (worldX >= box.minX - tolerance && worldX <= box.maxX + tolerance &&
+            worldY >= box.minY - tolerance && worldY <= box.maxY + tolerance) {
+          foundHover = true;
+          break;
+        }
+      }
+
+      if (foundHover !== hoverStateRef.current) {
+        hoverStateRef.current = foundHover;
+        setIsHovering(foundHover);
+      }
+    };
+
+    canvas.addEventListener('mousemove', handleMouseMove);
+    return () => canvas.removeEventListener('mousemove', handleMouseMove);
+  }, [componentHitboxes, scale, offset, isMirrored, boardCenterX]);
+  
   return (
     <div className="w-full h-full relative block overflow-hidden">
-        <canvas 
-          ref={canvasRef}
-          {...handlers}
-          className={`absolute inset-0 block w-full h-full touch-none ${
-            isSelectionMode 
-              ? 'cursor-crosshair' 
-              : 'cursor-grab active:cursor-grabbing'
-          }`}
-        />
+      <canvas 
+        ref={canvasRef}
+        {...handlers}
+        className={`absolute inset-0 block w-full h-full touch-none active:cursor-grabbing ${
+          isSelectionMode 
+            ? 'cursor-crosshair'
+            : isHovering 
+              ? 'cursor-pointer'
+              : 'cursor-grab'
+        }`}
+      />
     </div>
   );
 }
