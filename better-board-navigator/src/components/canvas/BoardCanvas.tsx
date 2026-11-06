@@ -280,9 +280,9 @@ function BoardCanvas() {
       if ((isOnCurrentSide || isTH) && comp.pins) {
         Object.values(comp.pins).forEach(pin => {
           if (pin.shapeData) {
-            if (isInspected) inspectedShapes.push(pin.shapeData);
+            if (selectedNet && pin.net === selectedNet) netShapes.push(pin.shapeData);
+            else if (isInspected) inspectedShapes.push(pin.shapeData);
             else if (isSelected) selectedShapes.push(pin.shapeData);
-            else if (selectedNet && pin.net === selectedNet) netShapes.push(pin.shapeData);
             else if (isTH) thtPads.push(pin.shapeData);
             else smtPads.push(pin.shapeData);
           }
@@ -332,18 +332,7 @@ function BoardCanvas() {
       ctx.stroke();
     }
 
-    // 6. Selected net
-    if (netShapes.length > 0) {
-      ctx.beginPath();
-      ctx.lineWidth = baseLineWidth * 2;
-      ctx.strokeStyle = isDarkMode ? '#d946ef' : '#c026d3'; 
-      ctx.fillStyle = isDarkMode ? 'rgba(217, 70, 239, 0.5)' : 'rgba(192, 38, 211, 0.5)';
-      netShapes.forEach(shape => addShapeToPath(ctx, shape));
-      ctx.fill();
-      ctx.stroke();
-    }
-
-    // 7. Inspected component (2nd selection)
+    // 6. Inspected component (2nd selection)
     if (inspectedShapes.length > 0) {
       ctx.beginPath();
       ctx.lineWidth = baseLineWidth * 2;
@@ -354,9 +343,22 @@ function BoardCanvas() {
       ctx.stroke();
     }
 
+    // 7. Selected net
+    if (netShapes.length > 0) {
+      ctx.beginPath();
+      ctx.lineWidth = baseLineWidth * 2;
+      ctx.strokeStyle = isDarkMode ? '#d946ef' : '#c026d3'; 
+      ctx.fillStyle = isDarkMode ? 'rgba(217, 70, 239, 0.5)' : 'rgba(192, 38, 211, 0.5)';
+      netShapes.forEach(shape => addShapeToPath(ctx, shape));
+      ctx.fill();
+      ctx.stroke();
+    }
+
     ctx.restore(); 
-  }, [boardData, currentSide, isMirrored, boardCenterX, isDarkMode, showOutlines, scale, 
-    offset, selectedComponents, selectedNet, inspectedComponent]);
+  }, [
+    boardData, currentSide, isMirrored, boardCenterX, isDarkMode, showOutlines, scale, 
+    offset, selectedComponents, selectedNet, inspectedComponent
+  ]);
   
 
   // --- MOUSE HOVER ---
