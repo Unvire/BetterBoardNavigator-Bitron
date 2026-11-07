@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { useBoardStore } from './store/boardStore';
 import BoardCanvas from './components/canvas/BoardCanvas'; 
 import { 
@@ -20,6 +20,21 @@ function App() {
 
   const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(true);
   const [activeTab, setActiveTab] = useState<'components' | 'nets'>('components');
+
+  const selectedNetRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (selectedNet) {
+      if (activeTab !== 'nets') setActiveTab('nets');
+      
+      setTimeout(() => {
+        selectedNetRef.current?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start'
+        });
+      }, 50);
+    }
+  }, [selectedNet]);
 
   const [isRightPanelOpen, setIsRightPanelOpen] = useState(true);
 
@@ -292,71 +307,102 @@ function App() {
               {filteredNets.map(net => {
                 const isSelected = selectedNet === net;
                 return (
-                  <div key={net} className="flex flex-col gap-0.5">
+                  <div 
+                    key={net} 
+                    className="flex flex-col gap-0.5"
+                    ref={isSelected ? selectedNetRef : null} 
+                  >
                     <li 
                       onClick={() => selectNet(isSelected ? null : net)}
                       className={`px-3 py-1.5 rounded-md cursor-pointer transition-all text-sm flex items-center justify-between ${
                         isSelected
                           ? (isDarkMode 
-                              ? 'bg-fuchsia-500/20 text-fuchsia-400 border-fuchsia-500/30 font-bold' 
-                              : 'bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200 font-bold shadow-sm')
+                              ? 'bg-fuchsia-900/80 text-fuchsia-300 border-fuchsia-500/50 font-bold shadow-md' 
+                              : 'bg-fuchsia-100/95 text-fuchsia-800 border-fuchsia-300 font-bold shadow-md')
                           : (isDarkMode 
                               ? 'text-slate-300 hover:bg-slate-800 hover:text-white' 
                               : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900')
                       } ${isSelected ? 'border' : 'border border-transparent'}`}
                     >
-                      <span>{net}</span>
+                      <span className="truncate">{net}</span>
                       
                       {isSelected && (
                         <button 
                           onClick={(e) => { e.stopPropagation(); selectNet(null); }}
-                          className="opacity-60 hover:opacity-100 p-0.5 rounded-full hover:bg-fuchsia-500/20"
+                          className="opacity-60 hover:opacity-100 p-0.5 rounded-full hover:bg-fuchsia-500/20 ml-2 shrink-0"
+                          title="Odznacz siatkę"
                         >
                           <X size={14}/>
                         </button>
                       )}
                     </li>
 
-                    {componentsInSelectedNet.map(({ comp, pin }, idx) => {
-                          // Sprawdzamy czy ten komponent jest w czerwonej grupie
-                          const isCompSelected = selectedComponents.has(comp);
-                          const isCompInspected = inspectedComponent === comp;
-                          
-                          return (
-                            <button
-                              key={`${comp}-${pin}-${idx}`}
-                              onClick={(e) => {
-                                const targetComp = boardData?.components[comp];
-                                if (targetComp && targetComp.side !== currentSide) {
-                                  setCurrentSide(targetComp.side);
-                                  setIsMirrored(targetComp.side === 'B');
-                                }
-                                
-                                if (e.ctrlKey || e.metaKey) {
-                                  if (isCompInspected) setInspectedComponent(null);
-                                  selectComponents([comp], true);
-                                } else {
-                                  if (isCompInspected) {
-                                    setInspectedComponent(null);
-                                  } else {
-                                    setInspectedComponent(comp);
-                                    if (!isCompSelected) triggerFocus(comp);
+                    {isSelected && (
+                      <div className={`ml-3 my-1 pl-2 border-l-2 space-y-1 max-h-[50vh] overflow-y-auto pr-1 ${isDarkMode ? 'border-fuchsia-900/50' : 'border-fuchsia-200'}`}>
+                        {(() => {
+                          const pinsInNet: { comp: string, pin: string }[] = [];
+                          if (boardData && boardData.components) {
+                            Object.entries(boardData.components).forEach(([compName, comp]) => {
+                              if (comp.pins) {
+                                Object.entries(comp.pins).forEach(([pinName, pin]) => {
+                                  if (pin.net === net) {
+                                    pinsInNet.push({ comp: compName, pin: pinName });
                                   }
-                                }
-                              }}
-                              className={`w-full flex items-center justify-between px-2 py-1 rounded text-xs transition-colors ${
-                                isCompInspected
-                                  ? (isDarkMode ? 'bg-cyan-900/40 text-cyan-300 font-bold' : 'bg-cyan-100 text-cyan-800 font-bold')
-                                  : isCompSelected
-                                    ? (isDarkMode ? 'bg-rose-900/30 text-rose-300' : 'bg-rose-100 text-rose-700')
-                                    : (isDarkMode ? 'text-slate-400 hover:text-cyan-400 hover:bg-cyan-900/20' : 'text-slate-500 hover:text-cyan-700 hover:bg-cyan-50')
-                              }`}
-                            >
-                              <span className={isCompInspected || isCompSelected ? "font-bold" : "font-medium"}>{comp}</span>
-                              <span className="opacity-70 font-mono">Pin: {pin}</span>
-                            </button>
-                          );
-                        })}
+                                });
+                              }
+                            });
+                          }
+                          
+                          if (pinsInNet.length === 0) {
+                            return <div className="text-xs opacity-50 px-2 py-1">Brak zdefiniowanych padów dla tej siatki</div>;
+                          }
+
+                          return pinsInNet
+                            .sort((a, b) => a.comp.localeCompare(b.comp, undefined, { numeric: true }))
+                            .map(({ comp, pin }, idx) => {
+                              const isCompSelected = selectedComponents.has(comp);
+                              const isCompInspected = inspectedComponent === comp;
+                              
+                              return (
+                                <button
+                                  key={`${comp}-${pin}-${idx}`}
+                                  onClick={(e) => {
+                                    const targetComp = boardData?.components[comp];
+                                    if (targetComp && targetComp.side !== currentSide) {
+                                      setCurrentSide(targetComp.side);
+                                      setIsMirrored(targetComp.side === 'B');
+                                    }
+                                    
+                                    if (e.ctrlKey || e.metaKey) {
+                                      if (isCompInspected) setInspectedComponent(null);
+                                      selectComponents([comp], true);
+                                    } else {
+                                      if (isCompInspected) {
+                                        setInspectedComponent(null);
+                                      } else {
+                                        setInspectedComponent(comp);
+                                        if (!isCompSelected) triggerFocus(comp);
+                                      }
+                                    }
+                                  }}
+                                  className={`w-full flex items-center justify-between px-2 py-1 rounded text-xs transition-colors ${
+                                    isCompInspected
+                                      ? (isDarkMode ? 'bg-cyan-900/40 text-cyan-300 font-bold' : 'bg-cyan-100 text-cyan-800 font-bold')
+                                      : isCompSelected
+                                        ? (isDarkMode ? 'bg-rose-900/30 text-rose-300' : 'bg-rose-100 text-rose-700')
+                                        : (isDarkMode ? 'text-slate-400 hover:text-cyan-400 hover:bg-cyan-900/20' : 'text-slate-500 hover:text-cyan-700 hover:bg-cyan-50')
+                                  }`}
+                                >
+                                  <span className={`truncate ${isCompInspected || isCompSelected ? "font-bold" : "font-medium"}`}>
+                                    {comp}
+                                  </span>
+                                  <span className="opacity-70 font-mono shrink-0 ml-2">Pin: {pin}</span>
+                                </button>
+                              );
+                            });
+                        })()}
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -473,12 +519,34 @@ function App() {
                   <tr><th className="px-4 py-2 font-medium">Pin</th><th className="px-4 py-2 font-medium">Net</th></tr>
                 </thead>
                 <tbody>
-                  {boardData.components[compToShow].pins && Object.entries(boardData.components[compToShow].pins).map(([pinName, pin]) => (
-                    <tr key={pinName} className={`border-b border-inherit ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}`}>
-                      <td className="px-4 py-2 font-mono font-medium">{pinName}</td>
-                      <td className="px-4 py-2 text-indigo-600 dark:text-indigo-400 font-semibold">{pin.net || "N/C"}</td>
-                    </tr>
-                  ))}
+                  {boardData.components[compToShow].pins && Object.entries(boardData.components[compToShow].pins).map(([pinName, pin]) => {
+                    const isNetSelected = pin.net !== undefined && pin.net === selectedNet;
+                    
+                    return (
+                      <tr 
+                        key={pinName} 
+                        onClick={() => pin.net && selectNet(isNetSelected ? null : pin.net)}
+                        className={`border-b border-inherit transition-colors ${
+                          pin.net ? 'cursor-pointer' : ''
+                        } ${
+                          isNetSelected
+                            ? (isDarkMode ? 'bg-fuchsia-900/30' : 'bg-fuchsia-50')
+                            : (isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-50')
+                        }`}
+                      >
+                        <td className={`px-4 py-2 font-mono ${isNetSelected ? 'font-bold text-fuchsia-400' : 'font-medium'}`}>
+                          {pinName}
+                        </td>
+                        <td className={`px-4 py-2 font-semibold ${
+                          isNetSelected 
+                            ? 'text-fuchsia-500' 
+                            : 'text-indigo-600 dark:text-indigo-400'
+                        }`}>
+                          {pin.net || "N/C"}
+                        </td>
+                      </tr>
+                    );
+                  })}
                   {!boardData.components[compToShow].pins && (
                     <tr><td colSpan={2} className="px-4 py-4 text-center opacity-50 text-xs">Brak zdefiniowanych pinów</td></tr>
                   )}
