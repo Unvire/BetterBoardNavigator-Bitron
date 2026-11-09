@@ -53,7 +53,9 @@ function BoardCanvas() {
 
     if (isMultiSelect) {
       if (store.inspectedComponent) store.setInspectedComponent(null);
+      if (store.highlightedPrefix) store.setHighlightedPrefix(null);
       store.selectComponents(clickedNames, true);
+      
     } else {
       store.setInspectedComponent(clickedNames[0]);
     }

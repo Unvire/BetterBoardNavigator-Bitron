@@ -3,8 +3,8 @@ import { useBoardStore } from '../../../store/boardStore';
 export default function ComponentList({ items }: { items: string[] }) {
   const { 
     boardData, isDarkMode, selectedComponents, inspectedComponent,
-    currentSide, setCurrentSide, setIsMirrored, 
-    selectComponents, triggerFocus, setInspectedComponent
+    currentSide, setCurrentSide, setIsMirrored, selectComponents, triggerFocus, 
+    setInspectedComponent, highlightedPrefix, setHighlightedPrefix
   } = useBoardStore();
 
   const handleComponentClick = (e: React.MouseEvent, compName: string) => {
@@ -19,6 +19,7 @@ export default function ComponentList({ items }: { items: string[] }) {
 
     if (e.ctrlKey || e.metaKey) {
       if (inspectedComponent) setInspectedComponent(null); 
+      if (highlightedPrefix) setHighlightedPrefix(null);
       
       selectComponents([compName], true);
       if (!isAlreadySelected) triggerFocus(compName);

@@ -98,7 +98,13 @@ export const useBoardStore = create<BoardState>((set) => ({
   
   clearFocus: () => set({ componentToFocus: null }),
 
-  setInspectedComponent: (name) => set({ inspectedComponent: name }),
+  setInspectedComponent: (name) => set({ 
+    inspectedComponent: name, 
+    highlightedPrefix: null
+  }),
 
-  setHighlightedPrefix: (prefix) => set({ highlightedPrefix: prefix }),
+  setHighlightedPrefix: (prefix) => set({ 
+    highlightedPrefix: prefix,
+    inspectedComponent: null
+  }),
 }));

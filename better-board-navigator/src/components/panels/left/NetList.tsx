@@ -5,8 +5,8 @@ import { X } from 'lucide-react';
 export default function NetList({ items }: { items: string[] }) {
   const { 
     selectedNet, selectNet, boardData, isDarkMode, 
-    currentSide, setCurrentSide, setIsMirrored,
-    selectedComponents, inspectedComponent, selectComponents, setInspectedComponent, triggerFocus
+    currentSide, setCurrentSide, setIsMirrored, selectedComponents, inspectedComponent, 
+    selectComponents, setInspectedComponent, triggerFocus, highlightedPrefix, setHighlightedPrefix
   } = useBoardStore();
 
   const selectedNetRef = useRef<HTMLDivElement>(null);
@@ -75,6 +75,7 @@ export default function NetList({ items }: { items: string[] }) {
                           }
                           if (e.ctrlKey || e.metaKey) {
                             if (inspectedComponent) setInspectedComponent(null);
+                            if (highlightedPrefix) setHighlightedPrefix(null);
                             selectComponents([comp], true);
                           } else {
                             if (isCompInspected) setInspectedComponent(null);
