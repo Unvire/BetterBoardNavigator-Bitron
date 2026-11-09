@@ -21,6 +21,7 @@ export default function MultiSelectView({ selectedNames }: { selectedNames: stri
             <button 
               onClick={() => { setInspectedComponent(name); triggerFocus(name); }}
               className="flex-1 flex justify-between items-center text-left p-2.5 pl-3 transition-colors rounded-l-md hover:bg-blue-500/10"
+              title={t('rightpanel.show_pins_tooltip')}
             >
               <div className="flex flex-col">
                 <span className="font-bold text-blue-500 block leading-tight">{name}</span>

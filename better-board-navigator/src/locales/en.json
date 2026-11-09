@@ -20,16 +20,17 @@
     "group": "Group:"
   },
   "rightpanel": {
-    "selected_count": "Zaznaczono: {{count}}",
-    "click_to_view_pins": "Kliknij \"Pokaż piny\", aby przejrzeć szczegóły bez utraty zaznaczenia na Canvasie.",
-    "side": "Strona: {{side}}",
-    "deselect_component": "Odznacz komponent",
-    "back_to_list": "Wróć do listy",
-    "type": "Typ: {{type}}",
-    "pn_waiting": "PN: [Oczekuje na moduł PDF...]",
+    "selected_count": "Selected: {{count}}",
+    "click_to_view_pins": "Click a component below to view its pins without losing the Canvas selection.",
+    "show_pins_tooltip": "Show pins and details",
+    "side": "Side: {{side}}",
+    "deselect_component": "Deselect component",
+    "back_to_list": "Back to list",
+    "type": "Type: {{type}}",
+    "pn_waiting": "PN: [Waiting for PDF module...]",
     "pin": "Pin",
-    "net": "Siatka",
+    "net": "Net",
     "not_connected": "N/C",
-    "no_pins": "Brak zdefiniowanych pinów"
+    "no_pins": "No defined pins"
   }
 }

@@ -1,5 +1,5 @@
 import { useBoardStore } from '../../../store/boardStore';
-import MultiSelectView from './MultiSelect';
+import MultiSelectView from './MultiSelectView';
 import InspectorView from './InspectorView';
 
 export default function RightPanel() {
