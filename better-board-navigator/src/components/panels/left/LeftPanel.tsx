@@ -4,8 +4,10 @@ import { Search, Cpu, Layers, Shapes } from 'lucide-react';
 import ComponentList from './ComponentList';
 import NetList from './NetList';
 import GroupList from './GroupList';
+import { useTranslation } from 'react-i18next';
 
 export default function LeftPanel() {
+  const { t } = useTranslation();
   const { boardData, isDarkMode, selectedNet, isLeftPanelOpen } = useBoardStore();
   const [activeTab, setActiveTab] = useState<'components' | 'nets' | 'groups'>('components');
   const [searchQuery, setSearchQuery] = useState('');
@@ -54,13 +56,13 @@ export default function LeftPanel() {
       {/* Panels */}
       <div className="flex border-b border-inherit shrink-0">
         <button onClick={() => setActiveTab('components')} className={`flex-1 py-3 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 ${activeTab === 'components' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-inherit opacity-70 hover:opacity-100'}`}>
-          <Cpu size={16}/> Comp.
+          <Cpu size={16}/> {t('leftpanel.tab_components')}
         </button>
         <button onClick={() => setActiveTab('nets')} className={`flex-1 py-3 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 ${activeTab === 'nets' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-inherit opacity-70 hover:opacity-100'}`}>
-          <Layers size={16}/> Nets
+          <Layers size={16}/> {t('leftpanel.tab_nets')}
         </button>
         <button onClick={() => setActiveTab('groups')} className={`flex-1 py-3 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 ${activeTab === 'groups' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-inherit opacity-70 hover:opacity-100'}`}>
-          <Shapes size={16}/> Typy
+          <Shapes size={16}/> {t('leftpanel.tab_groups')}
         </button>
       </div>
 
@@ -72,7 +74,7 @@ export default function LeftPanel() {
             type="text" 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={`Search ${activeTab}...`}
+            placeholder={`${t('leftpanel.search')}...`}
             className={`w-full pl-9 pr-3 py-2 text-sm rounded-md outline-none transition-all border ${
               isDarkMode 
                 ? 'bg-slate-950/50 border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500' 

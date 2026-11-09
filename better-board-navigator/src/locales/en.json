@@ -1,0 +1,35 @@
+{
+  "topbar": {
+    "toggle_sidebar": "Toggle Sidebar",
+    "switch_side": "Switch Side",
+    "flip": "Flip Horizontally",
+    "rotate_left": "Rotate Left",
+    "rotate_right": "Rotate Right",
+    "toggle_labels": "Toggle Labels",
+    "load_file": "Load File",
+    "language": "Language",
+    "theme": "Toggle Theme",
+    "settings": "Settings",
+    "help": "Help"
+  },
+  "leftpanel": {
+    "tab_components": "Comp.",
+    "tab_nets": "Nets",
+    "tab_groups": "Types",
+    "search": "Search",
+    "group": "Group:"
+  },
+  "rightpanel": {
+    "selected_count": "Zaznaczono: {{count}}",
+    "click_to_view_pins": "Kliknij \"Pokaż piny\", aby przejrzeć szczegóły bez utraty zaznaczenia na Canvasie.",
+    "side": "Strona: {{side}}",
+    "deselect_component": "Odznacz komponent",
+    "back_to_list": "Wróć do listy",
+    "type": "Typ: {{type}}",
+    "pn_waiting": "PN: [Oczekuje na moduł PDF...]",
+    "pin": "Pin",
+    "net": "Siatka",
+    "not_connected": "N/C",
+    "no_pins": "Brak zdefiniowanych pinów"
+  }
+}

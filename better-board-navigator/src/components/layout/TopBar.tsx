@@ -1,11 +1,16 @@
 import { useBoardStore } from '../../store/boardStore';
 import { 
   Upload, FlipHorizontal, RotateCw, RotateCcw, Settings2, HelpCircle, 
-  Layers, PanelLeftClose, PanelLeftOpen, Sun, Moon, Type 
+  Layers, PanelLeftClose, PanelLeftOpen, Sun, Moon, Type, Globe
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
+const SUPPORTED_LANGUAGES = ['pl', 'en'];
 
 
 export default function TopBar() {
+  const { t, i18n } = useTranslation();
+
   const { 
     currentSide, setCurrentSide, 
     mirrorState, toggleMirror, 
@@ -14,6 +19,16 @@ export default function TopBar() {
     isDarkMode, toggleDarkMode,
     isLeftPanelOpen, toggleLeftPanel
   } = useBoardStore();
+
+
+  const toggleLanguage = () => {
+    const currentLang = i18n.language.substring(0, 2).toLowerCase();
+    const currentIndex = SUPPORTED_LANGUAGES.indexOf(currentLang);
+    const safeIndex = currentIndex === -1 ? 0 : currentIndex;
+    const nextIndex = (safeIndex + 1) % SUPPORTED_LANGUAGES.length;
+    
+    i18n.changeLanguage(SUPPORTED_LANGUAGES[nextIndex]);
+  };
 
   
   const actionBtnClass = `p-2.5 rounded-lg transition-all flex items-center justify-center gap-1.5 font-medium text-sm
@@ -30,7 +45,7 @@ export default function TopBar() {
       
       {/* 1. LEFT: UI & Branding */}
       <div className="flex items-center gap-4 flex-1">
-        <button onClick={toggleLeftPanel} className={actionBtnClass} title="Toggle Sidebar [B]">
+        <button onClick={toggleLeftPanel} className={actionBtnClass} title={`${t('topbar.toggle_sidebar')} [B]`}>
           {isLeftPanelOpen ? <PanelLeftClose size={22}/> : <PanelLeftOpen size={22}/>}
         </button>
         <div className="font-bold text-lg flex items-center gap-2 tracking-tight select-none cursor-default">
@@ -44,7 +59,7 @@ export default function TopBar() {
           <button 
             onClick={() => setCurrentSide(currentSide === 'T' ? 'B' : 'T')} 
             className={`${actionBtnClass} w-16`} 
-            title="Switch Side [Space]"
+            title={`${t('topbar.switch_side')} [Space]`}
           >
             <Layers size={20} className={currentSide === 'B' ? "text-amber-500" : "text-blue-500"}/>
             <span className="font-bold">{currentSide}</span>
@@ -52,23 +67,23 @@ export default function TopBar() {
 
           <div className="w-px h-6 bg-slate-300 dark:bg-slate-600 mx-2"></div>
           
-          <button onClick={toggleMirror} className={actionBtnClass} title="Flip Horizontally [F]">
+          <button onClick={toggleMirror} className={actionBtnClass} title={`${t('topbar.flip')} [F]`}>
             <FlipHorizontal size={20} className={mirrorState[currentSide] ? "text-blue-500" : "opacity-70"} />
           </button>
         </div>
 
         <div className={toolGroupClass}>
-          <button onClick={() => setRotation(rotation === 0 ? 270 : rotation - 90)} className={actionBtnClass} title="Rotate Left [Shift+R]">
+          <button onClick={() => setRotation(rotation === 0 ? 270 : rotation - 90)} className={actionBtnClass} title={`${t('topbar.rotate_left')} [Shift+R]`}>
             <RotateCcw size={20} className="opacity-70" />
           </button>
 
-          <button onClick={() => setRotation(rotation + 90)} className={actionBtnClass} title="Rotate Right [R]">
+          <button onClick={() => setRotation(rotation + 90)} className={actionBtnClass} title={`${t('topbar.rotate_right')} [R]`}>
             <RotateCw size={20} className="opacity-70" />
           </button>
         </div>
 
         <div className={toolGroupClass}>
-          <button onClick={toggleLabels} className={actionBtnClass} title="Toggle Component Labels [L]">
+          <button onClick={toggleLabels} className={actionBtnClass} title={`${t('topbar.toggle_labels')} [L]`}>
             <Type size={20} className={showLabels ? "text-blue-500" : "opacity-70"} />
           </button>
         </div>
@@ -76,19 +91,24 @@ export default function TopBar() {
 
       {/* 3. RIGHT - GLOBAL SETTINGS AND FILE LOADER*/}
       <div className="flex items-center justify-end gap-1 flex-1">
-        <button className={actionBtnClass} title="Load File [Ctrl+O]">
+        <button className={actionBtnClass} title={`${t('topbar.load_file')} [Ctrl+O]`}>
           <Upload size={20} />
         </button>
         
         <div className="w-px h-6 bg-slate-300 dark:bg-slate-600 mx-2"></div>
         
-        <button onClick={toggleDarkMode} className={actionBtnClass} title="Toggle Theme [T]">
+        <button onClick={toggleLanguage} className={actionBtnClass} title={`${t('topbar.language')}`}>
+          <Globe size={18} className="opacity-70" />
+          <span className="font-bold text-xs">{i18n.language.substring(0, 2).toUpperCase()}</span>
+        </button>
+        
+        <button onClick={toggleDarkMode} className={actionBtnClass} title={`${t('topbar.theme')} [T]`}>
           {isDarkMode ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} />}
         </button>
-        <button className={actionBtnClass} title="Settings">
+        <button className={actionBtnClass} title={`${t('topbar.settings')}`}>
           <Settings2 size={20} />
         </button>
-        <button className={actionBtnClass} title="Help">
+        <button className={actionBtnClass} title={`${t('topbar.help')}`}>
           <HelpCircle size={20} />
         </button>
       </div>

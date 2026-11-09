@@ -1,8 +1,10 @@
 import { useMemo } from 'react';
 import { useBoardStore } from '../../../store/boardStore';
 import { X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function GroupList({ searchQuery }: { searchQuery: string }) {
+  const { t } = useTranslation();
   const { boardData, isDarkMode, highlightedPrefix, setHighlightedPrefix } = useBoardStore();
 
   const groups = useMemo(() => {
@@ -49,7 +51,7 @@ export default function GroupList({ searchQuery }: { searchQuery: string }) {
             }`}
           >
             <div className="flex items-center gap-2">
-              <span>Grupa: <span className={isSelected ? "" : "font-semibold"}>{prefix}</span></span>
+              <span>{t('leftpanel.group')} <span className={isSelected ? "" : "font-semibold"}>{prefix}</span></span>
               <span className={`text-xs px-1.5 py-0.5 rounded-full ${isDarkMode ? 'bg-slate-800' : 'bg-slate-200'} opacity-80`}>
                 {count}
               </span>

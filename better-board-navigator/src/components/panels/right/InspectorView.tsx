@@ -1,7 +1,9 @@
 import { useBoardStore } from '../../../store/boardStore';
 import { X, ArrowLeft, Cpu } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function InspectorView({ compName, isMultiSelected }: { compName: string, isMultiSelected: boolean }) {
+  const { t } = useTranslation();
   const { boardData, isDarkMode, clearSelection, setInspectedComponent, selectedNet, selectNet, inspectedComponent } = useBoardStore();
   const component = boardData?.components[compName];
 
@@ -16,7 +18,7 @@ export default function InspectorView({ compName, isMultiSelected }: { compName:
               <button 
                 onClick={() => setInspectedComponent(null)} 
                 className={`p-1.5 -ml-1 rounded-md transition-colors ${inspectedComponent ? 'text-cyan-500 hover:bg-cyan-500/15' : 'text-rose-500 hover:bg-rose-500/15'}`}
-                title="Wróć do listy"
+                title={t('rightpanel.back_to_list')}
               >
                 <ArrowLeft size={24} />
               </button>
@@ -30,15 +32,15 @@ export default function InspectorView({ compName, isMultiSelected }: { compName:
           <button onClick={clearSelection} className="opacity-60 hover:opacity-100 transition-opacity"><X size={18}/></button>
         </div>
         <div className="text-xs opacity-70 mt-1 flex flex-col gap-0.5">
-          <span>Type: {component.mountingType} | Side: {component.side}</span>
-          <span className="font-mono mt-1 text-blue-500 dark:text-blue-400">PN: [Oczekuje na moduł PDF...]</span>
+          <span>{t('rightpanel.type', { type: component.mountingType })} | {t('rightpanel.side', { side: component.side })}</span>
+          <span className="font-mono mt-1 text-blue-500 dark:text-blue-400">{t('rightpanel.pn_waiting')}</span>
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto">
         <table className="w-full text-sm text-left">
           <thead className={`text-xs uppercase sticky top-0 ${isDarkMode ? 'bg-slate-900/95 text-slate-400' : 'bg-white/95 text-slate-500'}`}>
-            <tr><th className="px-4 py-2 font-medium">Pin</th><th className="px-4 py-2 font-medium">Net</th></tr>
+            <tr><th className="px-4 py-2 font-medium">{t('rightpanel.pin')}</th><th className="px-4 py-2 font-medium">{t('rightpanel.net')}</th></tr>
           </thead>
           <tbody>
             {component.pins ? Object.entries(component.pins).map(([pinName, pin]) => {
@@ -50,11 +52,11 @@ export default function InspectorView({ compName, isMultiSelected }: { compName:
                   className={`border-b border-inherit transition-colors ${pin.net ? 'cursor-pointer' : ''} ${isNetSelected ? (isDarkMode ? 'bg-fuchsia-900/30' : 'bg-fuchsia-50') : (isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-50')}`}
                 >
                   <td className={`px-4 py-2 font-mono ${isNetSelected ? 'font-bold text-fuchsia-400' : 'font-medium'}`}>{pinName}</td>
-                  <td className={`px-4 py-2 font-semibold ${isNetSelected ? 'text-fuchsia-500' : 'text-indigo-600 dark:text-indigo-400'}`}>{pin.net || "N/C"}</td>
+                  <td className={`px-4 py-2 font-semibold ${isNetSelected ? 'text-fuchsia-500' : 'text-indigo-600 dark:text-indigo-400'}`}>{pin.net || t('rightpanel.not_connected')}</td>
                 </tr>
               );
             }) : (
-              <tr><td colSpan={2} className="px-4 py-4 text-center opacity-50 text-xs">Brak zdefiniowanych pinów</td></tr>
+              <tr><td colSpan={2} className="px-4 py-4 text-center opacity-50 text-xs">{t('rightpanel.no_pins')}</td></tr>
             )}
           </tbody>
         </table>

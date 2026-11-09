@@ -1,17 +1,19 @@
 import { useBoardStore } from '../../../store/boardStore';
 import { X, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function MultiSelectView({ selectedNames }: { selectedNames: string[] }) {
+  const { t } = useTranslation();
   const { clearSelection, setInspectedComponent, triggerFocus, selectComponents, boardData, isDarkMode } = useBoardStore();
 
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-between p-3 border-b border-inherit shrink-0">
-        <h2 className="text-sm font-bold text-amber-500">Zaznaczono: {selectedNames.length}</h2>
+        <h2 className="text-sm font-bold text-amber-500">{t('rightpanel.selected_count', { count: selectedNames.length })}</h2>
         <button onClick={clearSelection} className="opacity-60 hover:opacity-100"><X size={18}/></button>
       </div>
       <div className="p-3 text-xs opacity-75">
-        Kliknij "Pokaż piny", aby przejrzeć szczegóły bez utraty zaznaczenia na Canvasie.
+        {t('rightpanel.click_to_view_pins')}
       </div>
       <div className="flex-1 overflow-y-auto p-2 space-y-1.5">
         {selectedNames.map(name => (
@@ -22,7 +24,7 @@ export default function MultiSelectView({ selectedNames }: { selectedNames: stri
             >
               <div className="flex flex-col">
                 <span className="font-bold text-blue-500 block leading-tight">{name}</span>
-                <span className="text-xs opacity-60 mt-0.5">Side: {boardData?.components[name]?.side}</span>
+                <span className="text-xs opacity-60 mt-0.5">{t('rightpanel.side', { side: boardData?.components[name]?.side })}</span>
               </div>
               <ChevronRight size={16} className="text-blue-500/50 opacity-0 group-hover:opacity-100 transition-opacity -mr-1" />
             </button>
@@ -30,7 +32,7 @@ export default function MultiSelectView({ selectedNames }: { selectedNames: stri
             <button
               onClick={() => selectComponents([name], true)} 
               className={`px-3 flex items-center justify-center rounded-r-md transition-colors ${isDarkMode ? 'text-slate-500 hover:text-rose-400 hover:bg-rose-500/10' : 'text-slate-300 hover:text-rose-500 hover:bg-rose-50'}`}
-              title="Odznacz komponent"
+              title={t('rightpanel.deselect_component')}
             >
               <X size={14} className="stroke-[2.5]" />
             </button>

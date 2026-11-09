@@ -1,0 +1,35 @@
+{
+  "topbar": {
+    "toggle_sidebar": "Pokaż/ukryj panel",
+    "switch_side": "Zmień stronę",
+    "flip": "Odbicie lustrzane",
+    "rotate_left": "Obróć w lewo",
+    "rotate_right": "Obróć w prawo",
+    "toggle_labels": "Etykiety komponentów",
+    "load_file": "Wczytaj schemat",
+    "language": "Język",
+    "theme": "Zmień motyw",
+    "settings": "Ustawienia",
+    "help": "Pomoc"
+  },
+  "leftpanel": {
+    "tab_components": "Komp.",
+    "tab_nets": "Siatki",
+    "tab_groups": "Typy",
+    "search": "Szukaj",
+    "group": "Grupa:"
+  },
+  "rightpanel": {
+    "selected_count": "Selected: {{count}}",
+    "click_to_view_pins": "Click \"Show pins\" to view details without losing the Canvas selection.",
+    "side": "Side: {{side}}",
+    "deselect_component": "Deselect component",
+    "back_to_list": "Back to list",
+    "type": "Type: {{type}}",
+    "pn_waiting": "PN: [Waiting for PDF module...]",
+    "pin": "Pin",
+    "net": "Net",
+    "not_connected": "N/C",
+    "no_pins": "No defined pins"
+  }
+}
