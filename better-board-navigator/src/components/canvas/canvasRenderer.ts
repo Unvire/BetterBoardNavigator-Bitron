@@ -43,33 +43,57 @@ const addShapeToPath = (ctx: CanvasRenderingContext2D, shape: ShapeData) => {
 
 const drawLabels = (ctx: CanvasRenderingContext2D, options: RenderOptions) => {
   const { 
-    scale, offset,
+    scale, offset, rotation, boardCenterX, boardCenterY,
     isDarkMode, componentHitboxes, selectedComponents, 
-    inspectedComponent, highlightedPrefix, showLabels, isMirrored
+    inspectedComponent, highlightedPrefix, showLabels, isMirrored 
   } = options;
-
+  
   const canvasWidth = ctx.canvas.width;
   const canvasHeight = ctx.canvas.height;
+  
+  // converting screen to board coordinate system
+  const getOrigCoords = (sx: number, sy: number) => {
+    let wx = (sx - offset.x) / scale;
+    let wy = (sy - offset.y) / scale;
+    if (isMirrored) wx = boardCenterX * 2 - wx;
+    if (rotation !== 0) {
+      const rad = (-rotation * Math.PI) / 180;
+      const dx = wx - boardCenterX;
+      const dy = wy - boardCenterY;
+      wx = dx * Math.cos(rad) - dy * Math.sin(rad) + boardCenterX;
+      wy = dx * Math.sin(rad) + dy * Math.cos(rad) + boardCenterY;
+    }
+    return { wx, wy };
+  };
 
-  const vMinX = (-offset.x / scale) - (canvasWidth / scale); 
-  const vMaxX = ((canvasWidth - offset.x) / scale) + (canvasWidth / scale);
-  const vMinY = (-offset.y / scale) - (canvasHeight / scale);
-  const vMaxY = ((canvasHeight - offset.y) / scale) + (canvasHeight / scale);
+  const c1 = getOrigCoords(0, 0);
+  const c2 = getOrigCoords(canvasWidth, 0);
+  const c3 = getOrigCoords(0, canvasHeight);
+  const c4 = getOrigCoords(canvasWidth, canvasHeight);
+
+  const margin = 50 / scale;
+  const vMinX = Math.min(c1.wx, c2.wx, c3.wx, c4.wx) - margin;
+  const vMaxX = Math.max(c1.wx, c2.wx, c3.wx, c4.wx) + margin;
+  const vMinY = Math.min(c1.wy, c2.wy, c3.wy, c4.wy) - margin;
+  const vMaxY = Math.max(c1.wy, c2.wy, c3.wy, c4.wy) + margin;
+
 
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   
   const shadowColor = isDarkMode ? 'rgba(10, 10, 10, 0.8)' : 'rgba(255, 255, 255, 0.8)';
   const shadowBlur = 3 / scale;
-  const charWidthRatio = 0.6;
+  const charWidthRatio = 0.6; 
 
   componentHitboxes.forEach(box => {
+    // discard labels outside screen
     if (box.maxX < vMinX || box.minX > vMaxX || box.maxY < vMinY || box.minY > vMaxY) return; 
 
     const compName = box.name;
     const isSelected = selectedComponents.has(compName);
     const isInspected = inspectedComponent === compName;
 
+    // fast prefix checking
     let compPrefix = '#';
     for (let i = 0; i < compName.length; i++) {
       if (!isNaN(Number(compName[i]))) {
@@ -83,25 +107,22 @@ const drawLabels = (ctx: CanvasRenderingContext2D, options: RenderOptions) => {
     const compWidth = box.maxX - box.minX;
     const compHeight = box.maxY - box.minY;
     const shortestSide = Math.min(compWidth, compHeight);
-
-    // max sizes in board units
-    const minFontWorldSize = 0.5;
-    const maxFontWorldSize = 5.0;
-
+    
+    const minFontWorldSize = 0.5; 
+    const maxFontWorldSize = 5.0; 
+    
+    // clamped font size
     let targetWorldFontSize = shortestSide * 0.4;
+    
     if (targetWorldFontSize < minFontWorldSize) targetWorldFontSize = minFontWorldSize;
     if (targetWorldFontSize > maxFontWorldSize) targetWorldFontSize = maxFontWorldSize;
-
     if (isHighlighted) targetWorldFontSize *= 1.2;
-    
 
     const visualPixelSize = targetWorldFontSize * scale;
-
     let shouldDraw = false;
 
-    if (isInspected) shouldDraw = true; 
-    else if (showLabels && visualPixelSize > 8)  shouldDraw = true;
-    else if (isSelected || isPrefixHighlighted) {
+    if (showLabels && visualPixelSize > 8) shouldDraw = true;
+    else if (isSelected || isInspected || isPrefixHighlighted) {
       const approxTextWidth = compName.length * (targetWorldFontSize * charWidthRatio);
       const maxAllowedTextWidth = Math.max(compWidth, compHeight) * 1.5; 
 
@@ -129,7 +150,11 @@ const drawLabels = (ctx: CanvasRenderingContext2D, options: RenderOptions) => {
 
       ctx.save();
       ctx.translate(cx, cy);
+      
+      // revert rotation and mirroring
+      if (rotation !== 0) ctx.rotate((-rotation * Math.PI) / 180);
       if (isMirrored) ctx.scale(-1, 1);
+      
       ctx.fillText(compName, 0, 0);
       ctx.restore();
     }
