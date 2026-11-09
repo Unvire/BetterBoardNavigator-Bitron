@@ -40,7 +40,6 @@ function BoardCanvas() {
   const handleCanvasClick = useCallback((rawWorldX: number, rawWorldY: number, isMultiSelect: boolean) => {
     if (!store.boardData) return;
 
-    // Przetwarzamy surowe koordynaty z hooka kamery na układ współrzędnych Pythona
     const { wx, wy } = getHitboxCoords(rawWorldX, rawWorldY);
     
     const clickedNames = componentHitboxes
@@ -139,7 +138,9 @@ function BoardCanvas() {
       selectedComponents: store.selectedComponents,
       inspectedComponent: store.inspectedComponent,
       selectedNet: store.selectedNet,
-      highlightedPrefix: store.highlightedPrefix
+      highlightedPrefix: store.highlightedPrefix,
+      showLabels: store.showLabels,
+      componentHitboxes: componentHitboxes
     });
   }, [store, scale, offset, boardCenterX, boardCenterY, isMirrored]);
 

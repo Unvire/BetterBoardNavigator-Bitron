@@ -1,4 +1,5 @@
 import type { BoardData, ShapeData } from '../../types/board';
+import type { Hitbox } from '../../hooks/useBoardGeometry';
 
 export interface RenderOptions {
   ctx: CanvasRenderingContext2D;
@@ -16,6 +17,8 @@ export interface RenderOptions {
   inspectedComponent: string | null;
   selectedNet: string | null;
   highlightedPrefix: string | null;
+  showLabels: boolean;
+  componentHitboxes: Hitbox[];
 }
 
 
@@ -35,6 +38,87 @@ const addShapeToPath = (ctx: CanvasRenderingContext2D, shape: ShapeData) => {
     ctx.lineTo(shape.points[3].x, shape.points[3].y);
     ctx.closePath();
   }
+};
+
+
+const drawLabels = (ctx: CanvasRenderingContext2D, options: RenderOptions) => {
+  const { 
+    scale, isDarkMode, componentHitboxes, selectedComponents, 
+    inspectedComponent, highlightedPrefix, showLabels, isMirrored 
+  } = options;
+
+  const visualFontSize = 14 / scale;
+  const defaultFont = `600 ${visualFontSize}px sans-serif`;
+  const boldFont = `bold ${visualFontSize + (3/scale)}px sans-serif`;
+
+  // width of character is approx 60% of its height
+  const charWidthRatio = 0.6;
+  const estimatedCharWidth = visualFontSize * charWidthRatio;
+  const estimatedBoldCharWidth = (visualFontSize + (3/scale)) * charWidthRatio;
+  
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  const shadowColor = isDarkMode ? 'rgba(10, 10, 10, 0.8)' : 'rgba(255, 255, 255, 0.8)';
+  const shadowBlur = 3 / scale;
+
+  componentHitboxes.forEach(box => {
+    const compName = box.name;
+    const isSelected = selectedComponents.has(compName);
+    const isInspected = inspectedComponent === compName;
+
+    // checking first letter
+    let compPrefix = '#';
+    for (let i = 0; i < compName.length; i++) {
+      if (!isNaN(Number(compName[i]))) {
+        compPrefix = compName.substring(0, i).toUpperCase();
+        break;
+      }
+    }
+    const isPrefixHighlighted = highlightedPrefix === compPrefix;
+
+    const isHighlighted = isSelected || isInspected || isPrefixHighlighted;
+    const isGloballyVisible = showLabels && scale > 15;
+
+    let shouldDraw = false;
+    if (isInspected) shouldDraw = true;
+    else if (isGloballyVisible) shouldDraw = true;
+    else if (isSelected || isPrefixHighlighted) {
+      const compWidth = box.maxX - box.minX;
+      const compHeight = box.maxY - box.minY;
+      const maxAllowedTextWidth = Math.max(compWidth, compHeight) * 2; 
+
+      const approxTextWidth = compName.length * estimatedBoldCharWidth;
+      
+      if (approxTextWidth <= maxAllowedTextWidth) shouldDraw = true;
+    }
+
+    if (shouldDraw) {
+      const cx = (box.minX + box.maxX) / 2;
+      const cy = (box.minY + box.maxY) / 2;
+
+      ctx.fillStyle = isHighlighted
+        ? (isDarkMode ? '#ffffff' : '#000000')
+        : (isDarkMode ? '#94a3b8' : '#64748b');
+
+      ctx.font = isHighlighted ? boldFont : defaultFont;
+
+      if (isHighlighted) {
+        ctx.shadowColor = shadowColor;
+        ctx.shadowBlur = shadowBlur;
+      } else {
+        ctx.shadowBlur = 0;
+      }
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      if (isMirrored) ctx.scale(-1, 1);
+      ctx.fillText(compName, 0, 0);
+      ctx.restore();
+    }
+  });
+
+  ctx.shadowBlur = 0;
 };
 
 export const renderBoard = (options: RenderOptions) => {
@@ -132,6 +216,7 @@ export const renderBoard = (options: RenderOptions) => {
   drawGroup(selectedShapes, baseLineWidth * 1.5, isDarkMode ? '#f43f5e' : '#e11d48', isDarkMode ? 'rgba(244, 63, 94, 0.4)' : 'rgba(225, 29, 72, 0.4)');
   drawGroup(inspectedShapes, baseLineWidth * 2, isDarkMode ? '#22d3ee' : '#0891b2', isDarkMode ? 'rgba(34, 211, 238, 0.4)' : 'rgba(8, 145, 178, 0.4)');
   drawGroup(netShapes, baseLineWidth * 2, isDarkMode ? '#d946ef' : '#c026d3', isDarkMode ? 'rgba(217, 70, 239, 0.5)' : 'rgba(192, 38, 211, 0.5)');
+  drawLabels(ctx, options);
 
   ctx.restore(); 
 };

@@ -40,6 +40,10 @@ interface BoardState {
   // --- COMPONENT TYPES ---
   highlightedPrefix: string | null;
   setHighlightedPrefix: (prefix: string | null) => void;
+
+  // --- COMPONENT NAMES
+  showLabels: boolean;
+  toggleLabels: () => void;
 }
 
 export const useBoardStore = create<BoardState>((set) => ({
@@ -57,6 +61,8 @@ export const useBoardStore = create<BoardState>((set) => ({
 
   inspectedComponent: null,
   highlightedPrefix: null,
+
+  showLabels: false,
 
 
   setBoardData: (data) => set({ boardData: data }),
@@ -120,4 +126,6 @@ export const useBoardStore = create<BoardState>((set) => ({
     highlightedPrefix: prefix,
     inspectedComponent: null
   }),
+
+  toggleLabels: () => set((state) => ({ showLabels: !state.showLabels })),
 }));

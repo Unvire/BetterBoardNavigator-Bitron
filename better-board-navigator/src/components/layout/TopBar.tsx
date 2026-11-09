@@ -1,7 +1,7 @@
 import { useBoardStore } from '../../store/boardStore';
 import { 
   Upload, FlipHorizontal, RotateCw, RotateCcw, Settings2, HelpCircle, 
-  Layers, PanelLeftClose, PanelLeftOpen, Sun, Moon
+  Layers, PanelLeftClose, PanelLeftOpen, Sun, Moon, Type
 } from 'lucide-react';
 
 interface TopBarProps {
@@ -14,7 +14,8 @@ export default function TopBar({ isLeftPanelOpen, toggleLeftPanel }: TopBarProps
     currentSide, setCurrentSide, 
     mirrorState, toggleMirror, 
     rotation, setRotation,
-    isDarkMode, toggleDarkMode 
+    isDarkMode, toggleDarkMode,
+    showLabels, toggleLabels
   } = useBoardStore();
 
   const topBarBtnClass = "p-2 rounded-lg transition-colors hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center gap-1";
@@ -59,6 +60,16 @@ export default function TopBar({ isLeftPanelOpen, toggleLeftPanel }: TopBarProps
           <RotateCw size={18} />
         </button>
         
+        <div className="w-px h-6 bg-slate-300 dark:bg-slate-600 mx-2"></div>
+        
+        <button 
+          onClick={toggleLabels} 
+          className={topBarBtnClass} 
+          title="Toggle Component Labels"
+        >
+          <Type size={18} className={showLabels ? "text-blue-500" : ""} />
+        </button>
+
         <div className="w-px h-6 bg-slate-300 dark:bg-slate-600 mx-2"></div>
         
         <button onClick={toggleDarkMode} className={topBarBtnClass} title="Toggle Theme">
