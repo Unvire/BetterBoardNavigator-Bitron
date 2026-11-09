@@ -3,7 +3,7 @@ import { useBoardStore } from '../../../store/boardStore';
 export default function ComponentList({ items }: { items: string[] }) {
   const { 
     boardData, isDarkMode, selectedComponents, inspectedComponent,
-    currentSide, setCurrentSide, setIsMirrored, selectComponents, triggerFocus, 
+    currentSide, setCurrentSide, selectComponents, triggerFocus, 
     setInspectedComponent, highlightedPrefix, setHighlightedPrefix
   } = useBoardStore();
 
@@ -11,7 +11,6 @@ export default function ComponentList({ items }: { items: string[] }) {
     const comp = boardData?.components[compName];
     if (comp && comp.side !== currentSide) {
       setCurrentSide(comp.side);
-      setIsMirrored(comp.side === 'B');
     }
 
     const isAlreadySelected = selectedComponents.has(compName);

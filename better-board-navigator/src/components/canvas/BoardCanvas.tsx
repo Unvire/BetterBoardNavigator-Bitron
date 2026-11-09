@@ -11,6 +11,7 @@ function BoardCanvas() {
   const hoverStateRef = useRef(false); 
 
   const store = useBoardStore();
+  const isMirrored = store.mirrorState[store.currentSide];
   const { boardCenterX, boardCenterY, componentHitboxes } = useBoardGeometry(store.boardData, store.currentSide);
 
 
@@ -18,7 +19,7 @@ function BoardCanvas() {
     let wx = rawWx;
     let wy = rawWy;
 
-    if (store.isMirrored) {
+    if (isMirrored) {
       wx = boardCenterX * 2 - wx;
     }
 
@@ -32,7 +33,7 @@ function BoardCanvas() {
     }
 
     return { wx, wy };
-  }, [store.isMirrored, store.rotation, boardCenterX, boardCenterY]);
+  }, [isMirrored, store.rotation, boardCenterX, boardCenterY]);
 
 
   // Click logic
@@ -54,7 +55,6 @@ function BoardCanvas() {
     const firstComp = store.boardData.components[clickedNames[0]];
     if (firstComp && firstComp.side !== store.currentSide) {
       store.setCurrentSide(firstComp.side);
-      store.setIsMirrored(firstComp.side === 'B');
     }
 
     if (isMultiSelect) {
@@ -93,7 +93,7 @@ function BoardCanvas() {
           }
         }
 
-        if (store.isMirrored) {
+        if (isMirrored) {
           cx = boardCenterX * 2 - cx;
         }
 
@@ -132,7 +132,7 @@ function BoardCanvas() {
       boardCenterX,
       boardCenterY,
       rotation: store.rotation,
-      isMirrored: store.isMirrored,
+      isMirrored: isMirrored,
       isDarkMode: store.isDarkMode,
       showOutlines: store.showOutlines,
       currentSide: store.currentSide,
@@ -141,7 +141,7 @@ function BoardCanvas() {
       selectedNet: store.selectedNet,
       highlightedPrefix: store.highlightedPrefix
     });
-  }, [store, scale, offset, boardCenterX, boardCenterY]);
+  }, [store, scale, offset, boardCenterX, boardCenterY, isMirrored]);
 
 
   // Mouse Clicking

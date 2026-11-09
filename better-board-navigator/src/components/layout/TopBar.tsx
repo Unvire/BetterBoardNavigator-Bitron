@@ -12,7 +12,7 @@ interface TopBarProps {
 export default function TopBar({ isLeftPanelOpen, toggleLeftPanel }: TopBarProps) {
   const { 
     currentSide, setCurrentSide, 
-    isMirrored, setIsMirrored, 
+    mirrorState, toggleMirror, 
     rotation, setRotation,
     isDarkMode, toggleDarkMode 
   } = useBoardStore();
@@ -39,7 +39,6 @@ export default function TopBar({ isLeftPanelOpen, toggleLeftPanel }: TopBarProps
           onClick={() => {
             const newSide = currentSide === 'T' ? 'B' : 'T';
             setCurrentSide(newSide);
-            setIsMirrored(newSide === 'B');
           }} 
           className={topBarBtnClass} 
           title="Switch Side (Top/Bottom)"
@@ -48,8 +47,8 @@ export default function TopBar({ isLeftPanelOpen, toggleLeftPanel }: TopBarProps
           <span className="text-xs font-bold w-3">{currentSide}</span>
         </button>
         
-        <button onClick={() => setIsMirrored(!isMirrored)} className={topBarBtnClass} title="Flip Horizontally">
-          <FlipHorizontal size={18} className={isMirrored ? "text-blue-500" : ""} />
+        <button onClick={toggleMirror} className={topBarBtnClass} title="Flip Horizontally">
+          <FlipHorizontal size={18} className={mirrorState[currentSide] ? "text-blue-500" : ""} />
         </button>
 
         <button onClick={() => setRotation(rotation === 0 ? 270 : rotation - 90)} className={topBarBtnClass} title="Rotate Left">
