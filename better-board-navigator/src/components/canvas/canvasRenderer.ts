@@ -43,31 +43,33 @@ const addShapeToPath = (ctx: CanvasRenderingContext2D, shape: ShapeData) => {
 
 const drawLabels = (ctx: CanvasRenderingContext2D, options: RenderOptions) => {
   const { 
-    scale, isDarkMode, componentHitboxes, selectedComponents, 
-    inspectedComponent, highlightedPrefix, showLabels, isMirrored 
+    scale, offset,
+    isDarkMode, componentHitboxes, selectedComponents, 
+    inspectedComponent, highlightedPrefix, showLabels, isMirrored
   } = options;
 
-  const visualFontSize = 14 / scale;
-  const defaultFont = `600 ${visualFontSize}px sans-serif`;
-  const boldFont = `bold ${visualFontSize + (3/scale)}px sans-serif`;
+  const canvasWidth = ctx.canvas.width;
+  const canvasHeight = ctx.canvas.height;
 
-  // width of character is approx 60% of its height
-  const charWidthRatio = 0.6;
-  const estimatedCharWidth = visualFontSize * charWidthRatio;
-  const estimatedBoldCharWidth = (visualFontSize + (3/scale)) * charWidthRatio;
-  
+  const vMinX = (-offset.x / scale) - (canvasWidth / scale); 
+  const vMaxX = ((canvasWidth - offset.x) / scale) + (canvasWidth / scale);
+  const vMinY = (-offset.y / scale) - (canvasHeight / scale);
+  const vMaxY = ((canvasHeight - offset.y) / scale) + (canvasHeight / scale);
+
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-
+  
   const shadowColor = isDarkMode ? 'rgba(10, 10, 10, 0.8)' : 'rgba(255, 255, 255, 0.8)';
   const shadowBlur = 3 / scale;
+  const charWidthRatio = 0.6;
 
   componentHitboxes.forEach(box => {
+    if (box.maxX < vMinX || box.minX > vMaxX || box.maxY < vMinY || box.minY > vMaxY) return; 
+
     const compName = box.name;
     const isSelected = selectedComponents.has(compName);
     const isInspected = inspectedComponent === compName;
 
-    // checking first letter
     let compPrefix = '#';
     for (let i = 0; i < compName.length; i++) {
       if (!isNaN(Number(compName[i]))) {
@@ -76,20 +78,33 @@ const drawLabels = (ctx: CanvasRenderingContext2D, options: RenderOptions) => {
       }
     }
     const isPrefixHighlighted = highlightedPrefix === compPrefix;
-
     const isHighlighted = isSelected || isInspected || isPrefixHighlighted;
-    const isGloballyVisible = showLabels && scale > 15;
+
+    const compWidth = box.maxX - box.minX;
+    const compHeight = box.maxY - box.minY;
+    const shortestSide = Math.min(compWidth, compHeight);
+
+    // max sizes in board units
+    const minFontWorldSize = 0.5;
+    const maxFontWorldSize = 5.0;
+
+    let targetWorldFontSize = shortestSide * 0.4;
+    if (targetWorldFontSize < minFontWorldSize) targetWorldFontSize = minFontWorldSize;
+    if (targetWorldFontSize > maxFontWorldSize) targetWorldFontSize = maxFontWorldSize;
+
+    if (isHighlighted) targetWorldFontSize *= 1.2;
+    
+
+    const visualPixelSize = targetWorldFontSize * scale;
 
     let shouldDraw = false;
-    if (isInspected) shouldDraw = true;
-    else if (isGloballyVisible) shouldDraw = true;
-    else if (isSelected || isPrefixHighlighted) {
-      const compWidth = box.maxX - box.minX;
-      const compHeight = box.maxY - box.minY;
-      const maxAllowedTextWidth = Math.max(compWidth, compHeight) * 2; 
 
-      const approxTextWidth = compName.length * estimatedBoldCharWidth;
-      
+    if (isInspected) shouldDraw = true; 
+    else if (showLabels && visualPixelSize > 8)  shouldDraw = true;
+    else if (isSelected || isPrefixHighlighted) {
+      const approxTextWidth = compName.length * (targetWorldFontSize * charWidthRatio);
+      const maxAllowedTextWidth = Math.max(compWidth, compHeight) * 1.5; 
+
       if (approxTextWidth <= maxAllowedTextWidth) shouldDraw = true;
     }
 
@@ -101,13 +116,15 @@ const drawLabels = (ctx: CanvasRenderingContext2D, options: RenderOptions) => {
         ? (isDarkMode ? '#ffffff' : '#000000')
         : (isDarkMode ? '#94a3b8' : '#64748b');
 
-      ctx.font = isHighlighted ? boldFont : defaultFont;
+      ctx.font = isHighlighted 
+         ? `bold ${targetWorldFontSize}px sans-serif` 
+         : `600 ${targetWorldFontSize}px sans-serif`;
 
       if (isHighlighted) {
         ctx.shadowColor = shadowColor;
         ctx.shadowBlur = shadowBlur;
       } else {
-        ctx.shadowBlur = 0;
+        ctx.shadowBlur = 0; 
       }
 
       ctx.save();
