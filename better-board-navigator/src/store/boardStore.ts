@@ -5,6 +5,9 @@ interface BoardState {
   boardData: BoardData | null;
   setBoardData: (data: BoardData) => void;
 
+  isLeftPanelOpen: boolean;
+  toggleLeftPanel: () => void;
+
   isDarkMode: boolean;
   toggleDarkMode: () => void;
   showOutlines: boolean;
@@ -48,6 +51,8 @@ interface BoardState {
 
 export const useBoardStore = create<BoardState>((set) => ({
   boardData: null,
+  isLeftPanelOpen: true,
+
   isDarkMode: true,
   showOutlines: true,
   
@@ -66,6 +71,8 @@ export const useBoardStore = create<BoardState>((set) => ({
 
 
   setBoardData: (data) => set({ boardData: data }),
+
+  toggleLeftPanel: () => set((state) => ({ isLeftPanelOpen: !state.isLeftPanelOpen })),
   
   toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
   

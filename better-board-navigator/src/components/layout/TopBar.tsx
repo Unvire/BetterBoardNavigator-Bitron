@@ -4,18 +4,15 @@ import {
   Layers, PanelLeftClose, PanelLeftOpen, Sun, Moon, Type 
 } from 'lucide-react';
 
-interface TopBarProps {
-  isLeftPanelOpen: boolean;
-  toggleLeftPanel: () => void;
-}
 
-export default function TopBar({ isLeftPanelOpen, toggleLeftPanel }: TopBarProps) {
+export default function TopBar() {
   const { 
     currentSide, setCurrentSide, 
     mirrorState, toggleMirror, 
     rotation, setRotation,
     showLabels, toggleLabels,
-    isDarkMode, toggleDarkMode 
+    isDarkMode, toggleDarkMode,
+    isLeftPanelOpen, toggleLeftPanel
   } = useBoardStore();
 
   

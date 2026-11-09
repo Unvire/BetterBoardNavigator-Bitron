@@ -5,8 +5,8 @@ import ComponentList from './ComponentList';
 import NetList from './NetList';
 import GroupList from './GroupList';
 
-export default function LeftPanel({ isOpen }: { isOpen: boolean }) {
-  const { boardData, isDarkMode, selectedNet } = useBoardStore();
+export default function LeftPanel() {
+  const { boardData, isDarkMode, selectedNet, isLeftPanelOpen } = useBoardStore();
   const [activeTab, setActiveTab] = useState<'components' | 'nets' | 'groups'>('components');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -49,7 +49,7 @@ export default function LeftPanel({ isOpen }: { isOpen: boolean }) {
 
 
   return (
-    <aside className={glassPanelClass} style={{ transform: isOpen ? 'translateX(0)' : 'translateX(-120%)' }}>
+    <aside className={glassPanelClass} style={{ transform: isLeftPanelOpen ? 'translateX(0)' : 'translateX(-120%)' }}>
       
       {/* Panels */}
       <div className="flex border-b border-inherit shrink-0">

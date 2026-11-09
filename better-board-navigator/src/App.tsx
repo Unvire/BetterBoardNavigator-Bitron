@@ -5,6 +5,7 @@ import TopBar from './components/layout/TopBar';
 import LeftPanel from './components/panels/left/LeftPanel';
 import RightPanel from './components/panels/right/RightPanel';
 import { Layers } from 'lucide-react';
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 
 function App() {
   const { 
@@ -14,7 +15,9 @@ function App() {
   } = useBoardStore();
 
   const [isLoading, setIsLoading] = useState(true);
-  const [isLeftPanelOpen, setIsLeftPanelOpen] = useState(true);
+
+
+  useKeyboardShortcuts();
 
 
   useEffect(() => {
@@ -70,11 +73,8 @@ function App() {
       </div>
 
       {/* LAYER 1: FLOATING UI */}
-      <TopBar 
-        isLeftPanelOpen={isLeftPanelOpen}
-        toggleLeftPanel={() => setIsLeftPanelOpen(!isLeftPanelOpen)}
-      />
-      <LeftPanel isOpen={isLeftPanelOpen} />
+      <TopBar/>
+      <LeftPanel/>
       <RightPanel />
     </div>
   );
