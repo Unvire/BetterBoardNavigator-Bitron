@@ -52,7 +52,7 @@ function BoardCanvas() {
     }
 
     if (isMultiSelect) {
-      if (store.inspectedComponent === clickedNames[0]) store.setInspectedComponent(null);
+      if (store.inspectedComponent) store.setInspectedComponent(null);
       store.selectComponents(clickedNames, true);
     } else {
       store.setInspectedComponent(clickedNames[0]);
@@ -144,7 +144,7 @@ function BoardCanvas() {
     return () => canvas.removeEventListener('mousemove', handleMouseMove);
   }, [componentHitboxes, scale, offset, store.isMirrored, boardCenterX]);
   
-  
+
   return (
     <div className="w-full h-full relative block overflow-hidden">
       <canvas 

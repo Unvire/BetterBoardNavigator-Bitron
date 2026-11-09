@@ -18,7 +18,8 @@ export default function ComponentList({ items }: { items: string[] }) {
     const isAlreadyInspected = inspectedComponent === compName;
 
     if (e.ctrlKey || e.metaKey) {
-      if (isAlreadyInspected) setInspectedComponent(null); 
+      if (inspectedComponent) setInspectedComponent(null); 
+      
       selectComponents([compName], true);
       if (!isAlreadySelected) triggerFocus(compName);
     } else {

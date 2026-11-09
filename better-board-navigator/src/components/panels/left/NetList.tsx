@@ -74,7 +74,7 @@ export default function NetList({ items }: { items: string[] }) {
                             setIsMirrored(targetComp.side === 'B');
                           }
                           if (e.ctrlKey || e.metaKey) {
-                            if (isCompInspected) setInspectedComponent(null);
+                            if (inspectedComponent) setInspectedComponent(null);
                             selectComponents([comp], true);
                           } else {
                             if (isCompInspected) setInspectedComponent(null);
