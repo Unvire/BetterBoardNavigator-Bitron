@@ -1,12 +1,13 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useBoardStore } from '../../../store/boardStore';
-import { Search, Cpu, Layers } from 'lucide-react';
+import { Search, Cpu, Layers, Shapes } from 'lucide-react';
 import ComponentList from './ComponentList';
 import NetList from './NetList';
+import GroupList from './GroupList';
 
 export default function LeftPanel({ isOpen }: { isOpen: boolean }) {
   const { boardData, isDarkMode, selectedNet } = useBoardStore();
-  const [activeTab, setActiveTab] = useState<'components' | 'nets'>('components');
+  const [activeTab, setActiveTab] = useState<'components' | 'nets' | 'groups'>('components');
   const [searchQuery, setSearchQuery] = useState('');
 
   
@@ -49,15 +50,21 @@ export default function LeftPanel({ isOpen }: { isOpen: boolean }) {
 
   return (
     <aside className={glassPanelClass} style={{ transform: isOpen ? 'translateX(0)' : 'translateX(-120%)' }}>
+      
+      {/* Panels */}
       <div className="flex border-b border-inherit shrink-0">
-        <button onClick={() => setActiveTab('components')} className={`flex-1 py-3 text-sm font-semibold flex items-center justify-center gap-2 ${activeTab === 'components' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-inherit opacity-70 hover:opacity-100'}`}>
-          <Cpu size={16}/> Components
+        <button onClick={() => setActiveTab('components')} className={`flex-1 py-3 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 ${activeTab === 'components' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-inherit opacity-70 hover:opacity-100'}`}>
+          <Cpu size={16}/> Comp.
         </button>
-        <button onClick={() => setActiveTab('nets')} className={`flex-1 py-3 text-sm font-semibold flex items-center justify-center gap-2 ${activeTab === 'nets' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-inherit opacity-70 hover:opacity-100'}`}>
+        <button onClick={() => setActiveTab('nets')} className={`flex-1 py-3 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 ${activeTab === 'nets' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-inherit opacity-70 hover:opacity-100'}`}>
           <Layers size={16}/> Nets
+        </button>
+        <button onClick={() => setActiveTab('groups')} className={`flex-1 py-3 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 ${activeTab === 'groups' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-inherit opacity-70 hover:opacity-100'}`}>
+          <Shapes size={16}/> Typy
         </button>
       </div>
 
+      {/* Searchbox */}
       <div className="p-3 shrink-0">
         <div className="relative">
           <Search size={14} className="absolute left-3 top-1/2 transform -translate-y-1/2 opacity-50" />
@@ -68,18 +75,18 @@ export default function LeftPanel({ isOpen }: { isOpen: boolean }) {
             placeholder={`Search ${activeTab}...`}
             className={`w-full pl-9 pr-3 py-2 text-sm rounded-md outline-none transition-all border ${
               isDarkMode 
-                ? 'bg-slate-950/50 border-slate-700 focus:border-blue-500 focus:ring-1' 
-                : 'bg-slate-50 border-slate-200 focus:border-blue-500 focus:ring-1 hover:border-slate-300'
+                ? 'bg-slate-950/50 border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500' 
+                : 'bg-slate-50 border-slate-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 hover:border-slate-300'
             }`}
           />
         </div>
       </div>
 
+      {/* Lists (components) */}
       <div className="flex-1 overflow-y-auto p-2">
-        {activeTab === 'components' 
-          ? <ComponentList items={filteredComponents} /> 
-          : <NetList items={filteredNets} />
-        }
+        {activeTab === 'components' && <ComponentList items={filteredComponents} />}
+        {activeTab === 'nets' && <NetList items={filteredNets} />}
+        {activeTab === 'groups' && <GroupList searchQuery={searchQuery} />}
       </div>
     </aside>
   );

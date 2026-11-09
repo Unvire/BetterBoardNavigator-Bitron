@@ -113,6 +113,7 @@ function BoardCanvas() {
       selectedComponents: store.selectedComponents,
       inspectedComponent: store.inspectedComponent,
       selectedNet: store.selectedNet,
+      highlightedPrefix: store.highlightedPrefix
     });
   }, [store, scale, offset, boardCenterX]);
 

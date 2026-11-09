@@ -31,6 +31,10 @@ interface BoardState {
   // --- 2ND SELECTION ---
   inspectedComponent: string | null;
   setInspectedComponent: (name: string | null) => void;
+
+  // --- COMPONENT TYPES ---
+  highlightedPrefix: string | null;
+  setHighlightedPrefix: (prefix: string | null) => void;
 }
 
 export const useBoardStore = create<BoardState>((set) => ({
@@ -46,6 +50,7 @@ export const useBoardStore = create<BoardState>((set) => ({
   componentToFocus: null,
 
   inspectedComponent: null,
+  highlightedPrefix: null,
 
 
   setBoardData: (data) => set({ boardData: data }),
@@ -81,7 +86,8 @@ export const useBoardStore = create<BoardState>((set) => ({
   clearSelection: () => set({ 
     selectedComponents: new Set(), 
     selectedNet: null,
-    inspectedComponent: null
+    inspectedComponent: null,
+    highlightedPrefix: null
   }),
 
   selectNet: (net) => set({ 
@@ -93,4 +99,6 @@ export const useBoardStore = create<BoardState>((set) => ({
   clearFocus: () => set({ componentToFocus: null }),
 
   setInspectedComponent: (name) => set({ inspectedComponent: name }),
+
+  setHighlightedPrefix: (prefix) => set({ highlightedPrefix: prefix }),
 }));

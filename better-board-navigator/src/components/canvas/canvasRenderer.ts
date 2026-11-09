@@ -13,6 +13,7 @@ export interface RenderOptions {
   selectedComponents: Set<string>;
   inspectedComponent: string | null;
   selectedNet: string | null;
+  highlightedPrefix: string | null;
 }
 
 
@@ -38,7 +39,7 @@ export const renderBoard = (options: RenderOptions) => {
   const { 
     ctx, boardData, scale, offset, isMirrored, boardCenterX, 
     isDarkMode, showOutlines, currentSide, 
-    selectedComponents, inspectedComponent, selectedNet 
+    selectedComponents, inspectedComponent, selectedNet, highlightedPrefix
   } = options;
 
   const canvas = ctx.canvas;
@@ -81,9 +82,13 @@ export const renderBoard = (options: RenderOptions) => {
     const isSelected = selectedComponents.has(compName);
     const isInspected = inspectedComponent === compName;
     const hasSinglePin = comp.pins ? Object.keys(comp.pins).length === 1 : false;
+
+    const match = compName.match(/^[a-zA-Z]+/);
+    const compPrefix = match ? match[0].toUpperCase() : '#';
+    const isPrefixHighlighted = highlightedPrefix === compPrefix;
     
     if (isOnCurrentSide && comp.shapeData && !hasSinglePin) {
-      if (isInspected) inspectedShapes.push(comp.shapeData);
+      if (isInspected || isPrefixHighlighted) inspectedShapes.push(comp.shapeData);
       else if (isSelected) selectedShapes.push(comp.shapeData);
       else bodyShapes.push(comp.shapeData);
     }
@@ -92,7 +97,7 @@ export const renderBoard = (options: RenderOptions) => {
       Object.values(comp.pins).forEach(pin => {
         if (pin.shapeData) {
           if (selectedNet && pin.net === selectedNet) netShapes.push(pin.shapeData);
-          else if (isInspected) inspectedShapes.push(pin.shapeData);
+          else if (isInspected || isPrefixHighlighted) inspectedShapes.push(pin.shapeData);
           else if (isSelected) selectedShapes.push(pin.shapeData);
           else if (isTH) thtPads.push(pin.shapeData);
           else smtPads.push(pin.shapeData);
