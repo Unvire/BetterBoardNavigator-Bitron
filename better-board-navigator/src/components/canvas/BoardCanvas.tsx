@@ -11,33 +11,39 @@ function BoardCanvas() {
   const hoverStateRef = useRef(false); 
 
   const store = useBoardStore();
-  
+  const { boardCenterX, boardCenterY, componentHitboxes } = useBoardGeometry(store.boardData, store.currentSide);
 
-  const { boardCenterX, componentHitboxes } = useBoardGeometry(store.boardData, store.currentSide);
 
-  // Shortcuts
-  useEffect(() => {
-    const toggleSelect = (e: KeyboardEvent) => setIsSelectionMode(e.key === 'Control' || e.key === 'Meta');
-    const handleBlur = () => setIsSelectionMode(false);
+  const getHitboxCoords = useCallback((rawWx: number, rawWy: number) => {
+    let wx = rawWx;
+    let wy = rawWy;
 
-    window.addEventListener('keydown', toggleSelect);
-    window.addEventListener('keyup', toggleSelect);
-    window.addEventListener('blur', handleBlur);
-    return () => {
-      window.removeEventListener('keydown', toggleSelect);
-      window.removeEventListener('keyup', toggleSelect);
-      window.removeEventListener('blur', handleBlur);
-    };
-  }, []);
+    if (store.isMirrored) {
+      wx = boardCenterX * 2 - wx;
+    }
+
+    if (store.rotation !== 0) {
+      const rad = (-store.rotation * Math.PI) / 180;
+      const dx = wx - boardCenterX;
+      const dy = wy - boardCenterY;
+
+      wx = dx * Math.cos(rad) - dy * Math.sin(rad) + boardCenterX;
+      wy = dx * Math.sin(rad) + dy * Math.cos(rad) + boardCenterY;
+    }
+
+    return { wx, wy };
+  }, [store.isMirrored, store.rotation, boardCenterX, boardCenterY]);
 
 
   // Click logic
-  const handleCanvasClick = useCallback((clickWorldX: number, clickWorldY: number, isMultiSelect: boolean) => {
+  const handleCanvasClick = useCallback((rawWorldX: number, rawWorldY: number, isMultiSelect: boolean) => {
     if (!store.boardData) return;
-    const worldX = store.isMirrored ? (boardCenterX * 2 - clickWorldX) : clickWorldX;
+
+    // Przetwarzamy surowe koordynaty z hooka kamery na układ współrzędnych Pythona
+    const { wx, wy } = getHitboxCoords(rawWorldX, rawWorldY);
     
     const clickedNames = componentHitboxes
-      .filter(box => worldX >= box.minX - 0.5 && worldX <= box.maxX + 0.5 && clickWorldY >= box.minY - 0.5 && clickWorldY <= box.maxY + 0.5)
+      .filter(box => wx >= box.minX - 0.5 && wx <= box.maxX + 0.5 && wy >= box.minY - 0.5 && wy <= box.maxY + 0.5)
       .map(box => box.name);
 
     if (clickedNames.length === 0) {
@@ -55,11 +61,10 @@ function BoardCanvas() {
       if (store.inspectedComponent) store.setInspectedComponent(null);
       if (store.highlightedPrefix) store.setHighlightedPrefix(null);
       store.selectComponents(clickedNames, true);
-      
     } else {
       store.setInspectedComponent(clickedNames[0]);
     }
-  }, [store, boardCenterX, componentHitboxes]);
+  }, [store, boardCenterX, componentHitboxes, getHitboxCoords]);
 
 
   // Camera
@@ -71,29 +76,46 @@ function BoardCanvas() {
     if (store.componentToFocus && store.boardData) {
       const box = componentHitboxes.find(b => b.name === store.componentToFocus);
       if (box) {
-        const padding = Math.max(15, Math.max(box.maxX - box.minX, box.maxY - box.minY) * 0.5);
-        if (store.isMirrored) {
-          focusOnBoundingBox(boardCenterX * 2 - box.maxX - padding, boardCenterX * 2 - box.minX + padding, box.minY - padding, box.maxY + padding);
-        } else {
-          focusOnBoundingBox(box.minX - padding, box.maxX + padding, box.minY - padding, box.maxY + padding);
+        let cx = (box.minX + box.maxX) / 2;
+        let cy = (box.minY + box.maxY) / 2;
+        let w = box.maxX - box.minX;
+        let h = box.maxY - box.minY;
+
+        if (store.rotation !== 0) {
+          const rad = (store.rotation * Math.PI) / 180;
+          const dx = cx - boardCenterX;
+          const dy = cy - boardCenterY;
+          cx = dx * Math.cos(rad) - dy * Math.sin(rad) + boardCenterX;
+          cy = dx * Math.sin(rad) + dy * Math.cos(rad) + boardCenterY;
+          
+          if (store.rotation === 90 || store.rotation === 270) {
+            [w, h] = [h, w]; 
+          }
         }
+
+        if (store.isMirrored) {
+          cx = boardCenterX * 2 - cx;
+        }
+
+        const padding = Math.max(15, Math.max(w, h) * 0.5);
+        focusOnBoundingBox(cx - w/2 - padding, cx + w/2 + padding, cy - h/2 - padding, cy + h/2 + padding);
       }
       store.clearFocus();
     }
-  }, [store.componentToFocus, store, componentHitboxes, focusOnBoundingBox, boardCenterX]);
+  }, [store.componentToFocus, store, componentHitboxes, focusOnBoundingBox, boardCenterX, boardCenterY]);
+  
 
-
+  // Reset View
   useEffect(() => {
     if (store.boardData) resetView(store.boardData);
   }, [store.boardData, resetView]);
-
+  
 
   // Rendering
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || !store.boardData) return;
     
-    // Auto-resize
     if (canvas.parentElement) {
       canvas.width = canvas.parentElement.clientWidth;
       canvas.height = canvas.parentElement.clientHeight;
@@ -108,6 +130,8 @@ function BoardCanvas() {
       scale,
       offset,
       boardCenterX,
+      boardCenterY,
+      rotation: store.rotation,
       isMirrored: store.isMirrored,
       isDarkMode: store.isDarkMode,
       showOutlines: store.showOutlines,
@@ -117,24 +141,27 @@ function BoardCanvas() {
       selectedNet: store.selectedNet,
       highlightedPrefix: store.highlightedPrefix
     });
-  }, [store, scale, offset, boardCenterX]);
+  }, [store, scale, offset, boardCenterX, boardCenterY]);
 
 
-  // Mouse Hover
+  // Mouse Clicking
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const handleMouseMove = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
-      let worldX = ((e.clientX - rect.left) - offset.x) / scale;
-      const worldY = ((e.clientY - rect.top) - offset.y) / scale;
 
-      if (store.isMirrored) worldX = boardCenterX * 2 - worldX;
+      // revert Camera offset and scale
+      const rawWx = ((e.clientX - rect.left) - offset.x) / scale;
+      const rawWy = ((e.clientY - rect.top) - offset.y) / scale;
+
+      // revert mirroring and rotation
+      const { wx, wy } = getHitboxCoords(rawWx, rawWy);
 
       const foundHover = componentHitboxes.some(box => 
-        worldX >= box.minX - 0.5 && worldX <= box.maxX + 0.5 && 
-        worldY >= box.minY - 0.5 && worldY <= box.maxY + 0.5
+        wx >= box.minX - 0.5 && wx <= box.maxX + 0.5 && 
+        wy >= box.minY - 0.5 && wy <= box.maxY + 0.5
       );
 
       if (foundHover !== hoverStateRef.current) {
@@ -145,8 +172,8 @@ function BoardCanvas() {
 
     canvas.addEventListener('mousemove', handleMouseMove);
     return () => canvas.removeEventListener('mousemove', handleMouseMove);
-  }, [componentHitboxes, scale, offset, store.isMirrored, boardCenterX]);
-  
+  }, [componentHitboxes, scale, offset, getHitboxCoords]);
+
 
   return (
     <div className="w-full h-full relative block overflow-hidden">

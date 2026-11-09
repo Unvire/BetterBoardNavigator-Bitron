@@ -7,6 +7,8 @@ export interface RenderOptions {
   offset: { x: number; y: number };
   isMirrored: boolean;
   boardCenterX: number;
+  boardCenterY: number;
+  rotation: number;
   isDarkMode: boolean;
   showOutlines: boolean;
   currentSide: 'T' | 'B';
@@ -37,7 +39,7 @@ const addShapeToPath = (ctx: CanvasRenderingContext2D, shape: ShapeData) => {
 
 export const renderBoard = (options: RenderOptions) => {
   const { 
-    ctx, boardData, scale, offset, isMirrored, boardCenterX, 
+    ctx, boardData, scale, offset, isMirrored, boardCenterX, boardCenterY, rotation,
     isDarkMode, showOutlines, currentSide, 
     selectedComponents, inspectedComponent, selectedNet, highlightedPrefix
   } = options;
@@ -55,6 +57,12 @@ export const renderBoard = (options: RenderOptions) => {
     ctx.translate(boardCenterX, 0);
     ctx.scale(-1, 1);
     ctx.translate(-boardCenterX, 0);
+  }
+
+  if (rotation !== 0) {
+    ctx.translate(boardCenterX, boardCenterY);
+    ctx.rotate((rotation * Math.PI) / 180);
+    ctx.translate(-boardCenterX, -boardCenterY);
   }
 
   const baseLineWidth = 1 / scale;

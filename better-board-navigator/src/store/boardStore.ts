@@ -10,10 +10,15 @@ interface BoardState {
   showOutlines: boolean;
   toggleOutlines: () => void;
   
+  // --- CHANGE SIDE AND MIRROR SIDE ---
   currentSide: 'T' | 'B';
   setCurrentSide: (side: 'T' | 'B') => void;
   isMirrored: boolean;
   setIsMirrored: (mirrored: boolean) => void;
+  
+  // --- ROTATION ---
+  rotation: number;
+  setRotation: (rotation: number) => void;
 
   // --- SELECTION ---
   selectedComponents: Set<string>;
@@ -44,6 +49,7 @@ export const useBoardStore = create<BoardState>((set) => ({
   
   currentSide: 'T',
   isMirrored: false,
+  rotation: 0,
   
   selectedComponents: new Set<string>(),
   selectedNet: null,
@@ -62,6 +68,8 @@ export const useBoardStore = create<BoardState>((set) => ({
   setCurrentSide: (side) => set({ currentSide: side }),
   
   setIsMirrored: (mirrored) => set({ isMirrored: mirrored }),
+
+  setRotation: (rot) => set({ rotation: rot % 360 }),
 
   selectComponents: (names, isMultiSelect = false) => set((state) => {
     if (isMultiSelect) {

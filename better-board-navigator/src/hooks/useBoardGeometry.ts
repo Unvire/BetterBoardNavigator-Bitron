@@ -11,23 +11,25 @@ export interface Hitbox {
 
 export function useBoardGeometry(boardData: BoardData | null, currentSide: 'T' | 'B') {
   // 1. Calculating center of board
-  const boardCenterX = useMemo(() => {
-    if (!boardData) return 0;
-    let minX = Infinity, maxX = -Infinity;
+  const { boardCenterX,  boardCenterY } = useMemo(() => {
+    if (!boardData) return { boardCenterX: 0, boardCenterY: 0 };
 
-    const addPoint = (x: number) => {
-      if (x < minX) minX = x;
-      if (x > maxX) maxX = x;
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+
+    const addPoint = (x: number, y: number) => {
+      if (x < minX) minX = x; if (x > maxX) maxX = x;
+      if (y < minY) minY = y; if (y > maxY) maxY = y;
     };
 
     const processShape = (shape: ShapeData) => {
       if (shape.type === 'Line' && shape.start && shape.end) {
-        addPoint(shape.start.x); addPoint(shape.end.x);
+        addPoint(shape.start.x, shape.start.y); 
+        addPoint(shape.end.x, shape.end.y);
       } else if (shape.type === 'Rectangle' && shape.points) {
-        shape.points.forEach(p => addPoint(p.x));
+        shape.points.forEach(p => addPoint(p.x, p.y));
       } else if ((shape.type === 'Circle' || shape.type === 'Arc') && shape.center) {
-        addPoint(shape.center.x - (shape.radius || 0));
-        addPoint(shape.center.x + (shape.radius || 0));
+        addPoint(shape.center.x - (shape.radius || 0), shape.center.y - (shape.radius || 0));
+        addPoint(shape.center.x + (shape.radius || 0), shape.center.y + (shape.radius || 0));
       }
     };
 
@@ -40,7 +42,10 @@ export function useBoardGeometry(boardData: BoardData | null, currentSide: 'T' |
       });
     }
 
-    return minX !== Infinity ? (minX + maxX) / 2 : 0;
+    return {
+      boardCenterX: minX !== Infinity ? (minX + maxX) / 2 : 0,
+      boardCenterY: minY !== Infinity ? (minY + maxY) / 2 : 0
+    };
   }, [boardData]);
 
   // 2. Calculating hitbox hover
@@ -82,5 +87,5 @@ export function useBoardGeometry(boardData: BoardData | null, currentSide: 'T' |
     return boxes;
   }, [boardData, currentSide]);
 
-  return { boardCenterX, componentHitboxes };
+  return { boardCenterX, boardCenterY, componentHitboxes };
 }
