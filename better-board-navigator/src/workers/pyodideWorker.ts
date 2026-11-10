@@ -106,7 +106,6 @@ def process(file_names):
     fileLines = loader.loadFile("/" + cadFile)
     boardInstance = loader.processFileLines(fileLines)
 
-    # Odchudzony obiekt zrzucamy do formatu tekstowego JSON!
     return boardInstance.toJson()
 
 process(${JSON.stringify(fileNames)})

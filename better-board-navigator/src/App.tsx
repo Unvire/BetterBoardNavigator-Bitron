@@ -40,7 +40,7 @@ function App() {
 
 
   return (
-    <div className={`relative w-screen h-screen overflow-hidden ${isDarkMode ? 'bg-slate-950' : 'bg-slate-100'}`}>
+    <div className={`relative w-screen h-screen overflow-hidden transition-colors duration-500 ${isDarkMode ? 'dark bg-slate-950 text-slate-200' : 'bg-slate-100 text-slate-800'}`}>
 
       {/* LAYER 0: CANVAS - background */}
       <div className="absolute inset-0 z-0">
@@ -66,15 +66,17 @@ function App() {
 
       {/* LAYER 2: LOADING OVERLAY */}
       {(workerStatus === 'loading_pyodide' || workerStatus === 'processing') && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm">
-          <div className="flex flex-col items-center p-8 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border dark:border-slate-700">
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/40 dark:bg-slate-950/70 backdrop-blur-sm transition-colors duration-500">
+          <div className="flex flex-col items-center p-8 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 transition-colors duration-500">
             <Layers className="animate-spin text-blue-500 mb-5" size={48} />
-            <h2 className="text-xl font-bold mb-2">
+            <h2 className="text-xl font-bold mb-2 text-slate-800 dark:text-slate-100 transition-colors duration-500">
               {workerStatus === 'loading_pyodide' 
                 ? `${t('main_screen.init_pyodide')}`
                 : `${t('main_screen.parsing_cad_files')}`}
             </h2>
-            <p className="text-sm opacity-70">{`${t('main_screen.waiting')}`}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 transition-colors duration-500">
+              {`${t('main_screen.waiting')}`}
+            </p>
           </div>
         </div>
       )}
