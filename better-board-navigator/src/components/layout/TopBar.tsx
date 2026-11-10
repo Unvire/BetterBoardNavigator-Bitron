@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { useBoardStore } from '../../store/boardStore';
 import { 
   Upload, FlipHorizontal, RotateCw, RotateCcw, Settings2, HelpCircle, 
-  Layers, PanelLeftClose, PanelLeftOpen, Sun, Moon, Type, Globe, Loader2
+  Layers, PanelLeftClose, PanelLeftOpen, Sun, Moon, Type, Globe, Loader2, SquareDashed
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useBoardWorker } from '../../hooks/useBoardWorker';
@@ -19,7 +19,8 @@ export default function TopBar() {
     rotation, setRotation,
     showLabels, toggleLabels,
     isDarkMode, toggleDarkMode,
-    isLeftPanelOpen, toggleLeftPanel
+    isLeftPanelOpen, toggleLeftPanel,
+    showOutlines, toggleOutlines
   } = useBoardStore();
 
 
@@ -96,6 +97,12 @@ export default function TopBar() {
         </div>
 
         <div className={toolGroupClass}>
+          <button onClick={toggleOutlines} className={actionBtnClass} title={`${t('topbar.toggle_outlines')} [O]`}>
+            <SquareDashed size={20} />
+          </button>
+
+          <div className="w-px h-6 bg-slate-300 dark:bg-slate-600 mx-2"></div>
+
           <button onClick={toggleLabels} className={actionBtnClass} title={`${t('topbar.toggle_labels')} [L]`}>
             <Type size={20} className={showLabels ? "text-blue-500" : "opacity-70"} />
           </button>

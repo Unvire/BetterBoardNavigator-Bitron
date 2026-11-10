@@ -45,10 +45,9 @@ export function useKeyboardShortcuts() {
           break;
 
         case 'o':
-          if (e.ctrlKey || e.metaKey) {
-            e.preventDefault();
-            document.querySelector<HTMLInputElement>('input[type="file"]')?.click();
-          }
+          e.preventDefault();
+          if (e.ctrlKey || e.metaKey) document.querySelector<HTMLInputElement>('input[type="file"]')?.click();
+          else store.toggleOutlines();
           break;
       }
     };

@@ -17,7 +17,8 @@
     "language": "Język",
     "theme": "Zmień motyw",
     "settings": "Ustawienia",
-    "help": "Pomoc"
+    "help": "Pomoc",
+    "toggle_outlines": "Pokaż/Ukryj obrys płytki"
   },
   "leftpanel": {
     "tab_components": "Komp.",

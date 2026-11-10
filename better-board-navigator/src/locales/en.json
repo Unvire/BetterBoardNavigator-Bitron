@@ -20,7 +20,8 @@
     "language": "Language",
     "theme": "Toggle Theme",
     "settings": "Settings",
-    "help": "Help"
+    "help": "Help",
+    "toggle_outlines": "Show/Hide board outlines"
   },
   "leftpanel": {
     "tab_components": "Comp.",
