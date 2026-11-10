@@ -1,6 +1,10 @@
 {
-  "init_screen": {
-    "init_message": "Trwa ładowanie środowskia 2D..."
+  "main_screen": {
+    "init_message": "Wczytaj plik schematu (Ctrl + O)",
+    "init_pyodide": "Inicjalizacja Pyodide...",
+    "parsing_cad_files": "Parsowanie schematów...",
+    "waiting": "Proszę czekać",
+    "parsing error": "Błąd przetwarzania"
   },
   "topbar": {
     "toggle_sidebar": "Pokaż/ukryj panel",

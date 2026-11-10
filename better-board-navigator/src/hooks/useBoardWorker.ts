@@ -1,14 +1,16 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useBoardStore } from '../store/boardStore';
 import type { BoardData } from '../types/board';
 
-export type WorkerStatus = 'idle' | 'loading_pyodide' | 'processing' | 'error';
-
 export function useBoardWorker() {
   const workerRef = useRef<Worker | null>(null);
-  const [status, setStatus] = useState<WorkerStatus>('idle');
-  const [error, setError] = useState<string | null>(null);
-  const setBoardData = useBoardStore((state) => state.setBoardData);
+
+  const { 
+    workerStatus: status, 
+    setWorkerStatus: setStatus, 
+    setWorkerError: setError, 
+    setBoardData 
+  } = useBoardStore();
 
   useEffect(() => {
     workerRef.current = new Worker(new URL('../workers/pyodideWorker.ts', import.meta.url), {
@@ -47,7 +49,7 @@ export function useBoardWorker() {
     return () => {
       workerRef.current?.terminate();
     };
-  }, [setBoardData]);
+  }, [setBoardData, setStatus, setError]);
 
 
   const processFiles = useCallback((files: FileList, companyType: string = 'DEFAULT') => {
@@ -61,7 +63,7 @@ export function useBoardWorker() {
         companyType 
       });
     }
-  }, [status]);
+  }, [status, setStatus, setError]);
 
-  return { status, error, processFiles };
+  return { status, processFiles };
 }

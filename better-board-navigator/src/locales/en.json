@@ -1,4 +1,11 @@
 {
+  "main_screen": {
+    "init_message": "Load schematic file (Ctrl + O)",
+    "init_pyodide": "Initializing Pyodide...",
+    "parsing_cad_files": "Processing schematic file...",
+    "waiting": "Please wait",
+    "parsing error": "Processing files error"
+  },
   "init_screen": {
     "init_message": "Initializing 2D environment..."
   },

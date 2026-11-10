@@ -1,7 +1,14 @@
 import { create } from 'zustand';
 import type { BoardData } from '../types/board';
 
+export type WorkerStatus = 'idle' | 'loading_pyodide' | 'processing' | 'error';
+
 interface BoardState {
+  workerStatus: WorkerStatus;
+  setWorkerStatus: (status: WorkerStatus) => void;
+  workerError: string | null;
+  setWorkerError: (error: string | null) => void;
+
   boardData: BoardData | null;
   setBoardData: (data: BoardData) => void;
 
@@ -50,6 +57,9 @@ interface BoardState {
 }
 
 export const useBoardStore = create<BoardState>((set) => ({
+  workerStatus: 'idle', 
+  workerError: null,
+
   boardData: null,
   isLeftPanelOpen: true,
 
@@ -69,6 +79,9 @@ export const useBoardStore = create<BoardState>((set) => ({
 
   showLabels: false,
 
+
+  setWorkerStatus: (status) => set({ workerStatus: status }), 
+  setWorkerError: (error) => set({ workerError: error }),
 
   setBoardData: (data) => set({ boardData: data }),
 
