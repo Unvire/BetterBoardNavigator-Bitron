@@ -64,9 +64,7 @@ self.addEventListener('message', async (event: MessageEvent) => {
   const { type, files } = event.data;
 
   if (type === 'PROCESS_FILES') {
-    try {
-      console.log(`[Pyodide Worker] Zaczynam przetwarzać pliki:`, files.map((f: File) => f.name));
-      
+    try {      
       self.postMessage({ type: 'STATUS', status: 'loading_pyodide' });
       const py = await initPyodide();
       self.postMessage({ type: 'STATUS', status: 'processing' });
@@ -75,9 +73,8 @@ self.addEventListener('message', async (event: MessageEvent) => {
         for (const fileName of lastUploadedFiles) {
           try {
             py.FS.unlink(`/${fileName}`);
-            console.log(`[Pyodide Worker] Usunięto stary plik z pamięci RAM: ${fileName}`);
           } catch (err) {
-            console.warn(`[Pyodide Worker] Nie usunięto starego pliku: ${fileName}`);
+            console.warn(`Pyodide warning - old file was not deleted: ${fileName}`);
           }
         }
         lastUploadedFiles = [];
@@ -88,7 +85,6 @@ self.addEventListener('message', async (event: MessageEvent) => {
         const buffer = await file.arrayBuffer();
         py.FS.writeFile(`/${file.name}`, new Uint8Array(buffer));
         lastUploadedFiles.push(file.name);
-        console.log(`[Pyodide Worker] Zapisano w wirtualnym FS: /${file.name}`);
       }
 
       const fileNames = files.map((f: File) => f.name);
@@ -116,16 +112,13 @@ def process(file_names):
 process(${JSON.stringify(fileNames)})
       `;
 
-      console.log("[Pyodide Worker] Wykonuję natywny parser Pythona...");
       const resultJsonStr = await py.runPythonAsync(pythonScript);
       const result = JSON.parse(resultJsonStr);
 
-      console.log("[Pyodide Worker] Python zakończył sukcesem! Odsyłam dane.");
       
       self.postMessage({ type: 'RESULT', payload: { boardData: result } });
 
     } catch (err: any) {
-      console.error("[Pyodide Worker] Złapano błąd podczas przetwarzania:", err);
       self.postMessage({ type: 'ERROR', message: err.message });
     }
   }

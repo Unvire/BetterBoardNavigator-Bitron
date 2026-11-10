@@ -47,7 +47,6 @@ export function useKeyboardShortcuts() {
         case 'o':
           if (e.ctrlKey || e.metaKey) {
             e.preventDefault();
-            console.log("Wywołano otwarcie pliku!");
           }
           break;
       }

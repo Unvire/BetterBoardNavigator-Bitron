@@ -26,23 +26,21 @@ export function useBoardWorker() {
 
         if (payload.boardData) {
           setBoardData(payload.boardData as BoardData);
-        } else {
-          console.error("[React Główny Wątek] Python nie zwrócił klucza 'boardData'!", payload);
         }
       } else if (type === 'ERROR') {
         setStatus('error');
         setError(message);
-        console.error("[React Główny Wątek] Błąd z Workera:", message);
+        console.error("Pyodide worker error:", message);
       }
     };
 
     workerRef.current.onerror = (error) => {
-      console.error(`[React Główny Wątek] KRYTYCZNY BŁĄD WORKERA:`, error.message);
+      console.error(`Pyodide CRITICAL error:`, error.message);
       setStatus('error');
     };
 
     workerRef.current.onmessageerror = (error) => {
-      console.error("[React Główny Wątek] Błąd deserializacji wiadomości od Workera!", error);
+      console.error("Pyodide deserializing error", error);
       setStatus('error');
     };
 
@@ -51,13 +49,12 @@ export function useBoardWorker() {
     };
   }, [setBoardData]);
 
-  
+
   const processFiles = useCallback((files: FileList, companyType: string = 'DEFAULT') => {
     if (workerRef.current && (status === 'idle' || status === 'error')) {
       setStatus('loading_pyodide');
       setError(null);
       
-      console.log("[React Główny Wątek] Wysyłam pliki do Workera.");
       workerRef.current.postMessage({ 
         type: 'PROCESS_FILES', 
         files: Array.from(files),
