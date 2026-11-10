@@ -143,13 +143,14 @@ export function usePanZoom(
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const compWidth = Math.max(maxX - minX, 1);
-    const compHeight = Math.max(maxY - minY, 1);
+    // 0.0001 is a small number that prevents 0 division
+    const compWidth = Math.max(maxX - minX, 0.0001);
+    const compHeight = Math.max(maxY - minY, 0.0001);
     const canvasWidth = canvas.clientWidth;
     const canvasHeight = canvas.clientHeight;
     
-    const scaleX = (canvasWidth * 0.4) / compWidth;
-    const scaleY = (canvasHeight * 0.4) / compHeight;
+    const scaleX = (canvasWidth * 0.3) / compWidth;
+    const scaleY = (canvasHeight * 0.3) / compHeight;
     const newScale = Math.min(scaleX, scaleY);
     
     const newOffsetX = (canvasWidth - (compWidth * newScale)) / 2 - (minX * newScale);

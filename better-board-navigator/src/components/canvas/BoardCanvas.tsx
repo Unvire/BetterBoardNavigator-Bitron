@@ -73,35 +73,42 @@ function BoardCanvas() {
   // Auto focus
   useEffect(() => {
     if (store.componentToFocus && store.boardData) {
-      const box = componentHitboxes.find(b => b.name === store.componentToFocus);
-      if (box) {
-        let cx = (box.minX + box.maxX) / 2;
-        let cy = (box.minY + box.maxY) / 2;
-        let w = box.maxX - box.minX;
-        let h = box.maxY - box.minY;
-
-        if (store.rotation !== 0) {
-          const rad = (store.rotation * Math.PI) / 180;
-          const dx = cx - boardCenterX;
-          const dy = cy - boardCenterY;
-          cx = dx * Math.cos(rad) - dy * Math.sin(rad) + boardCenterX;
-          cy = dx * Math.sin(rad) + dy * Math.cos(rad) + boardCenterY;
-          
-          if (store.rotation === 90 || store.rotation === 270) {
-            [w, h] = [h, w]; 
-          }
+      const comp = store.boardData.components[store.componentToFocus];
+      if (comp) {
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        
+        // finding area from components
+        if (comp.pins) {
+          Object.values(comp.pins).forEach(pin => {
+            if (pin.coords) {
+              minX = Math.min(minX, pin.coords.x);
+              maxX = Math.max(maxX, pin.coords.x);
+              minY = Math.min(minY, pin.coords.y);
+              maxY = Math.max(maxY, pin.coords.y);
+            }
+          });
         }
-
-        if (isMirrored) {
-          cx = boardCenterX * 2 - cx;
+        
+        // use component coords if above was fail
+        if (comp.coords && minX === Infinity) {
+          minX = comp.coords.x;
+          maxX = comp.coords.x;
+          minY = comp.coords.y;
+          maxY = comp.coords.y;
         }
+        
+        // add safety margin when 0 was calculated
+        if (minX === maxX) { minX -= 0.1; maxX += 0.1; }
+        if (minY === maxY) { minY -= 0.1; maxY += 0.1; }
 
-        const padding = Math.max(15, Math.max(w, h) * 0.5);
-        focusOnBoundingBox(cx - w/2 - padding, cx + w/2 + padding, cy - h/2 - padding, cy + h/2 + padding);
+        if (minX !== Infinity) {
+          focusOnBoundingBox(minX, maxX, minY, maxY);
+        }
       }
+
       store.clearFocus();
     }
-  }, [store.componentToFocus, store, componentHitboxes, focusOnBoundingBox, boardCenterX, boardCenterY]);
+  }, [store.componentToFocus, store.boardData, focusOnBoundingBox]);
   
 
   // Reset View
