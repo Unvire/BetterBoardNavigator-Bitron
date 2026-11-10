@@ -47,6 +47,7 @@ export function useKeyboardShortcuts() {
         case 'o':
           if (e.ctrlKey || e.metaKey) {
             e.preventDefault();
+            document.querySelector<HTMLInputElement>('input[type="file"]')?.click();
           }
           break;
       }
