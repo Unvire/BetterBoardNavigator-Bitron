@@ -107,9 +107,15 @@ const drawLabels = (ctx: CanvasRenderingContext2D, options: RenderOptions) => {
     const compWidth = box.maxX - box.minX;
     const compHeight = box.maxY - box.minY;
     const shortestSide = Math.min(compWidth, compHeight);
+    const longestSide = Math.max(compWidth, compHeight);
     
   
-    let targetWorldFontSize = shortestSide * 0.4;
+    let targetWorldFontSize = shortestSide * 0.3;
+    const maxFontBasedOnWidth = longestSide / (compName.length * charWidthRatio);
+    
+    if (targetWorldFontSize > maxFontBasedOnWidth) targetWorldFontSize = maxFontBasedOnWidth * 0.8; 
+    if (targetWorldFontSize > 2) targetWorldFontSize = 2;
+    if (targetWorldFontSize < 0.001) targetWorldFontSize = 0.5;
     if (isHighlighted) targetWorldFontSize *= 1.2;
 
     const visualPixelSize = targetWorldFontSize * scale;
@@ -127,27 +133,31 @@ const drawLabels = (ctx: CanvasRenderingContext2D, options: RenderOptions) => {
       const cx = (box.minX + box.maxX) / 2;
       const cy = (box.minY + box.maxY) / 2;
 
+      ctx.save();
+      
+      // revert all translations so that text is in native pixels
+      ctx.translate(cx, cy);
+      if (rotation !== 0) ctx.rotate((-rotation * Math.PI) / 180);
+      if (isMirrored) ctx.scale(-1, 1);
+      ctx.scale(1 / scale, 1 / scale);
+
       ctx.fillStyle = isHighlighted
         ? (isDarkMode ? '#ffffff' : '#000000')
         : (isDarkMode ? '#94a3b8' : '#64748b');
 
       ctx.font = isHighlighted 
-         ? `bold ${targetWorldFontSize}px sans-serif` 
-         : `600 ${targetWorldFontSize}px sans-serif`;
+         ? `bold ${visualPixelSize.toFixed(1)}px sans-serif` 
+         : `600 ${visualPixelSize.toFixed(1)}px sans-serif`;
 
       if (isHighlighted) {
         ctx.shadowColor = shadowColor;
-        ctx.shadowBlur = shadowBlur;
+        ctx.shadowBlur = 3; 
       } else {
         ctx.shadowBlur = 0; 
       }
 
-      ctx.save();
-      ctx.translate(cx, cy);
-      
-      // revert rotation and mirroring
-      if (rotation !== 0) ctx.rotate((-rotation * Math.PI) / 180);
-      if (isMirrored) ctx.scale(-1, 1);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
       
       ctx.fillText(compName, 0, 0);
       ctx.restore();

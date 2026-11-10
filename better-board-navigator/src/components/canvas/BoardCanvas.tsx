@@ -124,13 +124,45 @@ function BoardCanvas() {
         if (minY === maxY) { minY -= 0.1; maxY += 0.1; }
 
         if (minX !== Infinity) {
-          focusOnBoundingBox(minX, maxX, minY, maxY);
+          // calculate bounding box with currently applied transformations
+          const rad = (store.rotation * Math.PI) / 180;
+          const cos = Math.cos(rad);
+          const sin = Math.sin(rad);
+
+          const transformPoint = (x: number, y: number) => {
+            let nx = x;
+            let ny = y;
+            
+
+            if (store.rotation !== 0) {
+              const dx = nx - boardCenterX;
+              const dy = ny - boardCenterY;
+              nx = dx * cos - dy * sin + boardCenterX;
+              ny = dx * sin + dy * cos + boardCenterY;
+            }
+
+            if (isMirrored) nx = boardCenterX * 2 - nx;
+            
+            return { x: nx, y: ny };
+          };
+
+          const p1 = transformPoint(minX, minY);
+          const p2 = transformPoint(maxX, minY);
+          const p3 = transformPoint(maxX, maxY);
+          const p4 = transformPoint(minX, maxY);
+
+          const tMinX = Math.min(p1.x, p2.x, p3.x, p4.x);
+          const tMaxX = Math.max(p1.x, p2.x, p3.x, p4.x);
+          const tMinY = Math.min(p1.y, p2.y, p3.y, p4.y);
+          const tMaxY = Math.max(p1.y, p2.y, p3.y, p4.y);
+
+          focusOnBoundingBox(tMinX, tMaxX, tMinY, tMaxY);
         }
       }
 
       store.clearFocus();
     }
-  }, [store.componentToFocus, store.boardData, focusOnBoundingBox]);
+  }, [store.componentToFocus, store.boardData, focusOnBoundingBox, isMirrored, boardCenterX, boardCenterY, store.rotation]);
   
 
   // Reset View
