@@ -1,9 +1,11 @@
+import { useRef } from 'react';
 import { useBoardStore } from '../../store/boardStore';
 import { 
   Upload, FlipHorizontal, RotateCw, RotateCcw, Settings2, HelpCircle, 
-  Layers, PanelLeftClose, PanelLeftOpen, Sun, Moon, Type, Globe
+  Layers, PanelLeftClose, PanelLeftOpen, Sun, Moon, Type, Globe, Loader2
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useBoardWorker } from '../../hooks/useBoardWorker';
 
 const SUPPORTED_LANGUAGES = ['pl', 'en'];
 
@@ -28,6 +30,17 @@ export default function TopBar() {
     const nextIndex = (safeIndex + 1) % SUPPORTED_LANGUAGES.length;
     
     i18n.changeLanguage(SUPPORTED_LANGUAGES[nextIndex]);
+  };
+
+
+  const { status, processFiles } = useBoardWorker(); 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      processFiles(e.target.files, 'DEFAULT_COMPANY');
+    }
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   
@@ -91,8 +104,23 @@ export default function TopBar() {
 
       {/* 3. RIGHT - GLOBAL SETTINGS AND FILE LOADER*/}
       <div className="flex items-center justify-end gap-1 flex-1">
-        <button className={actionBtnClass} title={`${t('topbar.load_file')} [Ctrl+O]`}>
-          <Upload size={20} />
+        
+        <input 
+          type="file" 
+          multiple 
+          ref={fileInputRef} 
+          className="hidden" 
+          accept=".tgz,.gcd,.cad,.pdf,.zip" 
+          onChange={handleFileUpload} 
+        />
+
+        <button 
+          onClick={() => fileInputRef.current?.click()}
+          disabled={status !== 'idle'} 
+          className={`${actionBtnClass} ${status !== 'idle' ? 'opacity-50 cursor-not-allowed' : ''}`} 
+          title={`${t('topbar.load_file')} [Ctrl+O]`}
+        >
+          {status !== 'idle' ? <Loader2 size={20} className="animate-spin text-blue-500" /> : <Upload size={20} />}
         </button>
         
         <div className="w-px h-6 bg-slate-300 dark:bg-slate-600 mx-2"></div>
