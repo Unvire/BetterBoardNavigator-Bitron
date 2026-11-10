@@ -13,9 +13,7 @@ function App() {
   const { t } = useTranslation();
   
   const { 
-    boardData, isDarkMode, 
-    clearSelection, selectNet, 
-    inspectedComponents, setInspectedComponents,
+    boardData, isDarkMode,
     workerStatus, workerError
   } = useBoardStore();
 
@@ -26,17 +24,19 @@ function App() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        if (inspectedComponents) setInspectedComponents([]);
-        else {
-          clearSelection();
-          selectNet(null);
+        const state = useBoardStore.getState();
+        
+        if (state.inspectedComponents.length > 0) {
+          state.setInspectedComponents([]);
+        } else if (state.selectedNet || state.selectedComponents.size > 0 || state.highlightedPrefix) {
+          state.clearSelection();
         }
       }
     };
     
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [clearSelection, inspectedComponents, setInspectedComponents, selectNet]);
+  }, []);
 
 
   return (
