@@ -4,12 +4,10 @@ import type { BoardData } from '../types/board';
 
 export type WorkerStatus = 'idle' | 'loading_pyodide' | 'processing' | 'error';
 
-
 export function useBoardWorker() {
   const workerRef = useRef<Worker | null>(null);
   const [status, setStatus] = useState<WorkerStatus>('idle');
   const [error, setError] = useState<string | null>(null);
-  
   const setBoardData = useBoardStore((state) => state.setBoardData);
 
   useEffect(() => {
@@ -25,16 +23,27 @@ export function useBoardWorker() {
 
       } else if (type === 'RESULT') {
         setStatus('idle');
-        
+
         if (payload.boardData) {
           setBoardData(payload.boardData as BoardData);
         } else {
-          console.log("Mockowy zrzut z Pythona:", payload);
+          console.error("[React Główny Wątek] Python nie zwrócił klucza 'boardData'!", payload);
         }
       } else if (type === 'ERROR') {
         setStatus('error');
         setError(message);
+        console.error("[React Główny Wątek] Błąd z Workera:", message);
       }
+    };
+
+    workerRef.current.onerror = (error) => {
+      console.error(`[React Główny Wątek] KRYTYCZNY BŁĄD WORKERA:`, error.message);
+      setStatus('error');
+    };
+
+    workerRef.current.onmessageerror = (error) => {
+      console.error("[React Główny Wątek] Błąd deserializacji wiadomości od Workera!", error);
+      setStatus('error');
     };
 
     return () => {
@@ -48,6 +57,7 @@ export function useBoardWorker() {
       setStatus('loading_pyodide');
       setError(null);
       
+      console.log("[React Główny Wątek] Wysyłam pliki do Workera.");
       workerRef.current.postMessage({ 
         type: 'PROCESS_FILES', 
         files: Array.from(files),
