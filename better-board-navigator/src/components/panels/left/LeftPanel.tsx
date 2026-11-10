@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useBoardStore } from '../../../store/boardStore';
 import { Search, Cpu, Layers, Shapes } from 'lucide-react';
 import ComponentList from './ComponentList';
@@ -8,14 +8,10 @@ import { useTranslation } from 'react-i18next';
 
 export default function LeftPanel() {
   const { t } = useTranslation();
-  const { boardData, isDarkMode, selectedNet, isLeftPanelOpen } = useBoardStore();
+  const { boardData, isDarkMode, isLeftPanelOpen } = useBoardStore();
   const [activeTab, setActiveTab] = useState<'components' | 'nets' | 'groups'>('components');
   const [searchQuery, setSearchQuery] = useState('');
 
-  
-  useEffect(() => {
-    if (selectedNet && activeTab !== 'nets') setActiveTab('nets');
-  }, [selectedNet, activeTab]);
 
   const glassPanelClass = `absolute top-16 bottom-4 left-4 w-80 rounded-xl border shadow-lg flex flex-col transition-transform duration-300 z-10 backdrop-blur-xl overflow-hidden ${
     isDarkMode ? 'bg-slate-900/85 border-slate-700 text-slate-300' : 'bg-white/95 border-slate-200 text-slate-700'
@@ -55,13 +51,31 @@ export default function LeftPanel() {
       
       {/* Panels */}
       <div className="flex border-b border-inherit shrink-0">
-        <button onClick={() => setActiveTab('components')} className={`flex-1 py-3 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 ${activeTab === 'components' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-inherit opacity-70 hover:opacity-100'}`}>
+        <button 
+          onClick={() => setActiveTab('components')} 
+          className={`flex-1 py-2 flex items-center justify-center gap-1.5 text-xs font-bold transition-colors 
+            ${activeTab === 'components' 
+            ? 'text-blue-500 border-b-2 border-blue-500' 
+            : 'opacity-60 hover:opacity-100'}`}
+        >
           <Cpu size={16}/> {t('leftpanel.tab_components')}
         </button>
-        <button onClick={() => setActiveTab('nets')} className={`flex-1 py-3 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 ${activeTab === 'nets' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-inherit opacity-70 hover:opacity-100'}`}>
+        <button 
+          onClick={() => setActiveTab('nets')} 
+          className={`flex-1 py-2 flex items-center justify-center gap-1.5 text-xs font-bold transition-colors 
+            ${activeTab === 'nets' 
+              ? 'text-blue-500 border-b-2 border-blue-500' 
+              : 'opacity-60 hover:opacity-100'}`}
+        >
           <Layers size={16}/> {t('leftpanel.tab_nets')}
         </button>
-        <button onClick={() => setActiveTab('groups')} className={`flex-1 py-3 text-xs sm:text-sm font-semibold flex items-center justify-center gap-1.5 ${activeTab === 'groups' ? 'border-b-2 border-blue-500 text-blue-500' : 'text-inherit opacity-70 hover:opacity-100'}`}>
+        <button 
+          onClick={() => setActiveTab('groups')} 
+          className={`flex-1 py-2 flex items-center justify-center gap-1.5 text-xs font-bold transition-colors 
+            ${activeTab === 'groups' 
+              ? 'text-blue-500 border-b-2 border-blue-500' 
+              : 'opacity-60 hover:opacity-100'}`}
+          >
           <Shapes size={16}/> {t('leftpanel.tab_groups')}
         </button>
       </div>
