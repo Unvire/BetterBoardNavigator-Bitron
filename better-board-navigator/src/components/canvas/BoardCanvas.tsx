@@ -6,6 +6,28 @@ import { renderBoard } from './canvasRenderer';
 
 function BoardCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        setCanvasSize({ width, height });
+      }
+    });
+
+    resizeObserver.observe(canvas);
+    return () => resizeObserver.disconnect();
+  }, []);
+
+
   const [isSelectionMode, _] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const hoverStateRef = useRef(false); 
@@ -149,7 +171,7 @@ function BoardCanvas() {
       showLabels: store.showLabels,
       componentHitboxes: componentHitboxes
     });
-  }, [store, scale, offset, boardCenterX, boardCenterY, isMirrored]);
+  }, [store, scale, offset, boardCenterX, boardCenterY, isMirrored, canvasSize]);
 
 
   // Mouse Clicking
