@@ -5,8 +5,8 @@ import { X } from 'lucide-react';
 export default function NetList({ items }: { items: string[] }) {
   const { 
     selectedNet, selectNet, boardData, isDarkMode, 
-    currentSide, setCurrentSide, selectedComponents, inspectedComponent, 
-    selectComponents, setInspectedComponent, triggerFocus, highlightedPrefix, setHighlightedPrefix
+    currentSide, setCurrentSide, selectedComponents, inspectedComponents, 
+    selectComponents, setInspectedComponents, triggerFocus, highlightedPrefix, setHighlightedPrefix
   } = useBoardStore();
 
   const selectedNetRef = useRef<HTMLDivElement>(null);
@@ -62,7 +62,7 @@ export default function NetList({ items }: { items: string[] }) {
 
                   return pinsInNet.sort((a, b) => a.comp.localeCompare(b.comp, undefined, { numeric: true })).map(({ comp, pin }, idx) => {
                     const isCompSelected = selectedComponents.has(comp);
-                    const isCompInspected = inspectedComponent === comp;
+                    const isCompInspected = inspectedComponents.includes(comp);
                     
                     return (
                       <button
@@ -73,13 +73,13 @@ export default function NetList({ items }: { items: string[] }) {
                             setCurrentSide(targetComp.side);
                           }
                           if (e.ctrlKey || e.metaKey) {
-                            if (inspectedComponent) setInspectedComponent(null);
+                            if (inspectedComponents) setInspectedComponents([]);
                             if (highlightedPrefix) setHighlightedPrefix(null);
                             selectComponents([comp], true);
                           } else {
-                            if (isCompInspected) setInspectedComponent(null);
+                            if (isCompInspected) setInspectedComponents([]);
                             else {
-                              setInspectedComponent(comp);
+                              setInspectedComponents([comp]);
                               if (!isCompSelected) triggerFocus(comp);
                             }
                           }

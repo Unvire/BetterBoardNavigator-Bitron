@@ -38,6 +38,8 @@
     "pin": "Pin",
     "net": "Siatka",
     "not_connected": "N/C",
-    "no_pins": "Brak zdefiniowanych pinów"
+    "no_pins": "Brak zdefiniowanych pinów",    
+    "multiple_components": "Wiele elementów",
+    "multiple_components_label": "Wykryto nakładające się na siebie komponenty. Wybierz jeden, aby zobaczyć piny:"
   }
 }

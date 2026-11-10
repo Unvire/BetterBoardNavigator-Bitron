@@ -44,8 +44,8 @@ interface BoardState {
   clearFocus: () => void;
 
   // --- 2ND SELECTION ---
-  inspectedComponent: string | null;
-  setInspectedComponent: (name: string | null) => void;
+  inspectedComponents: string[];
+  setInspectedComponents: (names: string[]) => void;
 
   // --- COMPONENT TYPES ---
   highlightedPrefix: string | null;
@@ -74,7 +74,7 @@ export const useBoardStore = create<BoardState>((set) => ({
   selectedNet: null,
   componentToFocus: null,
 
-  inspectedComponent: null,
+  inspectedComponents: [],
   highlightedPrefix: null,
 
   showLabels: false,
@@ -105,27 +105,21 @@ export const useBoardStore = create<BoardState>((set) => ({
   selectComponents: (names, isMultiSelect = false) => set((state) => {
     if (isMultiSelect) {
       const newSelection = new Set(state.selectedComponents);
+      const allAlreadySelected = names.every(name => newSelection.has(name));
+      
       names.forEach(name => {
-        if (newSelection.has(name)) {
-          newSelection.delete(name);
-        } else {
-          newSelection.add(name);
-        }
+        if (allAlreadySelected) newSelection.delete(name);
+        else newSelection.add(name);
       });
-      return { 
-        selectedComponents: newSelection,
-      };
+      return { selectedComponents: newSelection };
     }
-    
-    return { 
-      selectedComponents: new Set(names)
-    };
+    return { selectedComponents: new Set(names) };
   }),
 
   clearSelection: () => set({ 
     selectedComponents: new Set(), 
     selectedNet: null,
-    inspectedComponent: null,
+    inspectedComponents: [],
     highlightedPrefix: null
   }),
 
@@ -137,14 +131,14 @@ export const useBoardStore = create<BoardState>((set) => ({
   
   clearFocus: () => set({ componentToFocus: null }),
 
-  setInspectedComponent: (name) => set({ 
-    inspectedComponent: name, 
+  setInspectedComponents: (names) => set({ 
+    inspectedComponents: names, 
     highlightedPrefix: null
   }),
 
   setHighlightedPrefix: (prefix) => set({ 
     highlightedPrefix: prefix,
-    inspectedComponent: null
+    inspectedComponents: []
   }),
 
   toggleLabels: () => set((state) => ({ showLabels: !state.showLabels })),

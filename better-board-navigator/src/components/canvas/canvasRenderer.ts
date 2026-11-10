@@ -14,7 +14,7 @@ export interface RenderOptions {
   showOutlines: boolean;
   currentSide: 'T' | 'B';
   selectedComponents: Set<string>;
-  inspectedComponent: string | null;
+  inspectedComponents: string[];
   selectedNet: string | null;
   highlightedPrefix: string | null;
   showLabels: boolean;
@@ -45,7 +45,7 @@ const drawLabels = (ctx: CanvasRenderingContext2D, options: RenderOptions) => {
   const { 
     scale, offset, rotation, boardCenterX, boardCenterY,
     isDarkMode, componentHitboxes, selectedComponents, 
-    inspectedComponent, highlightedPrefix, showLabels, isMirrored 
+    inspectedComponents, highlightedPrefix, showLabels, isMirrored 
   } = options;
   
   const canvasWidth = ctx.canvas.width;
@@ -91,7 +91,7 @@ const drawLabels = (ctx: CanvasRenderingContext2D, options: RenderOptions) => {
 
     const compName = box.name;
     const isSelected = selectedComponents.has(compName);
-    const isInspected = inspectedComponent === compName;
+    const isInspected = inspectedComponents.includes(compName);
 
     // fast prefix checking
     let compPrefix = '#';
@@ -161,7 +161,7 @@ export const renderBoard = (options: RenderOptions) => {
   const { 
     ctx, boardData, scale, offset, isMirrored, boardCenterX, boardCenterY, rotation,
     isDarkMode, showOutlines, currentSide, 
-    selectedComponents, inspectedComponent, selectedNet, highlightedPrefix
+    selectedComponents, inspectedComponents, selectedNet, highlightedPrefix
   } = options;
 
   const canvas = ctx.canvas;
@@ -208,7 +208,7 @@ export const renderBoard = (options: RenderOptions) => {
     const isOnCurrentSide = comp.side === currentSide;
     const isTH = comp.mountingType === 'TH';
     const isSelected = selectedComponents.has(compName);
-    const isInspected = inspectedComponent === compName;
+    const isInspected = inspectedComponents.includes(compName);
     const hasSinglePin = comp.pins ? Object.keys(comp.pins).length === 1 : false;
 
     const match = compName.match(/^[a-zA-Z]+/);

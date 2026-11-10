@@ -15,7 +15,7 @@ function App() {
   const { 
     boardData, isDarkMode, 
     clearSelection, selectNet, 
-    inspectedComponent, setInspectedComponent,
+    inspectedComponents, setInspectedComponents,
     workerStatus, workerError
   } = useBoardStore();
 
@@ -26,7 +26,7 @@ function App() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        if (inspectedComponent) setInspectedComponent(null);
+        if (inspectedComponents) setInspectedComponents([]);
         else {
           clearSelection();
           selectNet(null);
@@ -36,7 +36,7 @@ function App() {
     
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [clearSelection, inspectedComponent, setInspectedComponent, selectNet]);
+  }, [clearSelection, inspectedComponents, setInspectedComponents, selectNet]);
 
 
   return (

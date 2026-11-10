@@ -2,9 +2,9 @@ import { useBoardStore } from '../../../store/boardStore';
 
 export default function ComponentList({ items }: { items: string[] }) {
   const { 
-    boardData, isDarkMode, selectedComponents, inspectedComponent,
+    boardData, isDarkMode, selectedComponents, inspectedComponents,
     currentSide, setCurrentSide, selectComponents, triggerFocus, 
-    setInspectedComponent, highlightedPrefix, setHighlightedPrefix
+    setInspectedComponents, highlightedPrefix, setHighlightedPrefix
   } = useBoardStore();
 
   const handleComponentClick = (e: React.MouseEvent, compName: string) => {
@@ -14,18 +14,18 @@ export default function ComponentList({ items }: { items: string[] }) {
     }
 
     const isAlreadySelected = selectedComponents.has(compName);
-    const isAlreadyInspected = inspectedComponent === compName;
+    const isAlreadyInspected = inspectedComponents.includes(compName);
 
     if (e.ctrlKey || e.metaKey) {
-      if (inspectedComponent) setInspectedComponent(null); 
+      if (inspectedComponents) setInspectedComponents([]); 
       if (highlightedPrefix) setHighlightedPrefix(null);
       
       selectComponents([compName], true);
       if (!isAlreadySelected) triggerFocus(compName);
     } else {
-      if (isAlreadyInspected) setInspectedComponent(null);
+      if (isAlreadyInspected) setInspectedComponents([]);
       else {
-        setInspectedComponent(compName);
+        setInspectedComponents([compName]);
         triggerFocus(compName);
       }
     }
@@ -39,7 +39,7 @@ export default function ComponentList({ items }: { items: string[] }) {
     <ul className="text-sm space-y-0.5">
       {items.map(compName => {
         const isSelected = selectedComponents.has(compName);
-        const isInspected = inspectedComponent === compName;
+        const isInspected = inspectedComponents.includes(compName);
 
         let liClass = "px-3 py-1.5 rounded-md cursor-pointer flex justify-between items-center transition-all border ";
         if (isInspected) {

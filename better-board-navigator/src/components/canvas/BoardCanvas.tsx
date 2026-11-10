@@ -47,7 +47,7 @@ function BoardCanvas() {
       .map(box => box.name);
 
     if (clickedNames.length === 0) {
-      if (!isMultiSelect) store.setInspectedComponent(null);
+      if (!isMultiSelect) store.setInspectedComponents([]);
       return; 
     }
 
@@ -57,11 +57,11 @@ function BoardCanvas() {
     }
 
     if (isMultiSelect) {
-      if (store.inspectedComponent) store.setInspectedComponent(null);
+      if (store.inspectedComponents.length > 0) store.setInspectedComponents([]);
       if (store.highlightedPrefix) store.setHighlightedPrefix(null);
       store.selectComponents(clickedNames, true);
     } else {
-      store.setInspectedComponent(clickedNames[0]);
+      store.setInspectedComponents(clickedNames); // Przekazujemy wszystkie naraz!
     }
   }, [store, boardCenterX, componentHitboxes, getHitboxCoords]);
 
@@ -136,7 +136,7 @@ function BoardCanvas() {
       showOutlines: store.showOutlines,
       currentSide: store.currentSide,
       selectedComponents: store.selectedComponents,
-      inspectedComponent: store.inspectedComponent,
+      inspectedComponents: store.inspectedComponents,
       selectedNet: store.selectedNet,
       highlightedPrefix: store.highlightedPrefix,
       showLabels: store.showLabels,

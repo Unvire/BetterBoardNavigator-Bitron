@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 export default function InspectorView({ compName, isMultiSelected }: { compName: string, isMultiSelected: boolean }) {
   const { t } = useTranslation();
-  const { boardData, isDarkMode, clearSelection, setInspectedComponent, selectedNet, selectNet, inspectedComponent } = useBoardStore();
+  const { boardData, isDarkMode, clearSelection, setInspectedComponents, selectedNet, selectNet, inspectedComponents } = useBoardStore();
   const component = boardData?.components[compName];
 
   if (!component) return null;
@@ -16,16 +16,16 @@ export default function InspectorView({ compName, isMultiSelected }: { compName:
           <div className="flex items-center gap-2">
             {isMultiSelected ? (
               <button 
-                onClick={() => setInspectedComponent(null)} 
-                className={`p-1.5 -ml-1 rounded-md transition-colors ${inspectedComponent ? 'text-cyan-500 hover:bg-cyan-500/15' : 'text-rose-500 hover:bg-rose-500/15'}`}
+                onClick={() => setInspectedComponents([])} 
+                className={`p-1.5 -ml-1 rounded-md transition-colors ${inspectedComponents ? 'text-cyan-500 hover:bg-cyan-500/15' : 'text-rose-500 hover:bg-rose-500/15'}`}
                 title={t('rightpanel.back_to_list')}
               >
                 <ArrowLeft size={24} />
               </button>
             ) : (
-              <Cpu size={24} className={inspectedComponent ? "text-cyan-500 dark:text-cyan-400" : "text-rose-500 dark:text-rose-400"}/>
+              <Cpu size={24} className={inspectedComponents ? "text-cyan-500 dark:text-cyan-400" : "text-rose-500 dark:text-rose-400"}/>
             )}
-            <h2 className={`text-lg font-bold ${inspectedComponent ? "text-cyan-500 dark:text-cyan-400" : "text-rose-500 dark:text-rose-400"}`}>
+            <h2 className={`text-lg font-bold ${inspectedComponents ? "text-cyan-500 dark:text-cyan-400" : "text-rose-500 dark:text-rose-400"}`}>
               {compName}
             </h2>
           </div>

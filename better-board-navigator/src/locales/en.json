@@ -41,6 +41,8 @@
     "pin": "Pin",
     "net": "Net",
     "not_connected": "N/C",
-    "no_pins": "No defined pins"
+    "no_pins": "No defined pins",
+    "multiple_components": "Multiple components",
+    "multiple_components_label": "Overlaping components detected. Select one to check its pinout:"
   }
 }
