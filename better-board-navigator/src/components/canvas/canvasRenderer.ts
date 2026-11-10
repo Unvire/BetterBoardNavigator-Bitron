@@ -82,7 +82,6 @@ const drawLabels = (ctx: CanvasRenderingContext2D, options: RenderOptions) => {
   ctx.textBaseline = 'middle';
   
   const shadowColor = isDarkMode ? 'rgba(10, 10, 10, 0.8)' : 'rgba(255, 255, 255, 0.8)';
-  const shadowBlur = 3 / scale;
   const charWidthRatio = 0.6; 
 
   componentHitboxes.forEach(box => {
