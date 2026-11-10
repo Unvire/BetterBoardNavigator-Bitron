@@ -1,3 +1,5 @@
+import json
+
 import geometryObjects as gobj
 import component as comp
 from abstractShape import Shape
@@ -117,3 +119,62 @@ class Board:
             if shape.checkIfPointInside(clickedPoint):
                 result.append(componentName)
         return result
+
+
+    def toDict(self) -> dict:
+        def serializeShape(obj):
+            if obj is None:
+                return None
+            if isinstance(obj, gobj.Point):
+                return {'x': obj.x, 'y': obj.y}
+            elif isinstance(obj, gobj.Line):
+                return {'type': 'Line', 'start': serializeShape(obj.startPoint), 'end': serializeShape(obj.endPoint)}
+            elif isinstance(obj, gobj.Arc):
+                center, radius, start_angle, end_angle = obj.getAsCenterRadiusAngles()
+                return {'type': 'Arc', 'center': serializeShape(center), 'radius': radius, 'startAngle': start_angle, 'endAngle': end_angle}
+            elif isinstance(obj, gobj.Circle):
+                return {'type': 'Circle', 'center': serializeShape(obj.centerPoint), 'radius': obj.radius}
+            elif isinstance(obj, gobj.Rectangle):
+                return {'type': 'Rectangle', 'points': [serializeShape(p) for p in obj.getPoints()]}
+            return None
+
+        def serializePin(p):
+            return {
+                'name': getattr(p, 'name', ''),
+                'net': getattr(p, 'net', None),
+                'shapeType': getattr(p, 'shape', 'RECT'),
+                'shapeData': serializeShape(getattr(p, 'shapeData', None)),
+                'coords': serializeShape(getattr(p, 'coords', None))
+            }
+
+        def serializeComponent(c):
+            pinsDict = getattr(c, 'pins', {})
+            return {
+                'name': getattr(c, 'name', ''),
+                'side': getattr(c, 'side', 'T'),
+                'angle': getattr(c, 'angle', 0),
+                'mountingType': getattr(c, 'mountingType', 'SMT'),
+                'shapeType': getattr(c, 'shape', ''),
+                'shapeData': serializeShape(getattr(c, 'shapeData', None)),
+                'coords': serializeShape(getattr(c, 'coords', None)),
+                'pins': {pinName: serializePin(pinObj) for pinName, pinObj in pinsDict.items()}
+            }
+
+        simplifiedNets = {}
+        for netName, compDict in self.nets.items():
+            simplifiedNets[netName] = {
+                compName: {'pins': data.get('pins', [])} 
+                for compName, data in compDict.items()
+            }
+
+        return {
+            'boardDimensions': self.getWidthHeight(),
+            'area': [serializeShape(p) for p in self.getArea()],
+            'outlines': [serializeShape(shape) for shape in self.outlines],
+            'components': {name: serializeComponent(c) for name, c in self.components.items()},
+            'nets': simplifiedNets,
+            'mostCommonPrefix': self.mostCommonPrefix
+        }
+
+    def toJson(self) -> str:
+        return json.dumps(self.toDict())
