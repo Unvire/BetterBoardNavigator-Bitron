@@ -20,7 +20,7 @@ export default function TopBar() {
     showLabels, toggleLabels,
     isDarkMode, toggleDarkMode,
     isLeftPanelOpen, toggleLeftPanel,
-    showOutlines, toggleOutlines
+    toggleOutlines
   } = useBoardStore();
 
 

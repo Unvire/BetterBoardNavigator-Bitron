@@ -6,7 +6,7 @@ import { renderBoard } from './canvasRenderer';
 
 function BoardCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [isSelectionMode, _] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const hoverStateRef = useRef(false); 
 
