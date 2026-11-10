@@ -1,4 +1,7 @@
 {
+  "init_screen": {
+    "init_message": "Initializing 2D environment..."
+  },
   "topbar": {
     "toggle_sidebar": "Toggle Sidebar",
     "switch_side": "Switch Side",

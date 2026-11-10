@@ -1,4 +1,7 @@
 {
+  "init_screen": {
+    "init_message": "Trwa ładowanie środowskia 2D..."
+  },
   "topbar": {
     "toggle_sidebar": "Pokaż/ukryj panel",
     "switch_side": "Zmień stronę",

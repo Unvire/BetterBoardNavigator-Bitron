@@ -6,8 +6,11 @@ import LeftPanel from './components/panels/left/LeftPanel';
 import RightPanel from './components/panels/right/RightPanel';
 import { Layers } from 'lucide-react';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+import { useTranslation } from 'react-i18next';
+
 
 function App() {
+  const { t } = useTranslation();
   const { 
     setBoardData, isDarkMode, 
     clearSelection, selectNet, 
@@ -58,7 +61,7 @@ function App() {
     return (
       <div className={`flex h-screen w-screen items-center justify-center ${isDarkMode ? 'bg-slate-900 text-slate-300' : 'bg-slate-300 text-slate-700'}`}>
         <p className="text-xl animate-pulse flex items-center gap-3">
-          <Layers className="animate-spin" /> Initializing 2D environment...
+          <Layers className="animate-spin" /> {`${t('init_screen.init_message')}`}
         </p>
       </div>
     );
