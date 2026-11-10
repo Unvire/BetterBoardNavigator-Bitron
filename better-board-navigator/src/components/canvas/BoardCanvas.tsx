@@ -43,7 +43,7 @@ function BoardCanvas() {
     const { wx, wy } = getHitboxCoords(rawWorldX, rawWorldY);
     
     const clickedNames = componentHitboxes
-      .filter(box => wx >= box.minX - 0.5 && wx <= box.maxX + 0.5 && wy >= box.minY - 0.5 && wy <= box.maxY + 0.5)
+      .filter(box => wx >= box.minX && wx <= box.maxX && wy >= box.minY && wy <= box.maxY)
       .map(box => box.name);
 
     if (clickedNames.length === 0) {
@@ -161,8 +161,8 @@ function BoardCanvas() {
       const { wx, wy } = getHitboxCoords(rawWx, rawWy);
 
       const foundHover = componentHitboxes.some(box => 
-        wx >= box.minX - 0.5 && wx <= box.maxX + 0.5 && 
-        wy >= box.minY - 0.5 && wy <= box.maxY + 0.5
+        wx >= box.minX && wx <= box.maxX && 
+        wy >= box.minY && wy <= box.maxY
       );
 
       if (foundHover !== hoverStateRef.current) {

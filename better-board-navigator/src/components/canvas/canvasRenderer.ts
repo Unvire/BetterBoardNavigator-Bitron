@@ -108,14 +108,8 @@ const drawLabels = (ctx: CanvasRenderingContext2D, options: RenderOptions) => {
     const compHeight = box.maxY - box.minY;
     const shortestSide = Math.min(compWidth, compHeight);
     
-    const minFontWorldSize = 0.5; 
-    const maxFontWorldSize = 5.0; 
-    
-    // clamped font size
+  
     let targetWorldFontSize = shortestSide * 0.4;
-    
-    if (targetWorldFontSize < minFontWorldSize) targetWorldFontSize = minFontWorldSize;
-    if (targetWorldFontSize > maxFontWorldSize) targetWorldFontSize = maxFontWorldSize;
     if (isHighlighted) targetWorldFontSize *= 1.2;
 
     const visualPixelSize = targetWorldFontSize * scale;

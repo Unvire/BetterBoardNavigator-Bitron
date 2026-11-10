@@ -80,7 +80,7 @@ export function usePanZoom(
       const prevOffset = offsetRef.current;
 
       const newScale = prevScale * zoomFactor;
-      if (newScale < 0.1 || newScale > 200) return;
+      if (newScale < 0.0001 || newScale > 1000000) return;
 
       const rect = canvas.getBoundingClientRect();
       const mouseX = e.clientX - rect.left;
@@ -150,7 +150,7 @@ export function usePanZoom(
     
     const scaleX = (canvasWidth * 0.4) / compWidth;
     const scaleY = (canvasHeight * 0.4) / compHeight;
-    const newScale = Math.min(scaleX, scaleY, 50);
+    const newScale = Math.min(scaleX, scaleY);
     
     const newOffsetX = (canvasWidth - (compWidth * newScale)) / 2 - (minX * newScale);
     const newOffsetY = (canvasHeight - (compHeight * newScale)) / 2 - (minY * newScale);
