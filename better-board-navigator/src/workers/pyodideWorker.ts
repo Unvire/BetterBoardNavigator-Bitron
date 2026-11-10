@@ -98,7 +98,7 @@ if "/" not in sys.path:
 from loaderSelectorFactory import LoaderSelectorFactory
 
 def process(file_names):
-    cadFile = next((f for f in file_names if f.endswith(('.cad', '.gcd', '.tgz', '.zip'))), None)
+    cadFile = next((f for f in file_names if f.lower().endswith(('.cad', '.gcd', '.tgz', '.zip'))), None)
     if not cadFile:
         raise ValueError("There is no file with expected extension (.cad, .gcd, .tgz, .zip)!")
 
