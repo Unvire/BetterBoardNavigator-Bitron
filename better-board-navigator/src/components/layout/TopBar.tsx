@@ -158,7 +158,7 @@ export default function TopBar() {
           onClick={useBoardStore(s => s.toggleHideUnassignedPNs)}
           disabled={!useBoardStore(s => s.partNumbers)}
           className={`${actionBtnClass} ${!useBoardStore(s => s.partNumbers) ? 'opacity-50 cursor-not-allowed' : ''}`}
-          title={`${t('topbar.hide_comp')}`}
+          title={`${t('topbar.hide_comps_no_bom')}`}
         >
           {useBoardStore(s => s.hideUnassignedPNs) 
             ? <EyeOff size={20} className="text-cyan-500" /> 
