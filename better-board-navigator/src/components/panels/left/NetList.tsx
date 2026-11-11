@@ -6,7 +6,7 @@ export default function NetList({ items }: { items: string[] }) {
   const { 
     selectedNet, selectNet, boardData, isDarkMode, 
     currentSide, setCurrentSide, selectedComponents, inspectedComponents, 
-    selectComponents, setInspectedComponents, triggerFocus, highlightedPrefix, setHighlightedPrefix
+    selectComponents, setInspectedComponents, triggerFocus, highlightedPrefix, setHighlightedPrefix, partNumbers
   } = useBoardStore();
 
   const selectedNetRef = useRef<HTMLDivElement>(null);
@@ -92,7 +92,14 @@ export default function NetList({ items }: { items: string[] }) {
                               : (isDarkMode ? 'text-slate-400 hover:text-cyan-400 hover:bg-cyan-900/20' : 'text-slate-500 hover:text-cyan-700 hover:bg-cyan-50')
                         }`}
                       >
-                        <span className={`truncate ${isCompInspected || isCompSelected ? "font-bold" : "font-medium"}`}>{comp}</span>
+                        <div className="flex flex-col text-left truncate">
+                          <span className={`truncate ${isCompInspected || isCompSelected ? "font-bold" : "font-medium"}`}>{comp}</span>
+                          {partNumbers?.[comp] && (
+                            <span className="text-[9px] opacity-60 font-mono mt-0.5">
+                              {partNumbers[comp]}
+                            </span>
+                          )}
+                        </div>
                         <span className="opacity-70 font-mono shrink-0 ml-2">Pin: {pin}</span>
                       </button>
                     );

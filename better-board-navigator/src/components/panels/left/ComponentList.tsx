@@ -4,7 +4,7 @@ export default function ComponentList({ items }: { items: string[] }) {
   const { 
     boardData, isDarkMode, selectedComponents, inspectedComponents,
     currentSide, setCurrentSide, selectComponents, triggerFocus, 
-    setInspectedComponents, highlightedPrefix, setHighlightedPrefix
+    setInspectedComponents, highlightedPrefix, setHighlightedPrefix, partNumbers
   } = useBoardStore();
 
   const handleComponentClick = (e: React.MouseEvent, compName: string) => {
@@ -52,8 +52,15 @@ export default function ComponentList({ items }: { items: string[] }) {
 
         return (
           <li key={compName} onClick={(e) => handleComponentClick(e, compName)} className={liClass}>
-            <span>{compName}</span>
-            <span className={`text-xs px-1.5 py-0.5 rounded ${boardData?.components[compName]?.side === 'T' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'}`}>
+            <div className="flex flex-col">
+              <span>{compName}</span>
+              {partNumbers?.[compName] && (
+                <span className="text-[10px] opacity-50 font-mono mt-0.5">
+                  {partNumbers[compName]}
+                </span>
+              )}
+            </div>
+            <span className={`text-xs px-1.5 py-0.5 rounded shrink-0 ${boardData?.components[compName]?.side === 'T' ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400' : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'}`}>
               {boardData?.components[compName]?.side}
             </span>
           </li>

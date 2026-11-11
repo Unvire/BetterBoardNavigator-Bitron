@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 export default function InspectorView({ compName, isMultiSelected }: { compName: string, isMultiSelected: boolean }) {
   const { t } = useTranslation();
-  const { boardData, isDarkMode, clearSelection, setInspectedComponents, selectedNet, selectNet, inspectedComponents } = useBoardStore();
+  const { boardData, isDarkMode, clearSelection, setInspectedComponents, selectedNet, selectNet, inspectedComponents, partNumbers, setHighlightedPartNumber } = useBoardStore();
   const component = boardData?.components[compName];
 
   if (!component) return null;
@@ -33,7 +33,16 @@ export default function InspectorView({ compName, isMultiSelected }: { compName:
         </div>
         <div className="text-xs opacity-70 mt-1 flex flex-col gap-0.5">
           <span>{t('rightpanel.type', { type: component.mountingType })} | {t('rightpanel.side', { side: component.side })}</span>
-          <span className="font-mono mt-1 text-blue-500 dark:text-blue-400">{t('rightpanel.pn_waiting')}</span>
+          
+          {partNumbers?.[compName] && (
+            <button 
+              onClick={() => setHighlightedPartNumber(partNumbers[compName])}
+              className="font-mono mt-1 text-left text-blue-600 dark:text-blue-400 hover:text-cyan-500 transition-colors cursor-pointer w-fit"
+              title="Podświetl wszystkie komponenty o tym kodzie"
+            >
+              PN: {partNumbers[compName]}
+            </button>
+          )}
         </div>
       </div>
 

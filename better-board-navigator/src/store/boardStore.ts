@@ -51,9 +51,15 @@ interface BoardState {
   highlightedPrefix: string | null;
   setHighlightedPrefix: (prefix: string | null) => void;
 
-  // --- COMPONENT NAMES
+  // --- COMPONENT NAMES --- 
   showLabels: boolean;
   toggleLabels: () => void;
+
+  // --- PART NUMBERS ---
+  partNumbers: Record<string, string> | null;
+  setPartNumbers: (data: Record<string, string>) => void;
+  highlightedPartNumber: string | null;
+  setHighlightedPartNumber: (pn: string | null) => void;
 }
 
 export const useBoardStore = create<BoardState>((set) => ({
@@ -78,6 +84,9 @@ export const useBoardStore = create<BoardState>((set) => ({
   highlightedPrefix: null,
 
   showLabels: false,
+
+  partNumbers:null,
+  highlightedPartNumber: null,
 
 
   setWorkerStatus: (status) => set({ workerStatus: status }), 
@@ -120,7 +129,8 @@ export const useBoardStore = create<BoardState>((set) => ({
     selectedComponents: new Set(), 
     selectedNet: null,
     inspectedComponents: [],
-    highlightedPrefix: null
+    highlightedPrefix: null,
+    highlightedPartNumber: null
   }),
 
   selectNet: (net) => set({ 
@@ -133,13 +143,25 @@ export const useBoardStore = create<BoardState>((set) => ({
 
   setInspectedComponents: (names) => set({ 
     inspectedComponents: names, 
-    highlightedPrefix: null
+    highlightedPrefix: null,
+    highlightedPartNumber: null,
   }),
 
   setHighlightedPrefix: (prefix) => set({ 
     highlightedPrefix: prefix,
-    inspectedComponents: []
+    inspectedComponents: [],
+    highlightedPartNumber: null
   }),
 
   toggleLabels: () => set((state) => ({ showLabels: !state.showLabels })),
+
+  setPartNumbers: (data) => set({ 
+    partNumbers: data 
+  }),
+
+  setHighlightedPartNumber: (pn) => set({ 
+    highlightedPartNumber: pn,
+    highlightedPrefix: null,
+    inspectedComponents: []
+  }),
 }));

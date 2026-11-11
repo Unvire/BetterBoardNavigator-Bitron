@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 export default function MultiSelectView({ selectedNames }: { selectedNames: string[] }) {
   const { t } = useTranslation();
-  const { clearSelection, setInspectedComponents, triggerFocus, selectComponents, boardData, isDarkMode } = useBoardStore();
+  const { clearSelection, setInspectedComponents, triggerFocus, selectComponents, boardData, isDarkMode, partNumbers } = useBoardStore();
 
   return (
     <div className="flex flex-col h-full">
@@ -25,7 +25,16 @@ export default function MultiSelectView({ selectedNames }: { selectedNames: stri
             >
               <div className="flex flex-col">
                 <span className="font-bold text-blue-500 block leading-tight">{name}</span>
-                <span className="text-xs opacity-60 mt-0.5">{t('rightpanel.side', { side: boardData?.components[name]?.side })}</span>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="text-xs opacity-60">{t('rightpanel.side', { side: boardData?.components[name]?.side })}</span>
+                  
+                  {partNumbers?.[name] && (
+                    <span className="text-[10px] font-mono px-1.5 bg-slate-200 dark:bg-slate-700 rounded opacity-75">
+                      {partNumbers[name]}
+                    </span>
+                  )}
+                  
+                </div>
               </div>
               <ChevronRight size={16} className="text-blue-500/50 opacity-0 group-hover:opacity-100 transition-opacity -mr-1" />
             </button>
