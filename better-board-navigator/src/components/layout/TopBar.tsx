@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { useBoardStore } from '../../store/boardStore';
 import { 
-  Upload, FlipHorizontal, RotateCw, RotateCcw, Settings2, HelpCircle, 
+  Upload, FlipHorizontal, RotateCw, RotateCcw, Settings2, HelpCircle, Database,
   Layers, PanelLeftClose, PanelLeftOpen, Sun, Moon, Type, Globe, Loader2, SquareDashed
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -36,12 +36,31 @@ export default function TopBar() {
 
   const { status, processFiles } = useBoardWorker(); 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const bomInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      processFiles(e.target.files, 'DEFAULT_COMPANY');
+      processFiles(e.target.files);
     }
     if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleBomUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const json = JSON.parse(event.target?.result as string);
+        useBoardStore.getState().setPartNumbers(json);
+      } catch (err) {
+        console.error("Eror with parsing BOM JSON:", err);
+      }
+    };
+
+    reader.readAsText(file);
+    if (bomInputRef.current) bomInputRef.current.value = '';
   };
 
   
@@ -112,14 +131,8 @@ export default function TopBar() {
       {/* 3. RIGHT - GLOBAL SETTINGS AND FILE LOADER*/}
       <div className="flex items-center justify-end gap-1 flex-1">
         
-        <input 
-          type="file" 
-          multiple 
-          ref={fileInputRef} 
-          className="hidden" 
-          accept=".tgz,.gcd,.cad,.pdf,.zip" 
-          onChange={handleFileUpload} 
-        />
+        <input type="file" id="cad-file-input" ref={fileInputRef} className="hidden" accept=".tgz,.gcd,.cad,.zip" onChange={handleFileUpload}/>
+        <input type="file" id="bom-file-input" ref={bomInputRef} className="hidden" accept=".json" onChange={handleBomUpload} />
 
         <button 
           onClick={() => fileInputRef.current?.click()}
@@ -128,6 +141,14 @@ export default function TopBar() {
           title={`${t('topbar.load_file')} [Ctrl+O]`}
         >
           {status !== 'idle' ? <Loader2 size={20} className="animate-spin text-blue-500" /> : <Upload size={20} />}
+        </button>
+
+        <button 
+          onClick={() => bomInputRef.current?.click()}
+          className={actionBtnClass} 
+          title={`${t('topbar.load_bom')} [Ctrl+P]`}
+        >
+          <Database size={20} className={useBoardStore(s => s.partNumbers) ? "text-cyan-500" : ""} />
         </button>
         
         <div className="w-px h-6 bg-slate-300 dark:bg-slate-600 mx-2"></div>

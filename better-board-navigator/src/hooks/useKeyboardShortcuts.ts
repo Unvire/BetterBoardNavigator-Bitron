@@ -46,8 +46,15 @@ export function useKeyboardShortcuts() {
 
         case 'o':
           e.preventDefault();
-          if (e.ctrlKey || e.metaKey) document.querySelector<HTMLInputElement>('input[type="file"]')?.click();
+          if (e.ctrlKey || e.metaKey) document.getElementById('cad-file-input')?.click();
           else store.toggleOutlines();
+          break;
+
+        case 'p':
+          e.preventDefault();
+          if (e.ctrlKey || e.metaKey) {
+            document.getElementById('bom-file-input')?.click();
+          };
           break;
       }
     };

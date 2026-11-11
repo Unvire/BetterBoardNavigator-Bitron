@@ -52,15 +52,14 @@ export function useBoardWorker() {
   }, [setBoardData, setStatus, setError]);
 
 
-  const processFiles = useCallback((files: FileList, companyType: string = 'DEFAULT') => {
+  const processFiles = useCallback((files: FileList) => {
     if (workerRef.current && (status === 'idle' || status === 'error')) {
       setStatus('loading_pyodide');
       setError(null);
       
       workerRef.current.postMessage({ 
         type: 'PROCESS_FILES', 
-        files: Array.from(files),
-        companyType 
+        files: Array.from(files)
       });
     }
   }, [status, setStatus, setError]);

@@ -1,15 +1,16 @@
 import { useState, useMemo } from 'react';
 import { useBoardStore } from '../../../store/boardStore';
-import { Search, Cpu, Layers, Shapes } from 'lucide-react';
+import { Search, Cpu, Layers, Shapes, Database } from 'lucide-react';
 import ComponentList from './ComponentList';
 import NetList from './NetList';
 import GroupList from './GroupList';
 import { useTranslation } from 'react-i18next';
+import PartNumberList from './PartNumberList';
 
 export default function LeftPanel() {
   const { t } = useTranslation();
   const { boardData, isDarkMode, isLeftPanelOpen } = useBoardStore();
-  const [activeTab, setActiveTab] = useState<'components' | 'nets' | 'groups'>('components');
+  const [activeTab, setActiveTab] = useState<'components' | 'nets' | 'groups' | 'bom'>('components');
   const [searchQuery, setSearchQuery] = useState('');
 
 
@@ -78,6 +79,15 @@ export default function LeftPanel() {
           >
           <Shapes size={16}/> {t('leftpanel.tab_groups')}
         </button>
+        <button 
+          onClick={() => setActiveTab('bom')} 
+          className={`flex-1 py-2 flex items-center justify-center gap-1.5 text-xs font-bold transition-colors 
+            ${activeTab === 'bom' 
+              ? 'text-cyan-500 border-b-2 border-cyan-500' 
+              : 'opacity-60 hover:opacity-100'}`}
+          >
+          <Database size={16}/> {t('leftpanel.tab_groups')}
+        </button>
       </div>
 
       {/* Searchbox */}
@@ -103,6 +113,7 @@ export default function LeftPanel() {
         {activeTab === 'components' && <ComponentList items={filteredComponents} />}
         {activeTab === 'nets' && <NetList items={filteredNets} />}
         {activeTab === 'groups' && <GroupList searchQuery={searchQuery} />}
+        {activeTab === 'bom' && <PartNumberList searchQuery={searchQuery} />}
       </div>
     </aside>
   );

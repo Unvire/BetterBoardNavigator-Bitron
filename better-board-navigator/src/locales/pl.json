@@ -18,14 +18,19 @@
     "theme": "Zmień motyw",
     "settings": "Ustawienia",
     "help": "Pomoc",
-    "toggle_outlines": "Pokaż/Ukryj obrys płytki"
+    "toggle_outlines": "Pokaż/Ukryj obrys płytki",
+    "load_bom": "Wczytaj listę Part Number (plik .json)"
   },
   "leftpanel": {
     "tab_components": "Komp.",
     "tab_nets": "Siatki",
     "tab_groups": "Typy",
     "search": "Szukaj",
-    "group": "Grupa:"
+    "group": "Grupa:",
+    "bom": "PN",
+    "bom_load_file": "Wczytaj plik BOM (.json) z paska narzędzi.",
+    "bom_no_data": "Brak wyników",
+    "bom_quantity": "Ilość:"
   },
   "rightpanel": {
     "selected_count": "Zaznaczono: {{count}}",

@@ -21,14 +21,18 @@
     "theme": "Toggle Theme",
     "settings": "Settings",
     "help": "Help",
-    "toggle_outlines": "Show/Hide board outlines"
+    "toggle_outlines": "Show/Hide board outlines",
+    "load_bom": "Load Part Number file (.json)"
   },
   "leftpanel": {
     "tab_components": "Comp.",
     "tab_nets": "Nets",
     "tab_groups": "Types",
     "search": "Search",
-    "group": "Group:"
+    "group": "Group:",
+    "bom_load_file": "Load BOM  file (.json) with the button in TopBar.",
+    "bom_no_data": "No data",
+    "bom_quantity": "Quantity:"
   },
   "rightpanel": {
     "selected_count": "Selected: {{count}}",
