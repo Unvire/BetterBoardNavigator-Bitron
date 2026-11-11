@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import type { BoardData, ShapeData } from '../types/board';
+import { useBoardStore } from '../store/boardStore';
 
 export interface Hitbox {
   name: string;
@@ -10,6 +11,10 @@ export interface Hitbox {
 }
 
 export function useBoardGeometry(boardData: BoardData | null, currentSide: 'T' | 'B') {
+  const hideUnassignedPNs = useBoardStore(state => state.hideUnassignedPNs);
+  const hiddenComponents = useBoardStore(state => state.hiddenComponents);
+  const partNumbers = useBoardStore(state => state.partNumbers);
+
   // 1. Calculating center of board
   const { boardCenterX,  boardCenterY } = useMemo(() => {
     if (!boardData) return { boardCenterX: 0, boardCenterY: 0 };
@@ -54,6 +59,9 @@ export function useBoardGeometry(boardData: BoardData | null, currentSide: 'T' |
     const boxes: Hitbox[] = [];
     
     Object.entries(boardData.components).forEach(([name, comp]) => {
+      if (hiddenComponents.has(name)) return;
+      if (hideUnassignedPNs && (!partNumbers || !partNumbers[name])) return;
+
       if (comp.side !== currentSide && comp.mountingType !== 'TH') return;
 
       let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
@@ -85,7 +93,7 @@ export function useBoardGeometry(boardData: BoardData | null, currentSide: 'T' |
     });
 
     return boxes;
-  }, [boardData, currentSide]);
+  }, [boardData, currentSide, hideUnassignedPNs, hiddenComponents, partNumbers]);
 
   return { boardCenterX, boardCenterY, componentHitboxes };
 }

@@ -60,6 +60,10 @@ interface BoardState {
   setPartNumbers: (data: Record<string, string>) => void;
   highlightedPartNumber: string | null;
   setHighlightedPartNumber: (pn: string | null) => void;
+  hideUnassignedPNs: boolean;
+  hiddenComponents: Set<string>;
+  toggleHideUnassignedPNs: () => void;
+  toggleComponentVisibility: (compName: string) => void;
 }
 
 export const useBoardStore = create<BoardState>((set) => ({
@@ -87,6 +91,8 @@ export const useBoardStore = create<BoardState>((set) => ({
 
   partNumbers:null,
   highlightedPartNumber: null,
+  hideUnassignedPNs: false,
+  hiddenComponents: new Set<string>(),
 
 
   setWorkerStatus: (status) => set({ workerStatus: status }), 
@@ -163,5 +169,26 @@ export const useBoardStore = create<BoardState>((set) => ({
     highlightedPartNumber: pn,
     highlightedPrefix: null,
     inspectedComponents: []
+  }),
+
+  toggleHideUnassignedPNs: () => set((state) => ({ hideUnassignedPNs: !state.hideUnassignedPNs })),
+  
+  toggleComponentVisibility: (compName: string) => set((state) => {
+    const newHidden = new Set(state.hiddenComponents);
+    if (newHidden.has(compName)) {
+      newHidden.delete(compName);
+    } else {
+      newHidden.add(compName);
+    }
+    
+    const newSelected = new Set(state.selectedComponents);
+    newSelected.delete(compName);
+    const newInspected = state.inspectedComponents.filter(c => c !== compName);
+
+    return { 
+      hiddenComponents: newHidden,
+      selectedComponents: newSelected,
+      inspectedComponents: newInspected
+    };
   }),
 }));

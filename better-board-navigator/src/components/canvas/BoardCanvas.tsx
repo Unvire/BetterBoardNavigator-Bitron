@@ -217,7 +217,11 @@ function BoardCanvas() {
       selectedNet: store.selectedNet,
       highlightedPrefix: store.highlightedPrefix,
       showLabels: store.showLabels,
-      componentHitboxes: componentHitboxes
+      componentHitboxes: componentHitboxes,
+      partNumbers: store.partNumbers,
+      highlightedPartNumber: store.highlightedPartNumber,
+      hideUnassignedPNs: store.hideUnassignedPNs,
+      hiddenComponents: store.hiddenComponents
     });
   }, [store, scale, offset, boardCenterX, boardCenterY, isMirrored, canvasSize]);
 

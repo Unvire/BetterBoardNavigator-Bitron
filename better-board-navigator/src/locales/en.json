@@ -22,7 +22,8 @@
     "settings": "Settings",
     "help": "Help",
     "toggle_outlines": "Show/Hide board outlines",
-    "load_bom": "Load Part Number file (.json)"
+    "load_bom": "Load Part Number file (.json)",
+    "hide_comps_no_bom": "Hide components without assigned Part Number"
   },
   "leftpanel": {
     "tab_components": "Comp.",
@@ -48,6 +49,7 @@
     "not_connected": "N/C",
     "no_pins": "No defined pins",
     "multiple_components": "Multiple components",
-    "multiple_components_label": "Overlaping components detected. Select one to check its pinout:"
+    "multiple_components_label": "Overlaping components detected. Select one to check its pinout:",
+    "hide_comp": "Hide component"
   }
 }

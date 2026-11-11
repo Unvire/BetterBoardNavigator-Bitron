@@ -19,6 +19,10 @@ export interface RenderOptions {
   highlightedPrefix: string | null;
   showLabels: boolean;
   componentHitboxes: Hitbox[];
+  partNumbers: Record<string, string> | null;
+  highlightedPartNumber: string | null;
+  hideUnassignedPNs: boolean;
+  hiddenComponents: Set<string>;
 }
 
 
@@ -214,6 +218,9 @@ export const renderBoard = (options: RenderOptions) => {
   const inspectedShapes: ShapeData[] = [];
 
   Object.entries(boardData.components).forEach(([compName, comp]) => {
+    if (options.hiddenComponents.has(compName)) return;
+    if (options.hideUnassignedPNs && (!options.partNumbers || !options.partNumbers[compName])) return;
+
     const isOnCurrentSide = comp.side === currentSide;
     const isTH = comp.mountingType === 'TH';
     const isSelected = selectedComponents.has(compName);

@@ -2,7 +2,8 @@ import { useRef } from 'react';
 import { useBoardStore } from '../../store/boardStore';
 import { 
   Upload, FlipHorizontal, RotateCw, RotateCcw, Settings2, HelpCircle, Database,
-  Layers, PanelLeftClose, PanelLeftOpen, Sun, Moon, Type, Globe, Loader2, SquareDashed
+  Layers, PanelLeftClose, PanelLeftOpen, Sun, Moon, Type, Globe, Loader2, SquareDashed,
+  EyeOff, Eye
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useBoardWorker } from '../../hooks/useBoardWorker';
@@ -143,12 +144,26 @@ export default function TopBar() {
           {status !== 'idle' ? <Loader2 size={20} className="animate-spin text-blue-500" /> : <Upload size={20} />}
         </button>
 
+        <div className="w-px h-6 bg-slate-300 dark:bg-slate-600 mx-2"></div>
+
         <button 
           onClick={() => bomInputRef.current?.click()}
           className={actionBtnClass} 
           title={`${t('topbar.load_bom')} [Ctrl+P]`}
         >
           <Database size={20} className={useBoardStore(s => s.partNumbers) ? "text-cyan-500" : ""} />
+        </button>
+
+        <button 
+          onClick={useBoardStore(s => s.toggleHideUnassignedPNs)}
+          disabled={!useBoardStore(s => s.partNumbers)}
+          className={`${actionBtnClass} ${!useBoardStore(s => s.partNumbers) ? 'opacity-50 cursor-not-allowed' : ''}`}
+          title={`${t('topbar.hide_comp')}`}
+        >
+          {useBoardStore(s => s.hideUnassignedPNs) 
+            ? <EyeOff size={20} className="text-cyan-500" /> 
+            : <Eye size={20} />
+          }
         </button>
         
         <div className="w-px h-6 bg-slate-300 dark:bg-slate-600 mx-2"></div>

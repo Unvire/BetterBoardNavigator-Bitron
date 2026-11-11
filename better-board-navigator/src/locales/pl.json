@@ -19,7 +19,8 @@
     "settings": "Ustawienia",
     "help": "Pomoc",
     "toggle_outlines": "Pokaż/Ukryj obrys płytki",
-    "load_bom": "Wczytaj listę Part Number (plik .json)"
+    "load_bom": "Wczytaj listę Part Number (plik .json)",
+    "hide_comps_no_bom": "Ukryj komponenty bez przypisanego Part Number"
   },
   "leftpanel": {
     "tab_components": "Komp.",
@@ -46,6 +47,7 @@
     "not_connected": "N/C",
     "no_pins": "Brak zdefiniowanych pinów",    
     "multiple_components": "Wiele elementów",
-    "multiple_components_label": "Wykryto nakładające się na siebie komponenty. Wybierz jeden, aby zobaczyć piny:"
+    "multiple_components_label": "Wykryto nakładające się na siebie komponenty. Wybierz jeden, aby zobaczyć piny:",
+    "hide_comp": "Ukryj komponent"
   }
 }
