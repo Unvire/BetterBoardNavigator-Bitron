@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useBoardStore } from '../../../store/boardStore';
-import { X } from 'lucide-react';
+import { X, Eye, EyeOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface PartNumberListProps {
@@ -11,10 +11,8 @@ export default function PartNumberList({ searchQuery }: PartNumberListProps) {
   const { t } = useTranslation();
 
   const { 
-    partNumbers, 
-    isDarkMode, 
-    highlightedPartNumber, 
-    setHighlightedPartNumber 
+    partNumbers, isDarkMode, highlightedPartNumber, setHighlightedPartNumber,
+    hiddenComponents, toggleComponentVisibility
   } = useBoardStore();
 
   // [{ pn: "PN1", comps: ["R1", "R2"] }]
@@ -43,7 +41,7 @@ export default function PartNumberList({ searchQuery }: PartNumberListProps) {
   }
 
   if (groupedBom.length === 0) {
-    return <div className="px-3 py-2 text-center opacity-50 text-xs">{t('leftpanel.bom_no_data')}</div>;
+    return <div className="px-3 py-2 text-center opacity-50 text-xs">{t('leftpanel.no_data')}</div>;
   }
 
   return (
@@ -80,11 +78,30 @@ export default function PartNumberList({ searchQuery }: PartNumberListProps) {
 
             {isSelected && (
               <div className={`ml-3 my-1 pl-2 border-l-2 space-y-1 ${isDarkMode ? 'border-cyan-900/50' : 'border-cyan-200'}`}>
-                {comps.map(comp => (
-                  <div key={comp} className="px-2 py-1 text-xs opacity-75 font-medium">
-                    {comp}
-                  </div>
-                ))}
+                {comps.map(comp => {
+                  const isHidden = hiddenComponents.has(comp);
+                  return (
+                    <div key={comp} className="group flex items-center justify-between px-2 py-1 transition-all rounded hover:bg-slate-200/50 dark:hover:bg-slate-800/50">
+                      <span className={`text-xs font-medium ${isHidden ? "opacity-50 line-through" : "opacity-75"}`}>
+                        {comp}
+                      </span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleComponentVisibility(comp);
+                        }}
+                        className={`p-1 rounded-md transition-colors ${
+                          isHidden 
+                            ? 'text-rose-500 bg-rose-500/10 opacity-100' 
+                            : 'opacity-0 group-hover:opacity-60 hover:opacity-100 hover:bg-slate-300 dark:hover:bg-slate-700'
+                        }`}
+                        title={isHidden ? t('leftpanel.show_comp') : t('leftpanel.hide_comp')}
+                      >
+                        {isHidden ? <EyeOff size={14} /> : <Eye size={14} />}
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

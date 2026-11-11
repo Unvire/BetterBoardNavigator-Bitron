@@ -32,8 +32,11 @@
     "search": "Search",
     "group": "Group:",
     "bom_load_file": "Load BOM  file (.json) with the button in TopBar.",
-    "bom_no_data": "No data",
-    "bom_quantity": "Quantity:"
+    "no_data": "No data",
+    "bom_quantity": "Quantity:",
+    "hide_comp": "Hide component",
+    "show_comp": "Show component",
+    "no_pads": "No defined pads"
   },
   "rightpanel": {
     "selected_count": "Selected: {{count}}",
@@ -49,7 +52,6 @@
     "not_connected": "N/C",
     "no_pins": "No defined pins",
     "multiple_components": "Multiple components",
-    "multiple_components_label": "Overlaping components detected. Select one to check its pinout:",
-    "hide_comp": "Hide component"
+    "multiple_components_label": "Overlaping components detected. Select one to check its pinout:"
   }
 }

@@ -1,5 +1,5 @@
 import { useBoardStore } from '../../../store/boardStore';
-import { X, ArrowLeft, Cpu, EyeOff } from 'lucide-react';
+import { X, ArrowLeft, Cpu } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 export default function InspectorView({ compName, isMultiSelected }: { compName: string, isMultiSelected: boolean }) {
@@ -25,13 +25,6 @@ export default function InspectorView({ compName, isMultiSelected }: { compName:
             ) : (
               <Cpu size={24} className={inspectedComponents ? "text-cyan-500 dark:text-cyan-400" : "text-rose-500 dark:text-rose-400"}/>
             )}
-            <button 
-              onClick={() => useBoardStore.getState().toggleComponentVisibility(compName)}
-              className="p-1 hover:bg-rose-500/20 text-rose-500 rounded transition-colors"
-              title={t('rightpanel.type')}
-            >
-              <EyeOff size={20} />
-            </button>
             <h2 className={`text-lg font-bold ${inspectedComponents ? "text-cyan-500 dark:text-cyan-400" : "text-rose-500 dark:text-rose-400"}`}>
               {compName}
             </h2>

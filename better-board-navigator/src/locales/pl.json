@@ -30,8 +30,11 @@
     "group": "Grupa:",
     "bom": "PN",
     "bom_load_file": "Wczytaj plik BOM (.json) z paska narzędzi.",
-    "bom_no_data": "Brak wyników",
-    "bom_quantity": "Ilość:"
+    "no_data": "Brak wyników",
+    "bom_quantity": "Ilość:",
+    "hide_comp": "Ukryj komponent",
+    "show_comp": "Pokaż komponent",
+    "no_pads": "Brak zdefiniowanych padów"
   },
   "rightpanel": {
     "selected_count": "Zaznaczono: {{count}}",
@@ -47,7 +50,6 @@
     "not_connected": "N/C",
     "no_pins": "Brak zdefiniowanych pinów",    
     "multiple_components": "Wiele elementów",
-    "multiple_components_label": "Wykryto nakładające się na siebie komponenty. Wybierz jeden, aby zobaczyć piny:",
-    "hide_comp": "Ukryj komponent"
+    "multiple_components_label": "Wykryto nakładające się na siebie komponenty. Wybierz jeden, aby zobaczyć piny:"
   }
 }

@@ -1,12 +1,16 @@
 import { useEffect, useRef } from 'react';
 import { useBoardStore } from '../../../store/boardStore';
-import { X } from 'lucide-react';
+import { X, Eye, EyeOff } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function NetList({ items }: { items: string[] }) {
+  const { t } = useTranslation();
+
   const { 
     selectedNet, selectNet, boardData, isDarkMode, 
     currentSide, setCurrentSide, selectedComponents, inspectedComponents, 
-    selectComponents, setInspectedComponents, triggerFocus, highlightedPrefix, setHighlightedPrefix, partNumbers
+    selectComponents, setInspectedComponents, triggerFocus, highlightedPrefix, setHighlightedPrefix, partNumbers,
+    hiddenComponents, toggleComponentVisibility
   } = useBoardStore();
 
   const selectedNetRef = useRef<HTMLDivElement>(null);
@@ -58,14 +62,15 @@ export default function NetList({ items }: { items: string[] }) {
                     });
                   }
                   
-                  if (pinsInNet.length === 0) return <div className="text-xs opacity-50 px-2 py-1">Brak zdefiniowanych padów</div>;
+                  if (pinsInNet.length === 0) return <div className="text-xs opacity-50 px-2 py-1">{t('leftpanel.no_pads')}</div>;
 
                   return pinsInNet.sort((a, b) => a.comp.localeCompare(b.comp, undefined, { numeric: true })).map(({ comp, pin }, idx) => {
                     const isCompSelected = selectedComponents.has(comp);
                     const isCompInspected = inspectedComponents.includes(comp);
+                    const isHidden = hiddenComponents.has(comp);
                     
                     return (
-                      <button
+                      <div
                         key={`${comp}-${pin}-${idx}`}
                         onClick={(e) => {
                           const targetComp = boardData?.components[comp];
@@ -84,7 +89,9 @@ export default function NetList({ items }: { items: string[] }) {
                             }
                           }
                         }}
-                        className={`w-full flex items-center justify-between px-2 py-1 rounded text-xs transition-colors ${
+                        className={`group cursor-pointer w-full flex items-center justify-between px-2 py-1 rounded text-xs transition-colors ${
+                          isHidden ? "opacity-50" : ""
+                        } ${
                           isCompInspected
                             ? (isDarkMode ? 'bg-cyan-900/40 text-cyan-300 font-bold' : 'bg-cyan-100 text-cyan-800 font-bold')
                             : isCompSelected
@@ -92,16 +99,38 @@ export default function NetList({ items }: { items: string[] }) {
                               : (isDarkMode ? 'text-slate-400 hover:text-cyan-400 hover:bg-cyan-900/20' : 'text-slate-500 hover:text-cyan-700 hover:bg-cyan-50')
                         }`}
                       >
+                        
                         <div className="flex flex-col text-left truncate">
-                          <span className={`truncate ${isCompInspected || isCompSelected ? "font-bold" : "font-medium"}`}>{comp}</span>
+                          <span className={`truncate ${isCompInspected || isCompSelected ? "font-bold" : "font-medium"} ${isHidden ? "line-through" : ""}`}>
+                            {comp}
+                          </span>
                           {partNumbers?.[comp] && (
-                            <span className="text-[9px] opacity-60 font-mono mt-0.5">
+                            <span className="text-[9px] opacity-60 font-mono mt-0.5 truncate">
                               {partNumbers[comp]}
                             </span>
                           )}
                         </div>
-                        <span className="opacity-70 font-mono shrink-0 ml-2">Pin: {pin}</span>
-                      </button>
+                        
+                        <div className="flex items-center gap-2 shrink-0 ml-2">
+                          <span className="opacity-70 font-mono">Pin: {pin}</span>
+                          
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleComponentVisibility(comp);
+                            }}
+                            className={`p-1 -mr-1 rounded-md transition-colors ${
+                              isHidden 
+                                ? 'text-rose-500 bg-rose-500/10'
+                                : 'opacity-0 group-hover:opacity-100 hover:bg-slate-300 dark:hover:bg-slate-700'
+                            }`}
+                            title={isHidden ? t('leftpanel.show_comp') : t('leftpanel.hide_comp')}
+                          >
+                            {isHidden ? <EyeOff size={14} /> : <Eye size={14} />}
+                          </button>
+                        </div>
+                        
+                      </div>
                     );
                   });
                 })()}
