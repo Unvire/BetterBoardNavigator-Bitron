@@ -4,6 +4,70 @@ import { usePanZoom } from '../../hooks/usePanZoom';
 import { useBoardGeometry } from '../../hooks/useBoardGeometry';
 import { renderBoard } from './canvasRenderer';
 
+
+const getComponentBounds = (comp: any) => {
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+
+    if (comp.pins) {
+      Object.values(comp.pins).forEach((pin: any) => {
+        if (pin.coords) {
+          minX = Math.min(minX, pin.coords.x);
+          maxX = Math.max(maxX, pin.coords.x);
+          minY = Math.min(minY, pin.coords.y);
+          maxY = Math.max(maxY, pin.coords.y);
+        }
+      });
+    }
+
+    if (comp.coords && minX === Infinity) {
+      minX = comp.coords.x;
+      maxX = comp.coords.x;
+      minY = comp.coords.y;
+      maxY = comp.coords.y;
+    }
+
+    // Safety margin
+    if (minX === maxX) { minX -= 0.1; maxX += 0.1; }
+    if (minY === maxY) { minY -= 0.1; maxY += 0.1; }
+
+    return minX !== Infinity ? { minX, maxX, minY, maxY } : null;
+  };
+
+  const transformBounds = (
+    bounds: {minX: number, maxX: number, minY: number, maxY: number}, 
+    rotation: number, isMirrored: boolean, cx: number, cy: number) => {
+
+    const rad = (rotation * Math.PI) / 180;
+    const cos = Math.cos(rad);
+    const sin = Math.sin(rad);
+
+    const transformPoint = (x: number, y: number) => {
+      let nx = x, ny = y;
+      if (rotation !== 0) {
+        const dx = nx - cx;
+        const dy = ny - cy;
+        nx = dx * cos - dy * sin + cx;
+        ny = dx * sin + dy * cos + cy;
+      }
+      if (isMirrored) nx = cx * 2 - nx;
+      return { x: nx, y: ny };
+    };
+
+    const p1 = transformPoint(bounds.minX, bounds.minY);
+    const p2 = transformPoint(bounds.maxX, bounds.minY);
+    const p3 = transformPoint(bounds.maxX, bounds.maxY);
+    const p4 = transformPoint(bounds.minX, bounds.maxY);
+
+    return {
+      tMinX: Math.min(p1.x, p2.x, p3.x, p4.x),
+      tMaxX: Math.max(p1.x, p2.x, p3.x, p4.x),
+      tMinY: Math.min(p1.y, p2.y, p3.y, p4.y),
+      tMaxY: Math.max(p1.y, p2.y, p3.y, p4.y)
+    };
+  };
+
+
+
 function BoardCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -94,74 +158,26 @@ function BoardCanvas() {
 
   // Auto focus
   useEffect(() => {
-    if (store.componentToFocus && store.boardData) {
-      const comp = store.boardData.components[store.componentToFocus];
-      if (comp) {
-        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-        
-        // finding area from components
-        if (comp.pins) {
-          Object.values(comp.pins).forEach(pin => {
-            if (pin.coords) {
-              minX = Math.min(minX, pin.coords.x);
-              maxX = Math.max(maxX, pin.coords.x);
-              minY = Math.min(minY, pin.coords.y);
-              maxY = Math.max(maxY, pin.coords.y);
-            }
-          });
-        }
-        
-        // use component coords if above was fail
-        if (comp.coords && minX === Infinity) {
-          minX = comp.coords.x;
-          maxX = comp.coords.x;
-          minY = comp.coords.y;
-          maxY = comp.coords.y;
-        }
-        
-        // add safety margin when 0 was calculated
-        if (minX === maxX) { minX -= 0.1; maxX += 0.1; }
-        if (minY === maxY) { minY -= 0.1; maxY += 0.1; }
+    if (!store.componentToFocus || !store.boardData) return;
 
-        if (minX !== Infinity) {
-          // calculate bounding box with currently applied transformations
-          const rad = (store.rotation * Math.PI) / 180;
-          const cos = Math.cos(rad);
-          const sin = Math.sin(rad);
-
-          const transformPoint = (x: number, y: number) => {
-            let nx = x;
-            let ny = y;
-            
-
-            if (store.rotation !== 0) {
-              const dx = nx - boardCenterX;
-              const dy = ny - boardCenterY;
-              nx = dx * cos - dy * sin + boardCenterX;
-              ny = dx * sin + dy * cos + boardCenterY;
-            }
-
-            if (isMirrored) nx = boardCenterX * 2 - nx;
-            
-            return { x: nx, y: ny };
-          };
-
-          const p1 = transformPoint(minX, minY);
-          const p2 = transformPoint(maxX, minY);
-          const p3 = transformPoint(maxX, maxY);
-          const p4 = transformPoint(minX, maxY);
-
-          const tMinX = Math.min(p1.x, p2.x, p3.x, p4.x);
-          const tMaxX = Math.max(p1.x, p2.x, p3.x, p4.x);
-          const tMinY = Math.min(p1.y, p2.y, p3.y, p4.y);
-          const tMaxY = Math.max(p1.y, p2.y, p3.y, p4.y);
-
-          focusOnBoundingBox(tMinX, tMaxX, tMinY, tMaxY);
-        }
+    const comp = store.boardData.components[store.componentToFocus];
+    if (comp) {
+      const bounds = getComponentBounds(comp);
+      
+      if (bounds) {
+        const { tMinX, tMaxX, tMinY, tMaxY } = transformBounds(
+          bounds, 
+          store.rotation, 
+          isMirrored, 
+          boardCenterX, 
+          boardCenterY
+        );
+        focusOnBoundingBox(tMinX, tMaxX, tMinY, tMaxY);
       }
-
-      store.clearFocus();
     }
+
+    store.clearFocus();
+    
   }, [store.componentToFocus, store.boardData, focusOnBoundingBox, isMirrored, boardCenterX, boardCenterY, store.rotation]);
   
 
