@@ -34,6 +34,7 @@
     "bom_load_file": "Load BOM  file (.json) with the button in TopBar.",
     "no_data": "No data",
     "hidden_label": "Hidden",
+    "expand": "Expand",
     "bom_quantity": "Quantity:",
     "hide_comp": "Hide component",
     "show_comp": "Show component",

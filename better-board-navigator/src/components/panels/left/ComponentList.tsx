@@ -114,18 +114,34 @@ export default function ComponentList({ visibleItems, hiddenItems }: ComponentLi
       </ul>
 
       {hiddenItems.length > 0 && (
-        <div className="mt-4 pt-2 border-t border-inherit shrink-0">
+        <div className={`sticky -bottom-2 z-10 -mx-2 px-2 pb-2 mt-4 pt-2 border-t border-inherit ${
+          isDarkMode ? 'bg-slate-900/95' : 'bg-white/95'
+        } backdrop-blur-md shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.05)]`}>
+          
           <details className="group/details">
-            <summary className="text-xs font-bold opacity-60 cursor-pointer p-2 hover:opacity-100 flex items-center justify-between outline-none">
-              <span>{t('leftpanel.hidden_label')}: ({hiddenItems.length})</span>
+            <summary className={`text-xs font-bold cursor-pointer p-2.5 rounded-lg flex items-center justify-between outline-none transition-colors border shadow-sm ${
+              isDarkMode 
+                ? 'bg-slate-800/80 hover:bg-slate-700 text-slate-200 border-slate-700' 
+                : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
+            }`}>
+              <div className="flex items-center gap-2">
+                <EyeOff size={14} className="text-rose-500" />
+                <span>{t('leftpanel.hidden_label')}: ({hiddenItems.length})</span>
+              </div>
+              <span className="text-[10px] uppercase tracking-wider opacity-50 group-open/details:hidden">
+                {t('leftpanel.expand')}
+              </span>
             </summary>
-            <ul className="mt-1 space-y-0.5">
+            
+            <ul className="mt-2 space-y-0.5 max-h-48 overflow-y-auto pr-1">
               {hiddenItems.map(compName => renderItem(compName, true))}
             </ul>
           </details>
+          
         </div>
       )}
 
     </div>
   );
 }
+
