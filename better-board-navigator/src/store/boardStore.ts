@@ -64,6 +64,10 @@ interface BoardState {
   hiddenComponents: Set<string>;
   toggleHideUnassignedPNs: () => void;
   toggleComponentVisibility: (compName: string) => void;
+
+  // --- MODALS ---
+  isHelpOpen: boolean;
+  toggleHelp: () => void;
 }
 
 export const useBoardStore = create<BoardState>((set) => ({
@@ -93,6 +97,8 @@ export const useBoardStore = create<BoardState>((set) => ({
   highlightedPartNumber: null,
   hideUnassignedPNs: false,
   hiddenComponents: new Set<string>(),
+
+  isHelpOpen: false,
 
 
   setWorkerStatus: (status) => set({ workerStatus: status }), 
@@ -192,4 +198,6 @@ export const useBoardStore = create<BoardState>((set) => ({
       inspectedComponents: newInspected
     };
   }),
+
+  toggleHelp: () => set((state) => ({ isHelpOpen: !state.isHelpOpen })),
 }));

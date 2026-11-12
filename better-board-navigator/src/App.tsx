@@ -7,6 +7,7 @@ import RightPanel from './components/panels/right/RightPanel';
 import { Layers, Cpu, AlertTriangle } from 'lucide-react';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useTranslation } from 'react-i18next';
+import HelpModal from './components/modals/HelpModal';
 
 
 function App() {
@@ -91,6 +92,9 @@ function App() {
           </div>
         </div>
       )}
+
+      {/* LAYER 4: MODALS */}
+      <HelpModal />
 
     </div>
   );

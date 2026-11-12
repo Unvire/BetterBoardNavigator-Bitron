@@ -16,7 +16,6 @@
     "load_file": "Wczytaj schemat",
     "language": "Język",
     "theme": "Zmień motyw",
-    "settings": "Ustawienia",
     "help": "Pomoc",
     "toggle_outlines": "Pokaż/Ukryj obrys płytki",
     "load_bom": "Wczytaj listę Part Number (plik .json)",
@@ -53,5 +52,29 @@
     "no_pins": "Brak zdefiniowanych pinów",    
     "multiple_components": "Wiele elementów",
     "multiple_components_label": "Wykryto nakładające się na siebie komponenty. Wybierz jeden, aby zobaczyć piny:"
+  },
+  "help": {
+    "title": "Pomoc i Skróty Klawiszowe",
+    "mouse_controls": "Sterowanie Myszką",
+    "keyboard_shortcuts": "Skróty Klawiszowe",
+    "keys": {
+      "left_click": "Lewy Klik",
+      "drag": "Kliknij i przeciągnij (LPM)",
+      "scroll": "Rolka myszy (Scroll)"
+    },
+    "desc": {
+      "inspect": "Zaznacz / Zbadaj komponent",
+      "multiselect": "Zaznaczanie wielu elementów",
+      "pan": "Przesuwanie widoku (Pan)",
+      "zoom": "Przybliżanie / Oddalanie (Zoom)",
+      "load_cad": "Wczytaj plik CAD",
+      "load_bom": "Wczytaj listę BOM",
+      "switch_side": "Zmień stronę (Top/Bottom)",
+      "flip": "Odbicie lustrzane",
+      "rotate_cw": "Obróć w prawo",
+      "rotate_ccw": "Obróć w lewo",
+      "labels": "Pokaż/ukryj etykiety",
+      "clear_selection": "Wyczyść zaznaczenie / Zamknij panele"
+    }
   }
 }

@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import { useBoardStore } from '../../store/boardStore';
 import { 
-  Upload, FlipHorizontal, RotateCw, RotateCcw, Settings2, HelpCircle, Database,
+  Upload, FlipHorizontal, RotateCw, RotateCcw, HelpCircle, Database,
   Layers, PanelLeftClose, PanelLeftOpen, Sun, Moon, Type, Globe, Loader2, SquareDashed,
   EyeOff, Eye
 } from 'lucide-react';
@@ -176,11 +176,8 @@ export default function TopBar() {
         <button onClick={toggleDarkMode} className={actionBtnClass} title={`${t('topbar.theme')} [T]`}>
           {isDarkMode ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} />}
         </button>
-        <button className={actionBtnClass} title={`${t('topbar.settings')}`}>
-          <Settings2 size={20} />
-        </button>
-        <button className={actionBtnClass} title={`${t('topbar.help')}`}>
-          <HelpCircle size={20} />
+        <button onClick={useBoardStore(s => s.toggleHelp)} className={actionBtnClass} title={`${t('topbar.help')}`}>
+          <HelpCircle size={20} className={useBoardStore(s => s.isHelpOpen) ? "text-cyan-500" : ""} />
         </button>
       </div>
 
