@@ -49,7 +49,8 @@ const drawLabels = (ctx: CanvasRenderingContext2D, options: RenderOptions) => {
   const { 
     scale, offset, rotation, boardCenterX, boardCenterY,
     isDarkMode, componentHitboxes, selectedComponents, 
-    inspectedComponents, highlightedPrefix, showLabels, isMirrored 
+    inspectedComponents, highlightedPrefix, showLabels, isMirrored,
+    partNumbers, highlightedPartNumber
   } = options;
   
   const canvasWidth = ctx.canvas.width;
@@ -105,7 +106,12 @@ const drawLabels = (ctx: CanvasRenderingContext2D, options: RenderOptions) => {
       }
     }
     const isPrefixHighlighted = highlightedPrefix === compPrefix;
-    const isHighlighted = isSelected || isInspected || isPrefixHighlighted;
+    const isPNHighlighted = 
+      highlightedPartNumber !== null && 
+      partNumbers !== null && 
+      partNumbers[compName] === highlightedPartNumber;
+
+    const isHighlighted = isSelected || isInspected || isPrefixHighlighted || isPNHighlighted;
 
     const compWidth = box.maxX - box.minX;
     const compHeight = box.maxY - box.minY;
@@ -125,7 +131,7 @@ const drawLabels = (ctx: CanvasRenderingContext2D, options: RenderOptions) => {
     let shouldDraw = false;
 
     if (showLabels && visualPixelSize > 8) shouldDraw = true;
-    else if (isSelected || isInspected || isPrefixHighlighted) {
+    else if (isHighlighted) {
       const approxTextWidth = compName.length * (targetWorldFontSize * charWidthRatio);
       const maxAllowedTextWidth = Math.max(compWidth, compHeight) * 1.5; 
 
@@ -174,7 +180,8 @@ export const renderBoard = (options: RenderOptions) => {
   const { 
     ctx, boardData, scale, offset, isMirrored, boardCenterX, boardCenterY, rotation,
     isDarkMode, showOutlines, currentSide, 
-    selectedComponents, inspectedComponents, selectedNet, highlightedPrefix
+    selectedComponents, inspectedComponents, selectedNet, highlightedPrefix, 
+    partNumbers, highlightedPartNumber
   } = options;
 
   const canvas = ctx.canvas;
@@ -232,9 +239,9 @@ export const renderBoard = (options: RenderOptions) => {
     const isPrefixHighlighted = highlightedPrefix === compPrefix;
 
     const isPNHighlighted = 
-      options.highlightedPartNumber !== null && 
-      options.partNumbers !== null && 
-      options.partNumbers[compName] === options.highlightedPartNumber;
+      highlightedPartNumber !== null && 
+      partNumbers !== null && 
+      partNumbers[compName] === highlightedPartNumber;
       
     const isCyanHighlighted = isInspected || isPrefixHighlighted || isPNHighlighted;
     
