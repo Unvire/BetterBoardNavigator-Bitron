@@ -112,7 +112,7 @@ export default function NetList({ items }: { items: string[] }) {
                         </div>
                         
                         <div className="flex items-center gap-2 shrink-0 ml-2">
-                          <span className="opacity-70 font-mono">Pin: {pin}</span>
+                          <span className="opacity-70 font-mono">{t('leftpanel.pin')}: {pin}</span>
                           
                           <button
                             onClick={(e) => {

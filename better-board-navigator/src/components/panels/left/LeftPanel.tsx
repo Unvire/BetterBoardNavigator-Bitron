@@ -104,7 +104,7 @@ export default function LeftPanel() {
               ? 'text-cyan-500 border-b-2 border-cyan-500' 
               : 'opacity-60 hover:opacity-100'}`}
           >
-          <Database size={16}/> {t('leftpanel.tab_groups')}
+          <Database size={16}/> {t('leftpanel.tab_bom')}
         </button>
       </div>
 

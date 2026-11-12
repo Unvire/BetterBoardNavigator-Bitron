@@ -35,7 +35,10 @@
     "expand": "Rozwiń",
     "hide_comp": "Ukryj komponent",
     "show_comp": "Pokaż komponent",
-    "no_pads": "Brak zdefiniowanych padów"
+    "no_pads": "Brak zdefiniowanych padów",
+    "deselect_group": "Odznacz grupę",
+    "pin": "Pin",
+    "tab_bom": "BOM"
   },
   "rightpanel": {
     "selected_count": "Zaznaczono: {{count}}",
@@ -51,7 +54,9 @@
     "not_connected": "N/C",
     "no_pins": "Brak zdefiniowanych pinów",    
     "multiple_components": "Wiele elementów",
-    "multiple_components_label": "Wykryto nakładające się na siebie komponenty. Wybierz jeden, aby zobaczyć piny:"
+    "multiple_components_label": "Wykryto nakładające się na siebie komponenty. Wybierz jeden, aby zobaczyć piny:",
+    "highlight_pn": "Podświetl wszystkie komponenty o tym kodzie",
+    "pn_prefix": "PN:"
   },
   "help": {
     "title": "Pomoc i Skróty Klawiszowe",

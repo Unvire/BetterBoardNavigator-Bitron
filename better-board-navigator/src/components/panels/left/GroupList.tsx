@@ -61,7 +61,7 @@ export default function GroupList({ searchQuery }: { searchQuery: string }) {
               <button 
                 onClick={(e) => { e.stopPropagation(); setHighlightedPrefix(null); }}
                 className="opacity-60 hover:opacity-100 p-0.5 rounded-full hover:bg-cyan-500/20 ml-2 shrink-0"
-                title="Odznacz grupę"
+                title={t('leftpanel.deselect_group')}
               >
                 <X size={14}/>
               </button>
