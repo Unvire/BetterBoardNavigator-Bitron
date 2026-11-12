@@ -37,7 +37,7 @@ export default function InspectorView({ compName, isMultiSelected }: { compName:
           {partNumbers?.[compName] && (
             <button 
               onClick={() => setHighlightedPartNumber(partNumbers[compName])}
-              className="font-mono mt-1 text-left text-blue-600 dark:text-blue-400 hover:text-cyan-500 transition-colors cursor-pointer w-fit"
+              className="font-mono mt-1.5 px-2 py-1 rounded bg-slate-200/70 dark:bg-slate-800 text-left text-sm font-bold text-blue-600 dark:text-blue-400 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors cursor-pointer w-fit"
               title="Podświetl wszystkie komponenty o tym kodzie"
             >
               PN: {partNumbers[compName]}
