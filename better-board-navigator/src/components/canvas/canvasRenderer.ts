@@ -230,9 +230,16 @@ export const renderBoard = (options: RenderOptions) => {
     const match = compName.match(/^[a-zA-Z]+/);
     const compPrefix = match ? match[0].toUpperCase() : '#';
     const isPrefixHighlighted = highlightedPrefix === compPrefix;
+
+    const isPNHighlighted = 
+      options.highlightedPartNumber !== null && 
+      options.partNumbers !== null && 
+      options.partNumbers[compName] === options.highlightedPartNumber;
+      
+    const isCyanHighlighted = isInspected || isPrefixHighlighted || isPNHighlighted;
     
     if (isOnCurrentSide && comp.shapeData && !hasSinglePin) {
-      if (isInspected || isPrefixHighlighted) inspectedShapes.push(comp.shapeData);
+      if (isCyanHighlighted) inspectedShapes.push(comp.shapeData); 
       else if (isSelected) selectedShapes.push(comp.shapeData);
       else bodyShapes.push(comp.shapeData);
     }
@@ -241,7 +248,7 @@ export const renderBoard = (options: RenderOptions) => {
       Object.values(comp.pins).forEach(pin => {
         if (pin.shapeData) {
           if (selectedNet && pin.net === selectedNet) netShapes.push(pin.shapeData);
-          else if (isInspected || isPrefixHighlighted) inspectedShapes.push(pin.shapeData);
+          else if (isCyanHighlighted) inspectedShapes.push(pin.shapeData);
           else if (isSelected) selectedShapes.push(pin.shapeData);
           else if (isTH) thtPads.push(pin.shapeData);
           else smtPads.push(pin.shapeData);

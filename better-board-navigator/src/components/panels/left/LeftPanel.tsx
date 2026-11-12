@@ -9,7 +9,7 @@ import PartNumberList from './PartNumberList';
 
 export default function LeftPanel() {
   const { t } = useTranslation();
-  const { boardData, isDarkMode, isLeftPanelOpen } = useBoardStore();
+  const { boardData, isDarkMode, isLeftPanelOpen, hideUnassignedPNs, hiddenComponents, partNumbers } = useBoardStore();
   const [activeTab, setActiveTab] = useState<'components' | 'nets' | 'groups' | 'bom'>('components');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -21,7 +21,9 @@ export default function LeftPanel() {
   const availableNets = useMemo(() => {
     if (!boardData) return [];
     const nets = new Set<string>();
-    Object.values(boardData.components).forEach(comp => {
+    Object.entries(boardData.components).forEach(([compName, comp]) => {
+      if (hideUnassignedPNs && (!partNumbers || !partNumbers[compName])) return;
+      
       if (comp.pins) {
         Object.values(comp.pins).forEach(pin => {
           if (pin.net) nets.add(pin.net);
@@ -29,16 +31,32 @@ export default function LeftPanel() {
       }
     });
     return Array.from(nets).sort();
-  }, [boardData]);
+  }, [boardData, hideUnassignedPNs, partNumbers]);
 
 
-  const filteredComponents = useMemo(() => {
-    if (!boardData) return [];
+  const { visibleComponents, manuallyHiddenComponents } = useMemo(() => {
+    if (!boardData) return { visibleComponents: [], manuallyHiddenComponents: [] };
     const q = searchQuery.toLowerCase();
-    return Object.keys(boardData.components)
-      .filter(name => name.toLowerCase().includes(q))
-      .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
-  }, [boardData, searchQuery]);
+    
+    const visible: string[] = [];
+    const hidden: string[] = [];
+
+    Object.keys(boardData.components).forEach(name => {
+      if (!name.toLowerCase().includes(q)) return;
+      
+      if (hideUnassignedPNs && (!partNumbers || !partNumbers[name])) return;
+      
+      if (hiddenComponents.has(name)) hidden.push(name);
+      else visible.push(name);
+    });
+
+
+    const sortFn = (a: string, b: string) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+    return {
+      visibleComponents: visible.sort(sortFn),
+      manuallyHiddenComponents: hidden.sort(sortFn)
+    };
+  }, [boardData, searchQuery, hideUnassignedPNs, hiddenComponents, partNumbers]);
 
 
   const filteredNets = useMemo(() => {
@@ -110,7 +128,7 @@ export default function LeftPanel() {
 
       {/* Lists (components) */}
       <div className="flex-1 overflow-y-auto p-2">
-        {activeTab === 'components' && <ComponentList items={filteredComponents} />}
+        {activeTab === 'components' && <ComponentList visibleItems={visibleComponents} hiddenItems={manuallyHiddenComponents} />}
         {activeTab === 'nets' && <NetList items={filteredNets} />}
         {activeTab === 'groups' && <GroupList searchQuery={searchQuery} />}
         {activeTab === 'bom' && <PartNumberList searchQuery={searchQuery} />}

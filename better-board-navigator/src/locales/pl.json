@@ -31,6 +31,7 @@
     "bom": "PN",
     "bom_load_file": "Wczytaj plik BOM (.json) z paska narzędzi.",
     "no_data": "Brak wyników",
+    "hidden_label": "Ukryte",
     "bom_quantity": "Ilość:",
     "hide_comp": "Ukryj komponent",
     "show_comp": "Pokaż komponent",

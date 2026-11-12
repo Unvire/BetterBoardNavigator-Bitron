@@ -12,7 +12,7 @@ export default function PartNumberList({ searchQuery }: PartNumberListProps) {
 
   const { 
     partNumbers, isDarkMode, highlightedPartNumber, setHighlightedPartNumber,
-    hiddenComponents, toggleComponentVisibility
+    hiddenComponents, toggleComponentVisibility, setInspectedComponents, triggerFocus
   } = useBoardStore();
 
   // [{ pn: "PN1", comps: ["R1", "R2"] }]
@@ -82,9 +82,18 @@ export default function PartNumberList({ searchQuery }: PartNumberListProps) {
                   const isHidden = hiddenComponents.has(comp);
                   return (
                     <div key={comp} className="group flex items-center justify-between px-2 py-1 transition-all rounded hover:bg-slate-200/50 dark:hover:bg-slate-800/50">
-                      <span className={`text-xs font-medium ${isHidden ? "opacity-50 line-through" : "opacity-75"}`}>
+                      
+                      <span 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setInspectedComponents([comp]);
+                          triggerFocus(comp);
+                        }}
+                        className={`text-xs font-semibold cursor-pointer hover:text-cyan-500 transition-colors ${isHidden ? "opacity-50 line-through" : "opacity-75"}`}
+                      >
                         {comp}
                       </span>
+                      
                       <button
                         onClick={(e) => {
                           e.stopPropagation();

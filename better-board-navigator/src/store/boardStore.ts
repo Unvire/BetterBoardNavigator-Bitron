@@ -161,9 +161,10 @@ export const useBoardStore = create<BoardState>((set) => ({
 
   toggleLabels: () => set((state) => ({ showLabels: !state.showLabels })),
 
-  setPartNumbers: (data) => set({ 
-    partNumbers: data 
-  }),
+  setPartNumbers: (data) => set((state) => ({ 
+    partNumbers: data,
+    hideUnassignedPNs: data !== null ? true : state.hideUnassignedPNs
+  })),
 
   setHighlightedPartNumber: (pn) => set({ 
     highlightedPartNumber: pn,
