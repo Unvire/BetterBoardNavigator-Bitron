@@ -56,6 +56,10 @@ export function useBoardWorker() {
     if (workerRef.current && (status === 'idle' || status === 'error')) {
       setStatus('loading_pyodide');
       setError(null);
+
+      const store = useBoardStore.getState();
+      if (store.partNumbers) store.setPartNumbers(null);
+      if (store.highlightedPartNumber) store.setHighlightedPartNumber(null);
       
       workerRef.current.postMessage({ 
         type: 'PROCESS_FILES', 
