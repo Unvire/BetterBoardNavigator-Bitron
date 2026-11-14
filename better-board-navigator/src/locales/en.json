@@ -88,7 +88,7 @@
     }
   },
   "traceability": {
-    "title": "History of serial number",
+    "title": "History of a serial number",
     "sn_placeholder": "Enter serial number...",
     "search_btn": "Search",
     "missing_api_root": "Missing TRACEABILITY_API_ROOT configuration in config.json!",
