@@ -11,7 +11,8 @@ export default function TraceabilityModal() {
 
   const { 
     isTraceabilityOpen, toggleTraceability, isDarkMode, 
-    traceabilityApiRoot, setFailedComponents, selectComponents, setInspectedComponents, triggerFocus 
+    traceabilityApiRoot, selectComponents, setInspectedComponents, triggerFocus,
+    boardData, clearSelection
   } = useBoardStore();
   
   const [serialNumber, setSerialNumber] = useState('');
@@ -107,12 +108,26 @@ export default function TraceabilityModal() {
     const parsedComps = traceabilityParser.parse(failedItems);
 
     if (parsedComps.length > 0) {
-      setFailedComponents(parsedComps); 
-      selectComponents(parsedComps, true); 
+      let finalComps = parsedComps;
+      if (boardData) {
+        const prefixCounts: Record<string, number> = {};
+        Object.keys(boardData.components).forEach(name => {
+          const match = name.match(/^[a-zA-Z]+/);
+          if (match) {
+            const p = match[0].toUpperCase();
+            prefixCounts[p] = (prefixCounts[p] || 0) + 1;
+          }
+        });
+        
+        const mostCommonPrefix = Object.entries(prefixCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'TP';
+        finalComps = parsedComps.map(c => /^\d+$/.test(c) ? `${mostCommonPrefix}${c}` : c);
+      }
+      clearSelection();
+      selectComponents(finalComps, true);
       
-      if (parsedComps.length === 1) {
-        setInspectedComponents([parsedComps[0]]);
-        triggerFocus(parsedComps[0]);
+      if (finalComps.length === 1) {
+        setInspectedComponents([finalComps[0]]);
+        triggerFocus(finalComps[0]);
       }
       toggleTraceability(); 
     } else {

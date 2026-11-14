@@ -23,8 +23,7 @@ export interface RenderOptions {
   partNumbers: Record<string, BOMItem> | null;
   highlightedPartNumber: string | null;
   hideUnassignedPNs: boolean;
-  hiddenComponents: Set<string>;
-  failedComponents?: Set<string>;
+  hiddenComponents: Set<string>
 }
 
 
@@ -113,10 +112,8 @@ const drawLabels = (ctx: CanvasRenderingContext2D, options: RenderOptions) => {
       partNumbers !== null && 
       partNumbers[compName]?.partNumber === highlightedPartNumber;
 
-    const isFailed = options.failedComponents?.has(compName) ?? false;
 
-
-    const isHighlighted = isSelected || isInspected || isPrefixHighlighted || isPNHighlighted || isFailed;
+    const isHighlighted = isSelected || isInspected || isPrefixHighlighted || isPNHighlighted;
 
     const compWidth = box.maxX - box.minX;
     const compHeight = box.maxY - box.minY;
@@ -228,7 +225,6 @@ export const renderBoard = (options: RenderOptions) => {
   const selectedShapes: ShapeData[] = [];
   const netShapes: ShapeData[] = [];
   const inspectedShapes: ShapeData[] = [];
-  const failedShapes: ShapeData[] = [];
 
   Object.entries(boardData.components).forEach(([compName, comp]) => {
     if (options.hiddenComponents.has(compName)) return;
@@ -250,12 +246,9 @@ export const renderBoard = (options: RenderOptions) => {
       partNumbers[compName]?.partNumber === highlightedPartNumber;
       
     const isCyanHighlighted = isInspected || isPrefixHighlighted || isPNHighlighted;
-
-    const isFailed = options.failedComponents?.has(compName) ?? false;
     
     if (isOnCurrentSide && comp.shapeData && !hasSinglePin) {
-      if (isFailed) failedShapes.push(comp.shapeData);
-      else if (isCyanHighlighted) inspectedShapes.push(comp.shapeData); 
+      if (isCyanHighlighted) inspectedShapes.push(comp.shapeData); 
       else if (isSelected) selectedShapes.push(comp.shapeData);
       else bodyShapes.push(comp.shapeData);
     }
@@ -263,8 +256,7 @@ export const renderBoard = (options: RenderOptions) => {
     if ((isOnCurrentSide || isTH) && comp.pins) {
       Object.values(comp.pins).forEach(pin => {
         if (pin.shapeData) {
-          if (isFailed) failedShapes.push(pin.shapeData);
-          else if (selectedNet && pin.net === selectedNet) netShapes.push(pin.shapeData);
+          if (selectedNet && pin.net === selectedNet) netShapes.push(pin.shapeData);
           else if (isCyanHighlighted) inspectedShapes.push(pin.shapeData);
           else if (isSelected) selectedShapes.push(pin.shapeData);
           else if (isTH) thtPads.push(pin.shapeData);
@@ -292,7 +284,6 @@ export const renderBoard = (options: RenderOptions) => {
   drawGroup(selectedShapes, baseLineWidth * 1.5, isDarkMode ? '#f43f5e' : '#e11d48', isDarkMode ? 'rgba(244, 63, 94, 0.4)' : 'rgba(225, 29, 72, 0.4)');
   drawGroup(inspectedShapes, baseLineWidth * 2, isDarkMode ? '#22d3ee' : '#0891b2', isDarkMode ? 'rgba(34, 211, 238, 0.4)' : 'rgba(8, 145, 178, 0.4)');
   drawGroup(netShapes, baseLineWidth * 2, isDarkMode ? '#d946ef' : '#c026d3', isDarkMode ? 'rgba(217, 70, 239, 0.5)' : 'rgba(192, 38, 211, 0.5)');
-  drawGroup(failedShapes, baseLineWidth * 1.5, isDarkMode ? '#f43f5e' : '#e11d48', isDarkMode ? 'rgba(244, 63, 94, 0.4)' : 'rgba(225, 29, 72, 0.4)');
   drawLabels(ctx, options);
 
   ctx.restore(); 

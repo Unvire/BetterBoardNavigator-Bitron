@@ -80,10 +80,6 @@ interface BoardState {
   toggleTraceability: () => void;
   traceabilityApiRoot: string | null;
   setTraceabilityApiRoot: (url: string) => void;
-  
-  failedComponents: Set<string>;
-  setFailedComponents: (comps: string[]) => void;
-  clearFailedComponents: () => void;
 }
 
 export const useBoardStore = create<BoardState>((set) => ({
@@ -118,7 +114,6 @@ export const useBoardStore = create<BoardState>((set) => ({
 
   isTraceabilityOpen: false,
   traceabilityApiRoot: null,
-  failedComponents: new Set(),
 
 
   setWorkerStatus: (status) => set({ workerStatus: status }), 
@@ -132,8 +127,7 @@ export const useBoardStore = create<BoardState>((set) => ({
     selectedNet: null,
     highlightedPrefix: null,
     componentToFocus: null,
-    currentSide: 'T',
-    failedComponents: new Set()
+    currentSide: 'T'
   }),
 
   toggleLeftPanel: () => set((state) => ({ isLeftPanelOpen: !state.isLeftPanelOpen })),
@@ -172,8 +166,7 @@ export const useBoardStore = create<BoardState>((set) => ({
     selectedNet: null,
     inspectedComponents: [],
     highlightedPrefix: null,
-    highlightedPartNumber: null,
-    failedComponents: new Set()
+    highlightedPartNumber: null
   }),
 
   selectNet: (net) => set({ 
@@ -234,28 +227,4 @@ export const useBoardStore = create<BoardState>((set) => ({
 
   toggleTraceability: () => set((state) => ({ isTraceabilityOpen: !state.isTraceabilityOpen })),
   setTraceabilityApiRoot: (url) => set({ traceabilityApiRoot: url }),
-  clearFailedComponents: () => set({ failedComponents: new Set() }),
-
-  setFailedComponents: (parsedComps: string[]) => set((state) => {
-    if (!state.boardData) return { failedComponents: new Set(parsedComps) };
-
-    // searching most frequent prefix and assumin it is a testpoint prefix
-    const prefixCounts: Record<string, number> = {};
-    Object.keys(state.boardData.components).forEach(name => {
-      const match = name.match(/^[a-zA-Z]+/);
-      if (match) {
-        const p = match[0].toUpperCase();
-        prefixCounts[p] = (prefixCounts[p] || 0) + 1;
-      }
-    });
-    
-    const mostCommonPrefix = Object.entries(prefixCounts)
-      .sort((a, b) => b[1] - a[1])[0]?.[0] || 'TP';
-
-    const finalComps = parsedComps.map(c => 
-      /^\d+$/.test(c) ? `${mostCommonPrefix}${c}` : c
-    );
-
-    return { failedComponents: new Set(finalComps) };
-  }),
 }));
