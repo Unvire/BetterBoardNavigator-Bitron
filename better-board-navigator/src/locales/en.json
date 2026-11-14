@@ -103,6 +103,8 @@
     "table_main_status": "Status",
     "table_main_date": "Date",
     "table_main_code": "Code",
-    "table_main_phase": "Phase"
+    "table_main_phase": "Phase",
+    "filter_placeholder": "Filter results...",
+    "no_filter_results": "No results matching the filter."
   }
 }

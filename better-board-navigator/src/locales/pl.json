@@ -101,7 +101,8 @@
     "table_main_status": "Status",
     "table_main_date": "Data",
     "table_main_code": "Kod",
-    "table_main_phase": "Faza"
-    
+    "table_main_phase": "Faza",
+    "filter_placeholder": "Filtruj wyniki...",
+    "no_filter_results": "Brak wyników pasujących do filtra."
   }
 }
