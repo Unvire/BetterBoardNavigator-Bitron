@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useBoardStore } from '../../store/boardStore';
-import { X, Search, Loader2, AlertTriangle, ChevronRight, Activity, FileJson, Filter } from 'lucide-react';
+import { X, Search, Loader2, AlertTriangle, ChevronRight, Activity, Filter } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { traceabilityParser } from '../../utils/traceabilityParser';
 
@@ -121,32 +121,6 @@ export default function TraceabilityModal() {
   };
 
 
-
-  /////////////////////////////
-  const handleLoadMockData = async () => {
-    setIsLoading(true);
-    setHistoryData([]);
-    setExpandedRowId(null);
-
-    try {
-      const response = await fetch('/mock-nexyM-history.json');
-      if (!response.ok) throw new Error('Nie znaleziono pliku');
-      const data = await response.json();
-      const history = data?.payload?.history || (Array.isArray(data) ? data : []);
-      
-      if (history.length === 0) {
-        alert(t('traceability.mock_empty', 'Plik JSON jest pusty.'));
-        return;
-      }
-      setHistoryData(processApiData(history));
-    } catch (err) {
-      alert(t('traceability.error_parsing_mock', 'Błąd podczas wczytywania lokalnego JSONa.'));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  //////////////////////////
-
   if (!isTraceabilityOpen) return null;
 
 
@@ -188,7 +162,7 @@ export default function TraceabilityModal() {
         {/* TOOLBAR */}
         <div className="p-4 border-b border-slate-200 dark:border-slate-700 shrink-0 flex flex-col md:flex-row justify-between gap-4 bg-inherit z-20">
           
-          {/* LEWA STRONA */}
+          {/* LEFT */}
           <div className="flex w-full md:w-auto gap-2">
             <input 
               type="text" 
@@ -210,7 +184,7 @@ export default function TraceabilityModal() {
             </button>
           </div>
 
-          {/* PRAWA STRONA */}
+          {/* RIGHT */}
           <div className="flex w-full md:w-auto gap-2">
             <div className="relative flex-1 md:w-56">
               <Filter size={16} className="absolute left-3 top-1/2 transform -translate-y-1/2 opacity-40" />
@@ -228,21 +202,10 @@ export default function TraceabilityModal() {
               />
             </div>
 
-            <button 
-              onClick={handleLoadMockData}
-              disabled={isLoading}
-              className={`px-4 py-2.5 rounded-lg font-bold flex items-center justify-center gap-2 transition-colors border ${
-                isDarkMode ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-400 hover:text-slate-200' : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-600'
-              } disabled:opacity-50 shrink-0`}
-              title={t('traceability.load_mock_tooltip', 'Wczytaj plik mock-history.json (Dev)')}
-            >
-              <FileJson size={18} />
-            </button>
           </div>
-
         </div>
 
-        {/* WYNIKI */}
+        {/* RESULTS */}
         <div className="flex-1 overflow-y-auto relative bg-inherit">
           {!traceabilityApiRoot && historyData.length === 0 && (
              <div className="m-5 p-4 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 rounded-lg flex items-center gap-3">
