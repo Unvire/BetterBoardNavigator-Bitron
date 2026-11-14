@@ -8,6 +8,7 @@ import { Layers, Cpu, AlertTriangle } from 'lucide-react';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useTranslation } from 'react-i18next';
 import HelpModal from './components/modals/HelpModal';
+import TraceabilityModal from './components/modals/TraceabilityModal';
 
 
 function App() {
@@ -15,11 +16,24 @@ function App() {
   
   const { 
     boardData, isDarkMode,
-    workerStatus, workerError
+    workerStatus, workerError,
+    setTraceabilityApiRoot
   } = useBoardStore();
 
 
   useKeyboardShortcuts();
+
+
+  useEffect(() => {
+    fetch('./config.json')
+      .then(res => res.json())
+      .then(data => {
+        if (data.TRACEABILITY_API_ROOT) {
+          setTraceabilityApiRoot(data.TRACEABILITY_API_ROOT);
+        }
+      })
+      .catch(err => console.warn('public/config.json missing or parsing error. Traceability module is not working.', err));
+  }, [setTraceabilityApiRoot]);
 
 
   useEffect(() => {
@@ -95,6 +109,7 @@ function App() {
 
       {/* LAYER 4: MODALS */}
       <HelpModal />
+      <TraceabilityModal />
 
     </div>
   );

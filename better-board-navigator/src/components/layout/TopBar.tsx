@@ -3,7 +3,7 @@ import { useBoardStore } from '../../store/boardStore';
 import { 
   Upload, FlipHorizontal, RotateCw, RotateCcw, HelpCircle, Database,
   Layers, PanelLeftClose, PanelLeftOpen, Sun, Moon, Type, Loader2, SquareDashed,
-  EyeOff, Eye
+  EyeOff, Eye, Activity
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useBoardWorker } from '../../hooks/useBoardWorker';
@@ -26,8 +26,8 @@ export default function TopBar() {
     partNumbers,
     hideUnassignedPNs,
     toggleHideUnassignedPNs,
-    isHelpOpen,
-    toggleHelp
+    isHelpOpen, toggleHelp,
+    toggleTraceability, isTraceabilityOpen
   } = useBoardStore();
 
 
@@ -176,6 +176,16 @@ export default function TopBar() {
           }
         </button>
         
+        <div className="w-px h-6 bg-slate-300 dark:bg-slate-600 mx-2"></div>
+        
+        <button 
+          onClick={toggleTraceability} 
+          className={actionBtnClass} 
+          title={t('topbar.traceability')}
+        >
+          <Activity size={20} className={isTraceabilityOpen ? "text-rose-500" : "text-rose-400 opacity-80"} />
+        </button>
+
         <div className="w-px h-6 bg-slate-300 dark:bg-slate-600 mx-2"></div>
         
         <LanguageSelector actionBtnClass={actionBtnClass} />

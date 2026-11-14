@@ -24,7 +24,8 @@
     "load_bom": "Load Part Number file (.json)",
     "hide_comps_no_bom": "Hide components without assigned Part Number",
     "hide_comp": "Hide component",
-    "show_comp": "Show component"
+    "show_comp": "Show component",
+    "traceability": "Board History"
   },
   "leftpanel": {
     "tab_components": "Comp.",
@@ -85,5 +86,19 @@
       "labels": "Toggle component labels",
       "clear_selection": "Clear selection / Close panels"
     }
+  },
+  "traceability": {
+    "title": "Historia numeru seryjnego",
+    "sn_placeholder": "Wpisz numer seryjny...",
+    "search_btn": "Szukaj",
+    "missing_api_root": "Brak konfiguracji TRACEABILITY_API_ROOT w pliku config.json!",
+    "measures_title": "Szczegóły pomiarów",
+    "show_on_board": "Pokaż błędy na płytce",
+    "error_fetching_data": "Wystąpił błąd podczas pobierania danych historii z API.",
+    "no_components_found": "Parser nie zidentyfikował żadnych konkretnych komponentów/testpointów z tej awarii do podświetlenia.",
+    "table_result": "Wynik",
+    "table_test": "Test",
+    "table_value": "Wartość",
+    "table_unit": "Jednostka"
   }
 }

@@ -19,7 +19,8 @@
     "help": "Pomoc",
     "toggle_outlines": "Pokaż/Ukryj obrys płytki",
     "load_bom": "Wczytaj listę Part Number (plik .json)",
-    "hide_comps_no_bom": "Ukryj komponenty bez przypisanego Part Number"
+    "hide_comps_no_bom": "Ukryj komponenty bez przypisanego Part Number",
+    "traceability": "Historia Płytki"
   },
   "leftpanel": {
     "tab_components": "Komp.",
@@ -83,5 +84,19 @@
       "labels": "Pokaż/ukryj etykiety",
       "clear_selection": "Wyczyść zaznaczenie / Zamknij panele"
     }
+  },
+  "traceability": {
+    "title": "History of serial number",
+    "sn_placeholder": "Enter serial number...",
+    "search_btn": "Search",
+    "missing_api_root": "Missing TRACEABILITY_API_ROOT configuration in config.json!",
+    "measures_title": "Measurement Details",
+    "show_on_board": "Show defects on board",
+    "error_fetching_data": "An error occurred while fetching history data from the API.",
+    "no_components_found": "The parser could not identify any specific components/testpoints from this failure to highlight.",
+    "table_result": "Result",
+    "table_test": "Test",
+    "table_value": "Value",
+    "table_unit": "Unit"
   }
 }
