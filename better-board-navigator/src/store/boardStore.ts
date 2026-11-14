@@ -132,7 +132,8 @@ export const useBoardStore = create<BoardState>((set) => ({
     selectedNet: null,
     highlightedPrefix: null,
     componentToFocus: null,
-    currentSide: 'T'
+    currentSide: 'T',
+    failedComponents: new Set()
   }),
 
   toggleLeftPanel: () => set((state) => ({ isLeftPanelOpen: !state.isLeftPanelOpen })),
@@ -171,7 +172,8 @@ export const useBoardStore = create<BoardState>((set) => ({
     selectedNet: null,
     inspectedComponents: [],
     highlightedPrefix: null,
-    highlightedPartNumber: null
+    highlightedPartNumber: null,
+    failedComponents: new Set()
   }),
 
   selectNet: (net) => set({ 

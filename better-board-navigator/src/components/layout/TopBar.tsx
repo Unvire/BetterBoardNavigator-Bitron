@@ -183,7 +183,7 @@ export default function TopBar() {
           className={actionBtnClass} 
           title={t('topbar.traceability')}
         >
-          <Activity size={20} className={isTraceabilityOpen ? "text-rose-500" : "text-rose-400 opacity-80"} />
+          <Activity size={20} className={isTraceabilityOpen ? "text-blue-500" : "opacity-70"} />
         </button>
 
         <div className="w-px h-6 bg-slate-300 dark:bg-slate-600 mx-2"></div>

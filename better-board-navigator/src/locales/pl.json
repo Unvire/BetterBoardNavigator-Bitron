@@ -86,17 +86,22 @@
     }
   },
   "traceability": {
-    "title": "History of serial number",
-    "sn_placeholder": "Enter serial number...",
-    "search_btn": "Search",
-    "missing_api_root": "Missing TRACEABILITY_API_ROOT configuration in config.json!",
-    "measures_title": "Measurement Details",
-    "show_on_board": "Show defects on board",
-    "error_fetching_data": "An error occurred while fetching history data from the API.",
-    "no_components_found": "The parser could not identify any specific components/testpoints from this failure to highlight.",
-    "table_result": "Result",
+    "title": "Historia numeru seryjnego",
+    "sn_placeholder": "Wpisz numer seryjny...",
+    "search_btn": "Szukaj",
+    "missing_api_root": "Brak konfiguracji TRACEABILITY_API_ROOT w pliku config.json!",
+    "measures_title": "Szczegóły pomiarów",
+    "show_on_board": "Pokaż błędy na płytce",
+    "error_fetching_data": "Wystąpił błąd podczas pobierania danych historii z API.",
+    "no_components_found": "Parser nie zidentyfikował żadnych konkretnych komponentów/testpointów z tej awarii do podświetlenia.",
+    "table_result": "Wynik",
     "table_test": "Test",
-    "table_value": "Value",
-    "table_unit": "Unit"
+    "table_value": "Wartość",
+    "table_unit": "Jednostka",
+    "table_main_status": "Status",
+    "table_main_date": "Data",
+    "table_main_code": "Kod",
+    "table_main_phase": "Faza"
+    
   }
 }

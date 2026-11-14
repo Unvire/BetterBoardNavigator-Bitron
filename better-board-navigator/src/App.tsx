@@ -43,7 +43,7 @@ function App() {
         
         if (state.inspectedComponents.length > 0) {
           state.setInspectedComponents([]);
-        } else if (state.selectedNet || state.selectedComponents.size > 0 || state.highlightedPrefix) {
+        } else if (state.selectedNet || state.selectedComponents.size > 0 || state.highlightedPrefix || state.failedComponents) {
           state.clearSelection();
         }
       }
