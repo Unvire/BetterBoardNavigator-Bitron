@@ -8,6 +8,12 @@ export interface BOMItem {
   description?: string;
 }
 
+const isUseDarkMode = (): boolean => {
+  const savedTheme = localStorage.getItem('bbn-theme');
+
+  return savedTheme === 'dark';
+};
+
 
 interface BoardState {
   workerStatus: WorkerStatus;
@@ -89,7 +95,7 @@ export const useBoardStore = create<BoardState>((set) => ({
   boardData: null,
   isLeftPanelOpen: true,
 
-  isDarkMode: true,
+  isDarkMode: isUseDarkMode(),
   showOutlines: true,
   
   currentSide: 'T',
@@ -132,7 +138,12 @@ export const useBoardStore = create<BoardState>((set) => ({
 
   toggleLeftPanel: () => set((state) => ({ isLeftPanelOpen: !state.isLeftPanelOpen })),
   
-  toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
+  toggleDarkMode: () => set((state) => {
+    const newTheme = !state.isDarkMode;
+    localStorage.setItem('bbn-theme', newTheme ? 'dark' : 'light');
+    
+    return { isDarkMode: newTheme };
+  }),
   
   toggleOutlines: () => set((state) => ({ showOutlines: !state.showOutlines })),
   
