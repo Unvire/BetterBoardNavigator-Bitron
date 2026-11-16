@@ -10,8 +10,9 @@ export interface BOMItem {
 
 const isUseDarkMode = (): boolean => {
   const savedTheme = localStorage.getItem('bbn-theme');
+  const isFirstTime = savedTheme === undefined || savedTheme === null;
 
-  return savedTheme === 'dark';
+  return savedTheme === 'dark' || isFirstTime;
 };
 
 
