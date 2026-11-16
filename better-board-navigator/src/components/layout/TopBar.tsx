@@ -159,7 +159,7 @@ export default function TopBar() {
           onClick={() => bomInputRef.current?.click()}
           disabled={!boardData}
           className={`${actionBtnClass} ${!boardData ? 'opacity-50 cursor-not-allowed' : ''}`} 
-          title={`${t('topbar.load_bom')} [Ctrl+P]`}
+          title={`${t('topbar.load_bom')} [P]`}
         >
           <Database size={20} className={partNumbers ? "text-cyan-500" : ""} />
         </button>
@@ -181,7 +181,7 @@ export default function TopBar() {
         <button 
           onClick={toggleTraceability} 
           className={actionBtnClass} 
-          title={t('topbar.traceability')}
+          title={`${t('topbar.traceability')} [H]`}
         >
           <Activity size={20} className={isTraceabilityOpen ? "text-blue-500" : "opacity-70"} />
         </button>

@@ -52,9 +52,12 @@ export function useKeyboardShortcuts() {
 
         case 'p':
           e.preventDefault();
-          if (e.ctrlKey || e.metaKey) {
-            document.getElementById('bom-file-input')?.click();
-          };
+          document.getElementById('bom-file-input')?.click();
+          break;
+        
+        case 'h':
+          e.preventDefault();
+          store.toggleTraceability();
           break;
       }
     };
