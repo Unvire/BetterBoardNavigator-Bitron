@@ -84,7 +84,8 @@
       "rotate_cw": "Rotate Clockwise",
       "rotate_ccw": "Rotate Counter-Clockwise",
       "labels": "Toggle component labels",
-      "clear_selection": "Clear selection / Close panels"
+      "clear_selection": "Clear selection / Close panels",
+      "traceability": "Toggle tool for checking history of a serial number"
     }
   },
   "traceability": {

@@ -82,7 +82,8 @@
       "rotate_cw": "Obróć w prawo",
       "rotate_ccw": "Obróć w lewo",
       "labels": "Pokaż/ukryj etykiety",
-      "clear_selection": "Wyczyść zaznaczenie / Zamknij panele"
+      "clear_selection": "Wyczyść zaznaczenie / Zamknij panele",
+      "traceability": "Pokaż/ukryj narzędzie do sprawdzania historii numeru seryjnego"
     }
   },
   "traceability": {
