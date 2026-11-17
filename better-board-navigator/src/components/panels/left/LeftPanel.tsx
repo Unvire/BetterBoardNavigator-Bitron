@@ -28,7 +28,6 @@ export default function LeftPanel() {
 
   const handleTabChange = (tab: LeftPanelTab) => {
     setActiveLeftTab(tab);
-    setSearchQuery('');
   };
 
 
