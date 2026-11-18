@@ -48,8 +48,8 @@ By running CAD/PDF parsing entirely client-side using Web Assembly (Pyodide in a
    npm install
    ```
 
-3. Configure environment (Optional):
-   Create a `.env` file based on `.env.example` if you need to configure external API endpoints for Traceability or GitHub Pages deployment paths.
+3. Configure traceability root url:
+   Set proper traceability API root IP in config file: `./better-board-navigator/public/config.json`
 
 ### Development
 
@@ -73,12 +73,12 @@ The compiled files will be output to the `dist` directory. These static files ca
 
 1. Open the application.
 2. Click the **CAD Upload** button (or press `Ctrl+O`) in the top navigation bar to load a supported schematic file (`.tgz`, `.cad`, `.gcd`, `.zip`). Be careful with odb++ files. Component can be rotated 180deg.
-3. (Optional) Click the **Database** icon (or press `Ctrl+P`) to load a Bill of Materials (`BOM.json`) to map Part Numbers to components. `BOM.json` is supposed to be a flat json map: {componentName}: {partNumber}:
+3. (Optional) Click the **Database** icon (or press `Ctrl+P`) to load a Bill of Materials (`BOM.json`) to map Part Numbers to components. `BOM.json` is supposed to be a flat json map: {componentName}: {partNumber, description}:
 ```json
 {
-    "C1": "pn1",
-    "C2": "pn1",
-    "C3": "pn2",
+    "C1": { "partNumber": "pn1", "description": "description1"},
+    "C2": { "partNumber": "pn1", "description": "description1"},
+    "C3": { "partNumber": "pn2", "description": "description2"},
     "...": "..."
 }
 ```
@@ -89,12 +89,13 @@ The compiled files will be output to the `dist` directory. These static files ca
 ## Keyboard Shortcuts
 
 - `Ctrl` + `O` - Load CAD file
-- `Ctrl` + `P` - Load BOM (Part Numbers) file
+- `P` - Load BOM (Part Numbers) file
 - `Space` - Switch view side (Top / Bottom)
 - `F` - Flip (Mirror horizontally)
 - `R` - Rotate Clockwise (90°)
 - `Shift` + `R` - Rotate Counter-Clockwise (90°)
 - `L` - Toggle component labels (Names)
+- `H` - Toggles traceability serial history modal window
 - `Esc` - Clear selection / Close Inspector panel
 
 ## Architecture Notes
